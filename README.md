@@ -1,1 +1,1 @@
-# stone-compiler
+# Stone Compiler
