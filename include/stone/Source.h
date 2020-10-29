@@ -1,0 +1,7 @@
+
+
+namespace stone {
+
+	class Source {
+	};
+}

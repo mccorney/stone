@@ -1,0 +1,6 @@
+
+
+namespace stone{
+namespace ast {	
+}
+}
