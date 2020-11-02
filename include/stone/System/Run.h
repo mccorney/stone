@@ -1,0 +1,4 @@
+
+namespace stone{
+	void Run();
+}
