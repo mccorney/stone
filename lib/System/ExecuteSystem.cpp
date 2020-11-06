@@ -2,6 +2,10 @@
 #include "stone/System/ExecuteSystem.h"
 
 
-int stone::ExecuteSystem() {
+static int PrintSystemHelp() {
 	return 0;
+}
+
+int stone::ExecuteSystem() {
+
 }
