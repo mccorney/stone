@@ -1,7 +1,8 @@
 
 class Compiler {
 	public:
-		//Frontend; 
+		Builder *B;
+	public:
 		//ASTState *State;
 		//ASTScope *Scope; 
 }
