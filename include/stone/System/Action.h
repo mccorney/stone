@@ -1,12 +1,12 @@
 
 
-class CompilerAction;
-
-class CompilerAction {
-	public: 
-		std::vector<CompilerAction*> Deps; 
-		std::vector<CompilerAction*> Consumers;
+class Action {
 	public:
-		CompilerAction(Compiler* C); 
+		int ID; 
 
+	public: 
+		//std::vector<Action*> Deps; 
+		//std::vector<Action*> Consumers;
+	public:
+		Action(Compiler* C); 
 };
