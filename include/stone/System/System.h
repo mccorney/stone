@@ -1,9 +1,11 @@
 
 
-class System {
-	// llvm::PriorityQueue<Process*> ProcessQueue; 
-	
+namespace stone {
+
+class System final {
 	public:
-		void SpawnCompile();
-		void SpawnLink(); 
+		//SystemOptions Options;
+	// llvm::PriorityQueue<Process*> ProcessQueue; 
+	public: 
+};
 }

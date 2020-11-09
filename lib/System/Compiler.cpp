@@ -1,6 +1,7 @@
 
 class Compiler {
 	public:
+		//Analysis; 
 		//Action* A; 
 		//Builder *B;
 	public:
@@ -8,9 +9,3 @@ class Compiler {
 		//ASTScope *Scope; 
 }
 
-void Compiler::Clean() {
-
-}
-void Compiler::Compile() {
-
-}
