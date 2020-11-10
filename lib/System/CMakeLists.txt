@@ -1,37 +1,14 @@
-AST.cpp
-ASTConsumer.cpp
-ASTState.cpp
-Builtins.cpp
-Check.cpp
-CheckDecl.cpp
-CheckExpr.cpp
-Checker.cpp
-Compile.cpp
-Decl.cpp
+set(LLVM_LINK_COMPONENTS
+   Core
+   Support
+	 MC
+)
+set(stone_system_sources
 Compiler.cpp
-Diagnostics.cpp
-Driver.cpp
-ExecuteDriver.cpp
-ExecuteFrontend.cpp
-Expr.cpp
-FileManager.cpp
-Frontend.cpp
-FrontendAction.cpp
-GenDecl.cpp
-GenExpr.cpp
-GenStmt.cpp
-Job.cpp
-Lexer.cpp
-Main.cpp
-Options.cpp
-Parse.cpp
-ParseDecl.cpp
-ParseExpr.cpp
-ParseStmt.cpp
-Parser.cpp
-Semantics.cpp
-Source.cpp
-SourceLocation.cpp
-SourceManager.cpp
-Stmt.cpp
+)
+add_stone_library(StoneSystem
+	${stone_system_sources}
+)
+
+
 
