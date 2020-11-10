@@ -1,19 +1,24 @@
-set(clang_include_files
-	${CLANG_SOURCE_DIR}/include/clang/Parser/*.h
+set(stone_include_files
+	${STONE_SOURCE_DIR}/include/stone/Core/*.h
+	${STONE_SOURCE_DIR}/include/stone/Analysis/*.h
+	${STONE_SOURCE_DIR}/include/stone/System/*.h
+	${STONE_SOURCE_DIR}/include/stone/Gen/*.h
 )
-set(clang_lib_files
-	${CLANG_SOURCE_DIR}/lib/Parser/*.cpp
+set(stone_lib_files
+	${STONE_SOURCE_DIR}/lib/Core/*.cpp
+	${STONE_SOURCE_DIR}/lib/Analysis/*.cpp
+	${STONE_SOURCE_DIR}/lib/System/*.cpp
+	${STONE_SOURCE_DIR}/lib/Gen/*.cpp
 )
-
 find_program(CLANG_FORMAT clang-format)
-
 if(CLANG_FORMAT)
-	add_custom_target(clang-fmt
+	add_custom_target(
+		stone-fmt
 		clang-format
 		-i
 		-style=llvm
-		${clang_lib_files}
-		${clang_include_files}
-	)
+		${stone_lib_files}
+		${stone_include_files}
+		)
 
 endif()
