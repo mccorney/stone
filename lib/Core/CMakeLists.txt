@@ -1,37 +1,25 @@
-AST.cpp
-ASTConsumer.cpp
-ASTState.cpp
-Builtins.cpp
-Check.cpp
-CheckDecl.cpp
-CheckExpr.cpp
-Checker.cpp
-Compile.cpp
-Decl.cpp
-Compiler.cpp
-Diagnostics.cpp
-Driver.cpp
-ExecuteDriver.cpp
-ExecuteFrontend.cpp
-Expr.cpp
-FileManager.cpp
-Frontend.cpp
-FrontendAction.cpp
-GenDecl.cpp
-GenExpr.cpp
-GenStmt.cpp
-Job.cpp
-Lexer.cpp
-Main.cpp
-Options.cpp
-Parse.cpp
-ParseDecl.cpp
-ParseExpr.cpp
-ParseStmt.cpp
-Parser.cpp
-Semantics.cpp
-Source.cpp
-SourceLocation.cpp
-SourceManager.cpp
-Stmt.cpp
+
+set(stone_core_sources
+	AST.cpp
+	ASTState.cpp
+	ASTConsumer.cpp
+	ASTScope.cpp
+	Builtins.cpp
+	Decl.cpp
+	Diag.cpp
+	Expr.cpp
+	FileMgr.cpp
+	Module.cpp
+	Source.cpp
+	SrcLoc.cpp
+	SrcMgr.cpp
+	Stmt.cpp
+	Visitor.cpp
+	Walker.cpp
+)
+add_stone_library(StoneCore
+	${stone_core_sources}
+)
+
+
 
