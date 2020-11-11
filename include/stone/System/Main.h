@@ -1,4 +1,0 @@
-
-namespace stone {
-	int Main();
-}

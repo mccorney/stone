@@ -1,6 +1,5 @@
 
 
-int main(const argc, const char** args) {
-
-	return 0; 	
+int main(const int argc, const char** args) {
+	return stone::Run(argc, args); 	
 }

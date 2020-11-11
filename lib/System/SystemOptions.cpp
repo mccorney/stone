@@ -1,6 +1,2 @@
 
 
-
-int stone::PrintSystemOptions() {
-
-}

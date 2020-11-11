@@ -1,6 +1,7 @@
 namespace stone {
 
-struct SystemOptions final : public BaseOptions { 
+struct SystemOptions final : public BaseOptions {
+	
 };
 
 }

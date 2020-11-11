@@ -1,7 +1,4 @@
 
 namespace stone{
-
-	void Run(llvm::ArrayReff<const char*> Args,CompilerConsumer* Consumer); 
-	void Run(llvm::ArrayRef<const char *> Args, const char *FirstArg);
-        
+	int Run(const int argc, const char** args);
 }
