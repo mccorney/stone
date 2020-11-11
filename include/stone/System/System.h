@@ -8,12 +8,15 @@ class System final {
 	public:
 		//Action *A; // The action that creates the work 
 	// llvm::PriorityQueue<Process*> ProcessQueue;
-	// llvm::PriorityQueue<Work> WorkQueue; 
-	public:
+	// llvm::PriorityQueue<Work> WorkQueue;
+	private:
 		void BuildOpts(llvm::ArrayRef<const char*> Args);
-
+		void BuildWorkQueue(); 
+	public:
+		void Init(llvm::ArrayRef<const char*> Args);
 	public:
 		bool Run(); 
 };
 
-} 
+}
+

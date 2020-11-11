@@ -6,8 +6,6 @@ class Compiler final {
 	public:
 		//llvm::PriorityQueue<Action*> ActionQueue;
 	public:
-		BuildOpts(llvm::ArrayRef<const char*> Args);
-
-	void Run(); 
+		void Init(llvm::ArrayRef<const char*> Args);
+		bool Run(); 
 };
-
