@@ -1,11 +1,8 @@
 namespace stone {
 
-class CompilerOptions final : public BaseOptions {
-	public:
-		GenOptions			GenOpts; 
-		AnalysisOptions AnalysisOpts; 
-	public:
-		void override Build(llvm::ArrayRef<const char*> Args); 
+struct CompilerOptions final : public BaseOptions {
+	GenOptions			GenOpts; 
+	AnalysisOptions AnalysisOpts;  
 };
 
 }
