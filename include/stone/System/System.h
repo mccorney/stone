@@ -4,8 +4,12 @@ namespace stone {
 
 class System final {
 	public:
-		//SystemOptions Options;
-	// llvm::PriorityQueue<Process*> ProcessQueue; 
+		SystemOptions Opts;
+	public:
+
+		//Action *A; // The action that creates the work 
+	// llvm::PriorityQueue<Process*> ProcessQueue;
+	// llvm::PriorityQueue<Work> WorkQueue; 
 	public: 
 };
-}
+} 

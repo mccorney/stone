@@ -1,0 +1,5 @@
+
+
+class Work : public  Process {
+
+}
