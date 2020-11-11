@@ -1,6 +1,9 @@
 
 
 namespace stone{
-namespace ast {	
-}
+class AST {
+
+};
+
+
 }
