@@ -20,10 +20,7 @@ include_directories(BEFORE
 
 set_stone_build_properties(STONE)
 
-
 message(STATUS "Stone version: 0.0.1")
-
-
 
 if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
   install(DIRECTORY include/stone 
