@@ -1,2 +1,2 @@
-add_clang_subdirectory(stone)
+add_subdirectory(stone)
 

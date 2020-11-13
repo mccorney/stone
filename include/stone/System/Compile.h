@@ -1,4 +1,4 @@
 
 namespace stone {
-	int Compile();
+	int Compile(llvm::ArrayRef<const char*> Args, CompilerConsumer *Consumer);
 }

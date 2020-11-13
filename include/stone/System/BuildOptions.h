@@ -1,5 +1,5 @@
 
 
-struct BaseOptions {
+struct BuildOptions {
 	ActionKind Action;  
 };

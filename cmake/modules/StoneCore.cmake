@@ -3,26 +3,9 @@ macro(add_stone_subdirectory name)
   add_llvm_subdirectory(STONE TOOL ${name})
 endmacro()
 
-set(STONE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}") 
-
-# STONELIB_DIR is the directory in the build tree where Stone resource files
-# should be placed.  Note that $CMAKE_CFG_INTDIR expands to "." for
-# single-configuration builds.
-set(STONELIB_DIR
-    "${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib/stone")
-
-set(STONESTATICLIB_DIR
-    "${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib/stone_static")
-
-
 macro(add_stone_library name)
 
-	cmake_parse_arguments(ARG
-    "SHARED"
-		"STATIC"
-    "ADDITIONAL_HEADERS"
-    ${ARGN})
-
+	cmake_parse_arguments(ARG "SHARED" "STATIC" "ADDITIONAL_HEADERS" ${ARGN})
 	set(srcs)
 
   if(MSVC_IDE OR XCODE)
@@ -94,13 +77,13 @@ macro(add_stone_library name)
   endif()
 
   set_target_properties(${name} PROPERTIES FOLDER "Stone libraries")
-  set_stone_windows_version_resource_properties(${name})
+	#set_stone_windows_version_resource_properties(${name})
 endmacro(add_stone_library)
 
 macro(add_stone_executable name)
   add_llvm_executable( ${name} ${ARGN} )
   set_target_properties(${name} PROPERTIES FOLDER "Stone executables")
-  set_stone_windows_version_resource_properties(${name})
+	#set_stone_windows_version_resource_properties(${name})
 endmacro(add_stone_executable)
 
 macro(add_stone_tool name)

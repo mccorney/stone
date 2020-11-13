@@ -1,6 +1,0 @@
-
-
-
-int std::PrintCompilerOptions() {
-
-}

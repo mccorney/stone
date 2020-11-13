@@ -5,15 +5,11 @@ project(Stone)
 # we can include cmake files from this directory.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-
 include(CMakeParseArguments)
-
-#include(StoneCore)
-#include(StoneTblGen)
-#include(StoneFormat)
-#include(StoneUnitTests)
-
-
+include(StoneProperties)
+include(StoneCore)
+include(StoneTblGen)
+include(StoneFormat)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -22,13 +18,7 @@ include_directories(BEFORE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-
-set(STONE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(STONE_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-set(STONE_CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
-set(STONE_MAIN_INCLUDE_DIR "${STONE_SOURCE_DIR}/include")
-set(STONE_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
-
+set_stone_build_properties(STONE)
 
 #add_definitions( -D_GNU_SOURCE )
 

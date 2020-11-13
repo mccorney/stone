@@ -1,6 +1,6 @@
 
 
-class Analysis {
-	// ASTState; 
+class Analysis final {
+	// AST; 
 	// Module 
 };

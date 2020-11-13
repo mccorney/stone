@@ -1,6 +1,21 @@
 
 set(stone_system_sources
-Compiler.cpp
+	Action.cpp
+	Compile.cpp
+	Compiler.cpp
+	CompileProcess.cpp
+	Compiler.cpp
+	CompilerConsumer.cpp
+	CompilerFile.cpp
+	LangStd.cpp
+	Link.cpp
+	LinkProcess.cpp
+	Options.cpp
+	Process.cpp
+	Run.cpp
+	System.cpp
+	ToolChain.cpp
+	Work.cpp
 )
 add_stone_library(StoneSystem
 	${stone_system_sources}
