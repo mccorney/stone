@@ -1,24 +1,11 @@
-@CLANG_CONFIG_CODE@
 
-find_package(LLVM REQUIRED CONFIG
-             HINTS "@CLANG_CONFIG_LLVM_CMAKE_DIR@")
-
-set(CLANG_EXPORTED_TARGETS "@CLANG_EXPORTS@")
-set(CLANG_CMAKE_DIR "@CLANG_CONFIG_CMAKE_DIR@")
-set(CLANG_INCLUDE_DIRS "@CLANG_CONFIG_INCLUDE_DIRS@")
-
-# Provide all our library targets to users.
-include("@CLANG_CONFIG_EXPORTS_FILE@")
 
 
 file(GLOB_RECURSE
 	ALL_CXX_SOURCE_FILES
 	*.[chi]pp *.[chi]xx *.cpp *.cc *.h *.hh *.[CHI]
 )
-
-
 macro(stone_properties product)
-
   set(PATH_TO_LLVM_SOURCE "${CMAKE_SOURCE_DIR}")
   set(PATH_TO_LLVM_BUILD "${CMAKE_BINARY_DIR}")
   set(${product}_PATH_TO_CLANG_BUILD "${CMAKE_BINARY_DIR}")
@@ -40,4 +27,14 @@ macro(stone_properties product)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nested-anon-types")
   endif()
 endmacro()
+
+macro(stone_dir)
+set(STONE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(STONE_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+set(STONE_CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+set(STONE_MAIN_INCLUDE_DIR "${STONE_SOURCE_DIR}/include")
+set(STONE_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+
+endmacro()
+
 
