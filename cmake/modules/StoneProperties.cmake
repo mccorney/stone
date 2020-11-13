@@ -1,5 +1,3 @@
-# This file allows users to call find_package(Clang) and pick up our targets.
-
 @CLANG_CONFIG_CODE@
 
 find_package(LLVM REQUIRED CONFIG
