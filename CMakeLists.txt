@@ -9,7 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 include(CMakeParseArguments)
 
 #include(StoneCore)
-include(StoneTblGen)
+#include(StoneTblGen)
 #include(StoneFormat)
 #include(StoneUnitTests)
 
@@ -30,7 +30,7 @@ set(STONE_MAIN_INCLUDE_DIR "${STONE_SOURCE_DIR}/include")
 set(STONE_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 
-add_definitions( -D_GNU_SOURCE )
+#add_definitions( -D_GNU_SOURCE )
 
 #add_subdirectory(include)
 add_subdirectory(lib)

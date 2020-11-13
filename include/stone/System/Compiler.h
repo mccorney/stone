@@ -7,5 +7,7 @@ class Compiler final {
 		//llvm::PriorityQueue<Action*> ActionQueue;
 	public:
 		void Init(llvm::ArrayRef<const char*> Args);
-		bool Run(); 
+		bool Run();
+	public:
+		Analysis *GetAnalysis(); 
 };

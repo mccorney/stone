@@ -1,8 +1,9 @@
 
 
 class Action {
+	Compiler *C; 
 	public:
-		int ID; 
+		AtionKind Kind; 
 
 	public: 
 		//std::vector<Action*> Deps; 

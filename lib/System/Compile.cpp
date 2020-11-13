@@ -1,5 +1,5 @@
 
-static int stone::Compile(Compiler* C, CompilerConsumer* Consumer) {
+static int Compile(Compiler* C, CompilerConsumer* Consumer) {
 	return 0;
 }
 int stone::Compile(CompilerConsumer* Consumer) {
