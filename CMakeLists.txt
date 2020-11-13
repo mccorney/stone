@@ -20,6 +20,39 @@ include_directories(BEFORE
 
 set_stone_build_properties(STONE)
 
+
+message(STATUS "Stone version: 0.0.1")
+
+
+
+if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
+  install(DIRECTORY include/stone 
+    DESTINATION include
+    FILES_MATCHING
+    PATTERN "*.def"
+    PATTERN "*.h"
+    PATTERN "config.h" EXCLUDE
+	)
+
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/stone
+    DESTINATION include
+    FILES_MATCHING
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "*.inc"
+    PATTERN "*.h"
+    )
+
+  install(PROGRAMS utils/bash-autocomplete.sh
+    DESTINATION share/stone
+    )
+endif()
+
+add_definitions( -D_GNU_SOURCE )
+
+option(STONE_BUILD_TOOLS
+  "Build the Stone tools. If OFF, just generate build targets." ON)
+
+
 #add_definitions( -D_GNU_SOURCE )
 
 #add_subdirectory(include)
