@@ -16,6 +16,10 @@ set(stone_system_sources
 	System.cpp
 	ToolChain.cpp
 	Work.cpp
+
+	LINK_LIBS
+	StoneAnalysis
+	StoneGen
 )
 add_stone_library(StoneSystem
 	${stone_system_sources}

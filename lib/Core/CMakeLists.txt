@@ -1,7 +1,6 @@
 
 set(stone_core_sources
 	AST.cpp
-	ASTState.cpp
 	ASTConsumer.cpp
 	ASTScope.cpp
 	Builtins.cpp
@@ -10,9 +9,9 @@ set(stone_core_sources
 	Expr.cpp
 	FileMgr.cpp
 	Module.cpp
-	Source.cpp
 	SrcLoc.cpp
 	SrcMgr.cpp
+	Stats.cpp
 	Stmt.cpp
 	Visitor.cpp
 	Walker.cpp
