@@ -1,9 +1,9 @@
 
 
 namespace stone{
-class AST {
+
+class AST final {
 
 };
-
 
 }

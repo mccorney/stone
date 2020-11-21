@@ -1,7 +1,0 @@
-
-
-namespace stone {
-
-	class Source {
-	};
-}
