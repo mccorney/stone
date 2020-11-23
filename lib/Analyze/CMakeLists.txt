@@ -2,6 +2,7 @@
 set(stone_analyze_sources
 	Analysis.cpp
 	Analyze.cpp
+	Analyzer.cpp
 	Check.cpp
 	Checker.cpp
 	Lexer.cpp

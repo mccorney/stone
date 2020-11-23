@@ -3,10 +3,11 @@
 
 namespace stone{
 namespace ret{
-	enum ID : int {
+	enum Kind : int {
 		ok	=	0,
 		err = 1 
 	};
 }
 }
 #endif
+

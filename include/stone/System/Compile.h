@@ -5,8 +5,8 @@
 
 namespace stone {
 
-	class CompilerConsumer; 
+	class Pipeline; 
 	int Compile(llvm::ArrayRef<const char *> Args, const char *Arg0, void *MainAddr, 
-			CompilerConsumer *Consumer = nullptr);
+			Pipeline *P = nullptr);
 }
 #endif 

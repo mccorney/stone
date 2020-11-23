@@ -1,25 +1,25 @@
+#include "stone/Analyze/Analyze.h"
+#include "stone/Gen/Gen.h"
+#include "stone/Core/Ret.h"
 #include "stone/System/Compile.h"
 #include "stone/System/Compiler.h"
-#include "stone/System/CompilerConsumer.h"
+#include "stone/SubSys.h"
 
 using namespace stone;
 
-/*
-static int Compile(Compiler* C, CompilerConsumer* Consumer) {
-	return 0;
+namespace stone {
+	int Compile(Compiler& C, Pipeline* P) {
+		return ret::ok;
+	}
 }
-*/
-
-
 
 int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0, void *MainAddr, 
-			CompilerConsumer *Consumer) {
-	//stone::Compiler(..., nullptr); 
-	//Compiler C; 
-	//C.Init(Args);
-	//return C.Run();
+			Pipeline *P) {
+	
+	Compiler C;
+	C.Init(Args); 
 
-	return 0; 
+	return stone::Compile(C, P); 
 }
 
 
