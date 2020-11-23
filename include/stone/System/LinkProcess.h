@@ -1,6 +1,5 @@
 
 
-class LinkProcess {
-	public:
-		LinkProcess(Process* P); 
+class LinkProcess : final Process {
+	public: 
 };

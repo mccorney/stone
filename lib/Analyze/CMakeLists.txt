@@ -1,5 +1,5 @@
 
-set(stone_analysis_sources
+set(stone_analyze_sources
 	Analysis.cpp
 	Analyze.cpp
 	Check.cpp
@@ -12,8 +12,8 @@ set(stone_analysis_sources
 	LINK_LIBS
 	StoneCore
 )
-add_stone_library(StoneAnalysis
-	${stone_analysis_sources}
+add_stone_library(StoneAnalyze
+	${stone_analyze_sources}
 )
 
 

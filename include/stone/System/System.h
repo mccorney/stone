@@ -1,10 +1,13 @@
+#ifndef STONE_SYSTEM_SYSTEM_H
+#define STONE_SYSTEM_SYSTEM_H
 
+#include "llvm/ADT/ArrayRef.h"
 
 namespace stone {
-
 class System final {
+	//Compilation 
 	public:
-		//SystemOptions Opts;
+		//SystemOptions SysOpts;
 	public:
 		//Action *A; // The action that creates the work 
 	// llvm::PriorityQueue<Process*> ProcessQueue;
@@ -13,10 +16,11 @@ class System final {
 		//void BuildOpts(llvm::ArrayRef<const char*> Args);
 		void BuildWorkQueue(); 
 	public:
-		//void Init(llvm::ArrayRef<const char*> Args);
+		System();
+		void Init(llvm::ArrayRef<const char*> Args);
 	public:
 		bool Run(); 
 };
 
 }
-
+#endif

@@ -1,9 +1,31 @@
-
+set(LLVM_LINK_COMPONENTS
+  Analysis
+  BitReader
+  BitWriter
+  Core
+  Coroutines
+  Coverage
+  IPO
+  IRReader
+  AggressiveInstCombine
+  InstCombine
+  Instrumentation
+  LTO
+  Linker
+  MC
+  Object
+  Passes
+  ProfileData
+  Remarks
+  ScalarOpts
+  Support
+  Target
+  TransformUtils
+  )
 set(stone_gen_sources
 	Backend.cpp
 	Gen.cpp
 	Transformer.cpp
-
 
 	LINK_LIBS
 	StoneCore
