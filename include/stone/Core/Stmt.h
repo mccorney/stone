@@ -1,6 +1,9 @@
 #ifndef STONE_CORE_STMT_H
 #define STONE_CORE_STMT_H
 
+#include "stone/Core/ASTNode.h"
+
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -19,8 +22,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace stone{
-class Stmt  {
+namespace stone {
+class Stmt  : public ASTNode {
 public:
   enum Kind {
   };

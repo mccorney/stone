@@ -1,6 +1,8 @@
 #ifndef STONE_CORE_DECL_H
 #define STONE_CORE_DECL_H
 
+#include "stone/Core/ASTNode.h"
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -21,7 +23,7 @@
 
 
 namespace stone{
-class alignas(8) Decl {
+class alignas(8) Decl : public ASTNode {
 public:
   enum Kind {
   };

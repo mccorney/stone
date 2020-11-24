@@ -55,9 +55,7 @@ int Run(llvm::ArrayRef<const char*> Args) {
   //auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
 	// -compile ?
   auto Arg0 = Args[1]; 
-	if(Arg0 == "-compile") {
-		//fmt::Print("compile"); 
-
+	if(Arg0 == "-compile") { 
 		//return stone::Compile(llvm::makeArrayRef(Args.data() +2,
                                                 //Args.data() + Args.size()), Arg0) 
 	}

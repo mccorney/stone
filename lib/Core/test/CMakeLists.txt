@@ -4,6 +4,7 @@ set(LLVM_LINK_COMPONENTS
 )
 
 add_stone_unittest(StoneCoreTests
+	BuiltinTest.cpp
   DiagTest.cpp
 	FileMgrTest.cpp
 	SrcMgrTest.cpp

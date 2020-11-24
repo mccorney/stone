@@ -12,7 +12,6 @@ set(stone_core_sources
 	Decl.cpp
 	DeclContext.cpp
 	Diag.cpp
-	DiagTest.cpp
 	Expr.cpp
 	FileMgr.cpp
 	Fmt.cpp

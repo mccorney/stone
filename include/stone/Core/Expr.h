@@ -1,6 +1,9 @@
 #ifndef STONE_CORE_EXPR_H
 #define STONE_CORE_EXPR_H
 
+#include "stone/Core/ASTNode.h"
+
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -21,7 +24,7 @@
 
 
 namespace stone{
-class Expr  {
+class Expr  : public ASTNode {
 public:
   enum Kind {
   };
