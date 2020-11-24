@@ -31,5 +31,5 @@ set(stone_core_sources
 add_stone_library(StoneCore
 	${stone_core_sources}
 )
-add_subdirectory(tests)
+add_subdirectory(test)
 

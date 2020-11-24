@@ -16,7 +16,7 @@ set(stone_analyze_sources
 add_stone_library(StoneAnalyze
 	${stone_analyze_sources}
 )
-add_subdirectory(tests)
+add_subdirectory(test)
 
 
 

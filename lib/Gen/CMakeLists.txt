@@ -33,4 +33,4 @@ set(stone_gen_sources
 add_stone_library(StoneGen
 	${stone_gen_sources}
 )
-add_subdirectory(tests)
+add_subdirectory(test)
