@@ -3,6 +3,7 @@ set(LLVM_LINK_COMPONENTS
   Core
   Support
   )
+
 set(stone_core_sources
 	ASTContext.cpp
 	ASTConsumer.cpp
@@ -11,6 +12,7 @@ set(stone_core_sources
 	Decl.cpp
 	DeclContext.cpp
 	Diag.cpp
+	DiagTest.cpp
 	Expr.cpp
 	FileMgr.cpp
 	Fmt.cpp
@@ -24,10 +26,10 @@ set(stone_core_sources
 	Stmt.cpp
 	Visitor.cpp
 	Walker.cpp
+
 )
 add_stone_library(StoneCore
 	${stone_core_sources}
 )
-
-
+add_subdirectory(tests)
 

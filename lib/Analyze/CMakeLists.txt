@@ -6,8 +6,10 @@ set(stone_analyze_sources
 	Check.cpp
 	Checker.cpp
 	Lexer.cpp
+	LexerTest.cpp
 	Parse.cpp
 	Parser.cpp
+	ParserTest.cpp
 	Token.cpp
 
 	LINK_LIBS

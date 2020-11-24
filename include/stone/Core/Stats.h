@@ -1,9 +1,9 @@
-#ifndef STONE_CORE_ASTCONTEXT_H
-#define STONE_CORE_ASTCONTEXT_H
+#ifndef STONE_CORE_STATS_H
+#define STONE_CORE_STATS_H
 
 namespace stone{
 
-class Stats final {
+class Stats {
 
 };
 }

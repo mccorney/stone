@@ -10,6 +10,7 @@ include(StoneProperties)
 include(StoneCore)
 include(StoneTblGen)
 include(StoneFormat)
+include(StoneTests)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

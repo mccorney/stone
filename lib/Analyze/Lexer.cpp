@@ -12,9 +12,6 @@ void Lexer::Lex(Token& T) {
 
 }
 */
-
-
-
 void Lexer::LexChar() {
 
 }

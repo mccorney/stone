@@ -3,6 +3,7 @@
 
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
+#include "stone/Core/Stats.h"
 #include "stone/Analyze/AnalyzeOptions.h"
 
 #include <memory>
@@ -15,7 +16,8 @@ class Analysis final {
 	private:
 		std::unique_ptr<ASTContext> AC; 
 		std::unique_ptr<stone::Module> M; 
- 
+		std::unique_ptr<Stats> ST; 
+
 	public:
 		//TODO: Diag *DG; 
 		Analysis() = delete;
@@ -26,6 +28,8 @@ class Analysis final {
 	public:
 		ASTContext &GetASTContext(){ return *AC.get(); }
 		stone::Module &GetModule(){ return *M.get(); }
+		Stats &GetStats(){ return *ST.get(); }
+
 
 };
 }

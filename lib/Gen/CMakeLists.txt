@@ -25,6 +25,7 @@ set(LLVM_LINK_COMPONENTS
 set(stone_gen_sources
 	Backend.cpp
 	Gen.cpp
+	GenTest.cpp
 	Transformer.cpp
 
 	LINK_LIBS
