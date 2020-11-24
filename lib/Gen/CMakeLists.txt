@@ -25,7 +25,6 @@ set(LLVM_LINK_COMPONENTS
 set(stone_gen_sources
 	Backend.cpp
 	Gen.cpp
-	GenTest.cpp
 	Transformer.cpp
 
 	LINK_LIBS
@@ -34,6 +33,4 @@ set(stone_gen_sources
 add_stone_library(StoneGen
 	${stone_gen_sources}
 )
-
-
-
+add_subdirectory(tests)

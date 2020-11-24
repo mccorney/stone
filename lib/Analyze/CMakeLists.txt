@@ -6,10 +6,8 @@ set(stone_analyze_sources
 	Check.cpp
 	Checker.cpp
 	Lexer.cpp
-	LexerTest.cpp
 	Parse.cpp
 	Parser.cpp
-	ParserTest.cpp
 	Token.cpp
 
 	LINK_LIBS
@@ -18,6 +16,7 @@ set(stone_analyze_sources
 add_stone_library(StoneAnalyze
 	${stone_analyze_sources}
 )
+add_subdirectory(tests)
 
 
 
