@@ -23,7 +23,8 @@ int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
 		return ret::err;
 	}
 
-	//stone::Gen();
+	stone::Gen(C.GetAnalysis().GetModule(), C.CompilerOpts.GenOpts, P);
+
 
 	return ret::ok; 
 }

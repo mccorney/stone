@@ -3,7 +3,7 @@
 
 #include "stone/Core/LLVM.h"
 #include "stone/Core/ASTContext.h"
-
+#include "stone/Core/Module.h"
 namespace llvm {
   class raw_pwrite_stream;
   class GlobalVariable;
@@ -18,7 +18,7 @@ class Pipeline;
 
 class Transformer final {
 	public:
-		llvm::Module *ToLLVM(Pipeline *P = nullptr);
+		llvm::Module *ToIR(stone::Module& M, Pipeline *P = nullptr);
 };
 
 }

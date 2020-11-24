@@ -14,13 +14,15 @@ namespace llvm {
   class TargetMachine;
 }
 
-
 namespace stone {
 class Pipeline;
+class ASTContext;
+struct GenOptions;
 
 class Backend final {
 	public:
-		int ToObj(llvm::Module* M, Pipeline *P = nullptr);
+		int ToNative(ASTContext& AC, llvm::Module* M, const GenOptions& GenOptions, 
+				Pipeline *P = nullptr);
 };
 
 }

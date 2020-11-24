@@ -5,9 +5,10 @@ namespace stone{
 class ASTContext;
 class Pipeline;
 struct GenOptions;
+class Module; 
 
 	// May want to pass Module instead
-int Gen(ASTContext& AC, const GenOptions& GenOpts, Pipeline* P = nullptr);
+int Gen(Module& M, const GenOptions& GenOpts, Pipeline* P = nullptr);
 
 }
 
