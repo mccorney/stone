@@ -6,18 +6,18 @@
 #include <memory>
 
 namespace stone {
+
 class Analysis final {
 	public:
 		AnalyzeOptions AO;
 		std::unique_ptr<ASTContext> AC; 
 	// Module 
-	public:
-	
+	public:	
 		Analysis() = delete;
 		Analysis(const Analysis&) = delete;
 		Analysis(Analysis &&) = delete;
 		Analysis &operator=(const Analysis&) = delete;
-		Analysis &operator=(Analysis&&) = delete;
+		Analysis &operator=(Analysis&&) = delete; 
 };
 }
 #endif 

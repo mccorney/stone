@@ -8,19 +8,8 @@
 
 using namespace stone;
 
-namespace stone {
-
-
-	/// You do not need this. 
-	int Compile(Compiler& C, Pipeline* P) {
-
-		//C.Run(P); 
-		return ret::ok;
-	}
-}
-
-int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0, void *MainAddr, 
-			Pipeline *P) {
+int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0, 
+		void *MainAddr, Pipeline *P) {
 
 	if(Args[0] == "-help") {
 		stone::Help(HelpMode::Compile); 
@@ -29,10 +18,15 @@ int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0, void *Ma
 	
 	Compiler C;
 	C.Init(Args);
-	// C.Run(P); 
+
+	if(C.Run(P) == ret::err){
+		return ret::err;
+	}
+
+	//TODO: stone::Gen();
 
 
-	return stone::Compile(C, P); 
+	return ret::ok; 
 }
 
 

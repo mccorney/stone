@@ -1,5 +1,5 @@
 #ifndef DIAG_CLIENT
-#define DIAG_CLIENT(NAME, VALUE)
+#define DIAG_CLIENT(N, V)
 
 DIAG_CLIENT(sys,			1)
 DIAG_CLIENT(lexer,		2)

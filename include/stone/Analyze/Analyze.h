@@ -4,7 +4,6 @@
 namespace stone {
 	class Pipeline; 
 	class Analysis;
-
-	int Analyze(Analysis *A, Pipeline *P = nullptr);
+	int Analyze(Analysis& AS, Pipeline *P = nullptr);
 }
 #endif 
