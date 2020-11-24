@@ -65,8 +65,8 @@ int Run(llvm::ArrayRef<const char*> Args) {
 	System S;
 	S.Init(Args); 
 	return S.Run();
-
 }
+
 }
 int stone::Run(int argc, const char** args) {
 

@@ -4,15 +4,25 @@
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 #include "stone/Analyze/AnalyzeOptions.h"
+#include "stone/Analyze/Analysis.h"
 
 #include <memory>
 
 namespace stone {
+class Pipeline; 
 
 class Checker final {
 	Analysis& AS;
 	public:
-		Checker(Analysis& AS);
+		Checker(Analysis& AS, Pipeline* P = nullptr);
+	public:
+		void CheckDecl(); 
+
+	public:
+		void CheckStmt();
+
+	public:
+		void CheckExpr(); 
 };
 
 }

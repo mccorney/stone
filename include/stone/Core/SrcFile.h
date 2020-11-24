@@ -1,7 +1,6 @@
 #ifndef STONE_CORE_SRC_FILE_H
 #define STONE_CORE_SRC_FILE_H
 
-
 #include "stone/Core/FileSystem.h"
 #include "stone/Core/LLVM.h"
 

@@ -25,7 +25,6 @@ int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
 
 	stone::Gen(C.GetAnalysis().GetModule(), C.CompilerOpts.GenOpts, P);
 
-
 	return ret::ok; 
 }
 
