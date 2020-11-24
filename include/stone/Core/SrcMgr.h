@@ -36,7 +36,7 @@ namespace src {
   /// system code, or system code which is implicitly 'extern "C"' in C++ mode.
   ///
   /// Entire directories can be tagged with this (this is maintained by
-  /// DirectoryLookup and friends) as can specific FileInfos when a \#pragma
+  /// DirectoryLookup and friends) as can specific SrcFileInfos when a \#pragma
   /// system_header is seen or in various other cases.
   ///
   enum CharacteristicKind {
@@ -149,7 +149,7 @@ namespace src {
     ///   will be emitted at.
     ///
     /// \param Invalid If non-NULL, will be set \c true if an error occurred.
-    const llvm::MemoryBuffer *getBuffer(DiagEngine &Diag,
+    const llvm::MemoryBuffer *getBuffer(Diag &DG,
                                         const SrcMgr &SM,
                                         SrcLoc Loc = SrcLoc(),
                                         bool *Invalid = nullptr) const;
@@ -201,13 +201,13 @@ namespace src {
   /// Information about a SrcID, basically just the logical file
   /// that it represents and include stack information.
   ///
-  /// Each FileInfo has include stack information, indicating where it came
+  /// Each SrcFileInfo has include stack information, indicating where it came
   /// from. This information encodes the \#include chain that a token was
   /// expanded from. The main include file has an invalid IncludeLoc.
   ///
-  /// FileInfos contain a "ContentCache *", with the contents of the file.
+  /// SrcFileInfos contain a "ContentCache *", with the contents of the file.
   ///
-  class FileInfo {
+  class SrcFileInfo {
     friend class stone::SrcMgr;
     /// The location of the \#include that brought in this file.
     ///
@@ -220,7 +220,7 @@ namespace src {
     /// Zero means the preprocessor didn't provide such info for this SLocEntry.
     unsigned NumCreatedSIDs : 31;
 
-    /// Whether this FileInfo has any \#line directives.
+    /// Whether this SrcFileInfo has any \#line directives.
     unsigned HasLineDirectives : 1;
 
     /// The content cache and the characteristic of the file.
@@ -228,10 +228,10 @@ namespace src {
         ContentAndKind;
 
   public:
-    /// Return a FileInfo object.
-    static FileInfo get(SrcLoc IL, const ContentCache *Con,
+    /// Return a SrcFileInfo object.
+    static SrcFileInfo get(SrcLoc IL, const ContentCache *Con,
                         CharacteristicKind FileCharacter) {
-      FileInfo X;
+      SrcFileInfo X;
       X.IncludeLoc = IL.getRawEncoding();
       X.NumCreatedSIDs = 0;
       X.HasLineDirectives = false;
@@ -338,7 +338,7 @@ namespace src {
     }
   };
 
-  /// This is a discriminated union of FileInfo and ExpansionInfo.
+  /// This is a discriminated union of SrcFileInfo and ExpansionInfo.
   ///
   /// SrcMgr keeps an array of these objects, and they are uniquely
   /// identified by the SrcID datatype.
@@ -346,7 +346,7 @@ namespace src {
     unsigned Offset : 31;
     unsigned IsExpansion : 1;
     union {
-      FileInfo File;
+      SrcFileInfo File;
       ExpansionInfo Expansion;
     };
 
@@ -358,7 +358,7 @@ namespace src {
     bool isExpansion() const { return IsExpansion; }
     bool isFile() const { return !isExpansion(); }
 
-    const FileInfo &getFile() const {
+    const SrcFileInfo &getFile() const {
       assert(isFile() && "Not a file SLocEntry!");
       return File;
     }
@@ -368,7 +368,7 @@ namespace src {
       return Expansion;
     }
 
-    static SLocEntry get(unsigned Offset, const FileInfo &FI) {
+    static SLocEntry get(unsigned Offset, const SrcFileInfo &FI) {
       assert(!(Offset & (1u << 31)) && "Offset is too large");
       SLocEntry E;
       E.Offset = Offset;
@@ -500,8 +500,8 @@ using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSrcLoc>>;
 /// where the expanded token came from and the expansion location specifies
 /// where it was expanded.
 class SrcMgr : public RefCountedBase<SrcMgr> {
-  /// DiagEngine object.
-  DiagEngine &Diag;
+  /// Diag object.
+  Diag &DG;
 
   FileMgr &FM;
 
@@ -513,7 +513,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   /// This map allows us to merge ContentCache entries based
   /// on their SrcFile*.  All ContentCache objects will thus have unique,
   /// non-null, SrcFile pointers.
-  llvm::DenseMap<const SrcFile*, src::ContentCache*> FileInfos;
+  llvm::DenseMap<const SrcFile*, src::ContentCache*> SrcFileInfos;
 
   /// True if the ContentCache for files that are overridden by other
   /// files, should report the original file name. Defaults to true.
@@ -655,7 +655,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   SmallVector<std::pair<std::string, FullSrcLoc>, 2> StoredModuleBuildStack;
 
 public:
-  SrcMgr(DiagEngine &Diag, FileMgr &FM,
+  SrcMgr(Diag &DG, FileMgr &FM,
                 bool UserFilesAreVolatile = false);
   explicit SrcMgr(const SrcMgr &) = delete;
   SrcMgr &operator=(const SrcMgr &) = delete;
@@ -667,7 +667,7 @@ public:
   /// described by \p Old. Requires that \p Old outlive \p *this.
   void initializeForReplay(const SrcMgr &Old);
 
-  DiagEngine &getDiagEngine() const { return Diag; }
+  Diag &getDiag() const { return DG; }
 
   FileMgr &getFileMgr() const { return FM; }
 
@@ -868,7 +868,7 @@ public:
       return getFakeBufferForRecovery();
     }
 
-    return Entry.getFile().getContentCache()->getBuffer(Diag, *this, Loc,
+    return Entry.getFile().getContentCache()->getBuffer(DG, *this, Loc,
                                                         Invalid);
   }
 
@@ -883,7 +883,7 @@ public:
       return getFakeBufferForRecovery();
     }
 
-    return Entry.getFile().getContentCache()->getBuffer(Diag, *this,
+    return Entry.getFile().getContentCache()->getBuffer(DG, *this,
                                                         SrcLoc(),
                                                         Invalid);
   }
@@ -938,7 +938,7 @@ public:
       return;
 
     assert((Force || Entry.getFile().NumCreatedSIDs == 0) && "Already set!");
-    const_cast<src::FileInfo &>(Entry.getFile()).NumCreatedSIDs = NumSIDs;
+    const_cast<src::SrcFileInfo &>(Entry.getFile()).NumCreatedSIDs = NumSIDs;
   }
 
   //===--------------------------------------------------------------------===//
@@ -1460,14 +1460,14 @@ public:
             isBeforeInTranslationUnit(Location, End));
   }
 
-  // Iterators over FileInfos.
+  // Iterators over SrcFileInfos.
   using fileinfo_iterator =
       llvm::DenseMap<const SrcFile*, src::ContentCache*>::const_iterator;
 
-  fileinfo_iterator fileinfo_begin() const { return FileInfos.begin(); }
-  fileinfo_iterator fileinfo_end() const { return FileInfos.end(); }
-  bool hasFileInfo(const SrcFile *File) const {
-    return FileInfos.find(File) != FileInfos.end();
+  fileinfo_iterator fileinfo_begin() const { return SrcFileInfos.begin(); }
+  fileinfo_iterator fileinfo_end() const { return SrcFileInfos.end(); }
+  bool hasSrcFileInfo(const SrcFile *File) const {
+    return SrcFileInfos.find(File) != SrcFileInfos.end();
   }
 
   /// Print statistics to stderr.
@@ -1683,7 +1683,7 @@ private:
   // as they are created in `createSrcMgrForFile` so that they can be
   // deleted in the reverse order as they are created.
   std::unique_ptr<FileMgr> FM;
-  //std::unique_ptr<DiagEngine> Diagnostics;
+  //std::unique_ptr<Diag> Dbg;
   std::unique_ptr<SrcMgr> SM;
 };
 

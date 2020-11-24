@@ -4,6 +4,7 @@
 #include "stone/System/Help.h"
 #include "stone/Core/LLVM.h"
 #include "stone/Core/Ret.h"
+#include "stone/Core/Fmt.h"
 
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
@@ -39,6 +40,7 @@ std::string GetExecutablePath(const char *Arg0) {
 }
 
 namespace stone {
+
 int Run(llvm::ArrayRef<const char*> Args) {	
 	if(Args.size()  == 0) {
 		return ret::err; 
@@ -54,20 +56,21 @@ int Run(llvm::ArrayRef<const char*> Args) {
 	// -compile ?
   auto Arg0 = Args[1]; 
 	if(Arg0 == "-compile") {
+		//fmt::Print("compile"); 
+
 		//return stone::Compile(llvm::makeArrayRef(Args.data() +2,
                                                 //Args.data() + Args.size()), Arg0) 
-	}	
+	}
 
-	//System S;
-	//S.Init(Args); 
-	//return S.Run();
-	return ret::ok;	
-}
+	System S;
+	S.Init(Args); 
+	return S.Run();
 
 }
-int stone::Run(const int argc, const char** args) {
+}
+int stone::Run(int argc, const char** args) {
 
-	//llvm::InitLLVM LLVM(argc, args);
+	llvm::InitLLVM LLVM(argc, args);
 
 	llvm::SmallVector<const char *, 256> InitialArgs(args, args + argc);
 	llvm::BumpPtrAllocator A;

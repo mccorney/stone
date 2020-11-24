@@ -19,7 +19,7 @@ class System final {
 		System();
 		void Init(llvm::ArrayRef<const char*> Args);
 	public:
-		bool Run(); 
+		int Run(); 
 };
 
 }

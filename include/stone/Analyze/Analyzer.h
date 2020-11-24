@@ -4,10 +4,10 @@
 #include "stone/Analyze/AnalyzeOptions.h"
 
 namespace stone {
-
+class Pipeline; 
 class Analyzer final {
 	public:
-		int Analyze();
+		int Analyze(Pipeline* P = nullptr);
 };
 
 }

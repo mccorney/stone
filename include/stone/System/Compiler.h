@@ -3,20 +3,20 @@
 
 #include "llvm/ADT/ArrayRef.h"
 
-
 namespace stone {
 
+class Pipeline; 
 class Compiler final {
+	Pipeline *P = nullptr; 
 	// Action that triggers the Compiler; 
 	//CompilerAction* Trigger; 
 	public: 
 	 //CompilerOptions Opts; 
-	 //std::unique_ptr<Analyzer> A;
-	 //std::unique_ptr<Transformer> A;//no
+	 //std::unique_ptr<Analysis> A;
 	public:
 		Compiler(); 
 		void Init(llvm::ArrayRef<const char*> Args);
-		//bool Run(CompilerAction* Trigger);
+		int Run(Pipeline* P = nullptr);
 	public:
 		//Analysis *GetAnalysis(); 
 };

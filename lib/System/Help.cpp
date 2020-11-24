@@ -1,4 +1,6 @@
 #include "stone/System/Help.h"
+#include "stone/Core/Ret.h"
+
 
 int stone::Help(HelpMode Mode) {
 
@@ -7,5 +9,5 @@ int stone::Help(HelpMode Mode) {
 	else if(Mode == HelpMode::Compile) {
 
 	}
-	return -1; 
+	return ret::ok; 
 }

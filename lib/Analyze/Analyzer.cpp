@@ -5,7 +5,7 @@
 using namespace stone;
 
 
-int Analyzer::Analyze() {
+int Analyzer::Analyze(Pipeline* P) {
 
 	return ret::ok; 
 }

@@ -1,5 +1,5 @@
-#ifndef STONE_SUBSYS_H
-#define STONE_SUBSYS_H
+#ifndef STONE_SUBSYSTEM_H
+#define STONE_SUBSYSTEM_H
  
 namespace stone {
 

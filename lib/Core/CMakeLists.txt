@@ -7,13 +7,15 @@ set(stone_core_sources
 	ASTContext.cpp
 	ASTConsumer.cpp
 	ASTScope.cpp
-	Builtins.cpp
+	Builtin.cpp
 	Decl.cpp
 	DeclContext.cpp
 	Diag.cpp
 	Expr.cpp
 	FileMgr.cpp
+	Fmt.cpp
 	Identifier.cpp
+	IdentifierTable.cpp
 	Module.cpp
 	SrcFile.cpp
 	SrcLoc.cpp
