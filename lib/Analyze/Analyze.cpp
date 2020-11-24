@@ -7,7 +7,7 @@
 int stone::Analyze(Analysis& AS, Pipeline *P) {
 
 	Analyzer A(AS); 
-	
+	A.Analyze();
 	
 	return ret::ok; 
 }

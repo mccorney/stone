@@ -23,8 +23,7 @@ int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
 		return ret::err;
 	}
 
-	//TODO: stone::Gen();
-
+	//stone::Gen();
 
 	return ret::ok; 
 }
