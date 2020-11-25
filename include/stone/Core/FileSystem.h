@@ -6,11 +6,11 @@
 namespace stone{
 
 struct FileSystemOptions final {
-	std::string WorkingDir;
+	std::string workingDir;
 };
 
 class FileSystemStatCache final {
-	std::string WorkingDir;
+	std::string workingDir;
 };
 
 

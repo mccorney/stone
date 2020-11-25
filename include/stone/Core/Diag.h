@@ -30,10 +30,10 @@ namespace stone{
 	class Diag : public RefCountedBase<Diag> {
 	public:
  
-		explicit Diag(IntrusiveRefCntPtr<DiagIDs> IDs,
-                             IntrusiveRefCntPtr<DiagOptions> DiagOpts,
-                             DiagClient *Client = nullptr,
-                             bool ShouldOwnClient = true);
+		explicit Diag(IntrusiveRefCntPtr<DiagIDs> diagIDs,
+                             IntrusiveRefCntPtr<DiagOptions> diagOpts,
+                             DiagClient *diagClient = nullptr,
+                             bool shouldOwnClient = true);
 
   Diag(const Diag &) = delete;
   Diag &operator=(const Diag &) = delete;

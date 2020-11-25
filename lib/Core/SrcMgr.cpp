@@ -131,7 +131,7 @@ const llvm::MemoryBuffer *ContentCache::getBuffer(Diag &DG,
 
   bool isVolatile = SM.userFilesAreVolatile() && !IsSystemFile;
   auto BufferOrError =
-      SM.getFileMgr().getBufferForFile(ContentsEntry, isVolatile);
+      SM.getFileMgr().GetBufferForFile(ContentsEntry, isVolatile);
 
   // If we were unable to open the file, then we are in an inconsistent
   // situation where the content cache referenced a file which no longer
@@ -1923,7 +1923,7 @@ SrcMgrForFile::SrcMgrForFile(StringRef FileName,StringRef Content) {
       IntrusiveRefCntPtr<DiagIDs>(new DiagIDs),new DiagOptions);
 
   SM = llvm::make_unique<SrcMgr>(*DG, *FM);
-  SrcID ID = SM->createSrcID(FM->getFile(FileName),
+  SrcID ID = SM->createSrcID(FM->GetFile(FileName),
                                       SrcLoc(), stone::src::C_User);
   assert(ID.isValid());
   SM->setMainSrcID(ID);
