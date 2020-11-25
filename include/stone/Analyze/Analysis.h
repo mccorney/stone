@@ -12,11 +12,11 @@ namespace stone {
 
 class Analysis final {
 	public:
-		AnalyzeOptions AnalyzeOpts;
+		AnalyzeOptions analyzeOpts;
 	private:
-		std::unique_ptr<ASTContext> AC; 
-		std::unique_ptr<stone::Module> M; 
-		std::unique_ptr<Stats> ST; 
+		std::unique_ptr<ASTContext> astCtx; 
+		std::unique_ptr<stone::Module> m; 
+		std::unique_ptr<Stats> stats; 
 
 	public:
 		//TODO: Diag *DG; 
@@ -26,9 +26,9 @@ class Analysis final {
 		Analysis &operator=(const Analysis&) = delete;
 		Analysis &operator=(Analysis&&) = delete;
 	public:
-		ASTContext &GetASTContext(){ return *AC.get(); }
-		stone::Module &GetModule(){ return *M.get(); }
-		Stats &GetStats(){ return *ST.get(); }
+		ASTContext &GetASTContext(){ return *astCtx.get(); }
+		stone::Module &GetModule(){ return *m.get(); }
+		Stats &GetStats(){ return *stats.get(); }
 
 
 };
