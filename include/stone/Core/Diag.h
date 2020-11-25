@@ -1,7 +1,15 @@
 #ifndef STONE_CORE_DIAG_H
 #define STONE_CORE_DIAG_H
 
+#include "stone/Core/LLVM.h"
+
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/StringRef.h"
+#include <vector>
 namespace stone{
+
+	class DiagClient; 
+
 
 	enum class DiagLevel {
       // NOTE: 0 means "uncomputed".
@@ -12,24 +20,32 @@ namespace stone{
       Fatal = 5    ///< Present this diagnostic as a fatal error.
     };
 
-	struct DiagOptions {
-
+	class DiagOptions : public RefCountedBase<DiagOptions> {
 	};
-
+	
+	class DiagIDs : public RefCountedBase<DiagIDs>{
+	};
 	class Fix final {
 	};
-	class Diag final {
+	class Diag : public RefCountedBase<Diag> {
 	public:
-		//Diag() = delete;
-		Diag(const Diag&) = delete;
-		Diag(Diag &&) = delete;
-		Diag &operator=(const Diag&) = delete;
-		Diag &operator=(Diag&&) = delete;
+ 
+		explicit Diag(IntrusiveRefCntPtr<DiagIDs> IDs,
+                             IntrusiveRefCntPtr<DiagOptions> DiagOpts,
+                             DiagClient *Client = nullptr,
+                             bool ShouldOwnClient = true);
+
+  Diag(const Diag &) = delete;
+  Diag &operator=(const Diag &) = delete;
+  //~DiagnosticsEngine();
+
 	public:
 		void Write(); 
 		void Warn();
 		void Note();
 		void Error();
+		bool IsInFlight();
+
 
 	};
 	class DiagClient {
@@ -39,6 +55,7 @@ namespace stone{
 			DiagClient();
 		public:
 			virtual unsigned int GetID()  = 0;
+		public:
 	};
 }
 #endif

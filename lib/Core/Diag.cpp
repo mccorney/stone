@@ -6,3 +6,7 @@ using namespace stone;
 void Diag::Write() {
 
 }
+
+bool Diag::IsInFlight() {
+	return false; 
+}

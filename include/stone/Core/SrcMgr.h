@@ -1682,9 +1682,9 @@ private:
   // The order of these fields are important - they should be in the same order
   // as they are created in `createSrcMgrForFile` so that they can be
   // deleted in the reverse order as they are created.
-  std::unique_ptr<FileMgr> FM;
-  //std::unique_ptr<Diag> Dbg;
-  std::unique_ptr<SrcMgr> SM;
+  std::unique_ptr<FileMgr>	FM;
+  std::unique_ptr<Diag>			DG;
+  std::unique_ptr<SrcMgr>		SM;
 };
 
 } // namespace clang
