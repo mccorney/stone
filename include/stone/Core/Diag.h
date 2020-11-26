@@ -37,7 +37,7 @@ namespace stone{
 
   Diag(const Diag &) = delete;
   Diag &operator=(const Diag &) = delete;
-  //~DiagnosticsEngine();
+  //~Diag();
 
 	public:
 		void Write(); 

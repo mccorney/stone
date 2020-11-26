@@ -14,6 +14,7 @@ set(stone_core_sources
 	Diag.cpp
 	Expr.cpp
 	FileMgr.cpp
+	FileSystemStatCache.cpp
 	Fmt.cpp
 	Identifier.cpp
 	IdentifierTable.cpp

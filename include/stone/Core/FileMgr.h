@@ -1,9 +1,10 @@
 #ifndef STONE_CORE_FILEMGR_H
 #define STONE_CORE_FILEMGR_H
 
-#include "stone/Core/FileSystem.h"
+#include "stone/Core/FileSystemOptions.h"
 #include "stone/Core/SrcFile.h"
 #include "stone/Core/LLVM.h"
+#include "stone/Core/FileSystemStatCache.h"
 
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
@@ -90,22 +91,22 @@ class FileMgr final : public RefCountedBase<FileMgr> {
 
   // Statistics.
   unsigned numDirLookups;
-	unsigned umFileLookups;
+	unsigned numFileLookups;
   unsigned numDirCacheMisses;
 	unsigned numFileCacheMisses;
 
   // Caching.
-  //std::unique_ptr<FileSysStatCache> StatCache;
+	std::unique_ptr<FileSystemStatCache> statCache;
 
   bool GetStatValue(StringRef Path, llvm::vfs::Status &status, bool isFile,
                     std::unique_ptr<llvm::vfs::File> *file);
 
   /// Add all ancestors of the given path (pointing to either a file
   /// or a directory) as virtual directories.
-  void addAncestorsAsVirtualDirs(StringRef path);
+  void AddAncestorsAsVirtualDirs(StringRef path);
 
   /// Fills the RealPathName in file entry.
-  void fillRealPathName(SrcFile *UFE, llvm::StringRef fileName);
+  void FillRealPathName(SrcFile *srcFile, llvm::StringRef fileName);
 
 public:
   /// Construct a file manager, optionally with a custom VFS.
@@ -123,10 +124,10 @@ public:
   ///
   /// \param statCache the new stat cache to install. Ownership of this
   /// object is transferred to the FileMgr.
-  void setStatCache(std::unique_ptr<FileSystemStatCache> statCache);
+  void SetStatCache(std::unique_ptr<FileSystemStatCache> statCache);
 
   /// Removes the FileSystemStatCache object from the manager.
-  void clearStatCache();
+  void ClearStatCache();
 
   /// Lookup, cache, and verify the specified directory (real or
   /// virtual).
@@ -177,10 +178,10 @@ public:
   /// FileMgr's FileSystemOptions.
   ///
   /// \returns false on success, true on error.
-  bool GetNoncachedStatValue(StringRef Path, llvm::vfs::Status &fesult);
+  bool GetNoncachedStatValue(llvm::StringRef path, llvm::vfs::Status &status);
 
   /// Remove the real file \p Entry from the cache.
-  void invalidateCache(const SrcFile *srcFile);
+  void InvalidateCache(const SrcFile *srcFile);
 
   /// If path is not absolute and FileSystemOptions set the working
   /// directory, the path is modified to be relative to the given
@@ -191,7 +192,7 @@ public:
   /// Makes \c Path absolute taking into account FileSystemOptions and the
   /// working directory option.
   /// \returns true if \c Path changed to absolute.
-  bool makeAbsolutePath(SmallVectorImpl<char> &path) const;
+  bool MakeAbsolutePath(SmallVectorImpl<char> &path) const;
 
   /// Produce an array mapping from the unique IDs assigned to each
   /// file to the corresponding SrcFile pointer.
@@ -199,7 +200,7 @@ public:
 
   /// Modifies the size and modification time of a previously created
   /// SrcFile. Use with caution.
-  static void modifySrcFile(SrcFile *srcFile, off_t fileSize, time_t modificationTime);
+  static void ModifySrcFile(SrcFile *srcFile, off_t fileSize, time_t modificationTime);
 
   /// Retrieve the canonical name for a given directory.
   ///
@@ -208,7 +209,7 @@ public:
   /// required, which is (almost) never.
 	llvm::StringRef GetCanonicalName(const Directory *directory);
 
-  //void PrintStats() const;
+  void PrintStats() const;
 };
 
 } // end namespace stone
