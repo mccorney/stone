@@ -1093,12 +1093,13 @@ static LLVM_ATTRIBUTE_NOINLINE void
 ComputeLineNumbers(Diag &DG, ContentCache *FI,
                    llvm::BumpPtrAllocator &Alloc,
                    const SrcMgr &SM, bool &Invalid);
+
+
 static void ComputeLineNumbers(Diag &DG, ContentCache *FI,
                                llvm::BumpPtrAllocator &Alloc,
                                const SrcMgr &SM, bool &Invalid) {
   // Note that calling 'getBuffer()' may lazily page in the file.
-  const MemoryBuffer *Buffer =
-      FI->getBuffer(DG, SM, SrcLoc(), &Invalid);
+  const MemoryBuffer *Buffer = FI->getBuffer(DG, SM, SrcLoc(), &Invalid);
   if (Invalid)
     return;
 
