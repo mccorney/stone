@@ -7,7 +7,7 @@
 
 using namespace stone;
 
-llvm::Module *Transformer::ToIR(stone::Module& M, Pipeline *P) {
+llvm::Module *Transformer::ToIR(stone::Module& langModule, Pipeline *pipeline) {
 	
 	return nullptr; 
 }

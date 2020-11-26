@@ -35,51 +35,51 @@ class Directory;
 class SrcFile {
   friend class FileMgr;
 
-  llvm::StringRef Name;             // Name of the file.
-  std::string RealPathName;   // Real path to the file; could be empty.
-  off_t Size;                 // File size in bytes.
-  time_t ModTime;             // Modification time of file.
-  const Directory *Dir;  // Directory file lives in.
+  llvm::StringRef fileName;             // Name of the file.
+  std::string realPathName;   // Real path to the file; could be empty.
+  off_t fileSize;                 // File size in bytes.
+  time_t modificationTime;             // Modification time of file.
+  const Directory *dir;  // Directory file lives in.
   unsigned UID;               // A unique (small) ID for the file.
-  llvm::sys::fs::UniqueID UniqueID;
-  bool IsNamedPipe;
-  bool IsValid;               // Is this \c SrcFile initialized and valid?
+  llvm::sys::fs::UniqueID uniqueID;
+  bool isNamedPipe;
+  bool isValid;               // Is this \c SrcFile initialized and valid?
 
   /// The open file, if it is owned by the \p SrcFile.
-  mutable std::unique_ptr<llvm::vfs::File> File;
+  mutable std::unique_ptr<llvm::vfs::File> file;
 
 public:
   SrcFile()
-      : UniqueID(0, 0), IsNamedPipe(false), IsValid(false)
+      : uniqueID(0, 0), isNamedPipe(false), isValid(false)
   {}
 
   SrcFile(const SrcFile &) = delete;
   SrcFile &operator=(const SrcFile &) = delete;
 
-  llvm::StringRef getName() const { return Name; }
-  llvm::StringRef tryGetRealPathName() const { return RealPathName; }
-  bool isValid() const { return IsValid; }
-  off_t getSize() const { return Size; }
-  unsigned getUID() const { return UID; }
-  const llvm::sys::fs::UniqueID &getUniqueID() const { return UniqueID; }
-  time_t getModificationTime() const { return ModTime; }
+  llvm::StringRef GetName() const { return fileName; }
+  llvm::StringRef TryGetRealPathName() const { return realPathName; }
+  bool IsValid() const { return isValid; }
+  off_t GetSize() const { return fileSize; }
+  unsigned GetUID() const { return UID; }
+  const llvm::sys::fs::UniqueID &GetUniqueID() const { return uniqueID; }
+  time_t GetModificationTime() const { return modificationTime; }
 
   /// Return the directory the file lives in.
-  const Directory *getDir() const { return Dir; }
+  const Directory *GetDir() const { return dir; }
 
-  bool operator<(const SrcFile &RHS) const { return UniqueID < RHS.UniqueID; }
+  bool operator<(const SrcFile &RHS) const { return uniqueID < RHS.uniqueID; }
 
   /// Check whether the file is a named pipe (and thus can't be opened by
   /// the native FileMgr methods).
-  bool isNamedPipe() const { return IsNamedPipe; }
+  bool IsNamedPipe() const { return isNamedPipe; }
 
-  void closeFile() const {
-    File.reset(); // rely on destructor to close File
+  void CloseFile() const {
+    file.reset(); // rely on destructor to close File
   }
 
   // Only for use in tests to see if deferred opens are happening, rather than
   // relying on RealPathName being empty.
-  bool isOpenForTests() const { return File != nullptr; }
+  bool IsOpenForTests() const { return file != nullptr; }
 };
 
 }

@@ -964,7 +964,7 @@ public:
   /// Return the filename of the file containing a SrcLoc.
   StringRef getFilename(SrcLoc SpellingLoc) const {
     if (const SrcFile *F = getSrcFileForID(getSrcID(SpellingLoc)))
-      return F->getName();
+      return F->GetName();
     return StringRef();
   }
 

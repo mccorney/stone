@@ -21,8 +21,10 @@ struct GenOptions;
 
 class Backend final {
 	public:
-		int ToNative(ASTContext& AC, llvm::Module* M, const GenOptions& GenOptions, 
-				Pipeline *P = nullptr);
+		int ToNative(ASTContext& astCtx, llvm::Module* llvmModule, const GenOptions& genOpts, 
+				Pipeline *pipeline = nullptr);
+		bool ToObject();
+		bool ToAssembly(); 
 };
 
 }

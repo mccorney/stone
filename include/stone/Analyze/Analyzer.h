@@ -7,11 +7,11 @@ namespace stone {
 class Pipeline;
 
 class Analyzer final {
-	Analysis& AS; 
+	Analysis& analysis; 
 	public:
-		Analyzer(Analysis& AS); 
+		Analyzer(Analysis& analysis); 
 	public:
-		int Analyze(Pipeline* P = nullptr);
+		int Analyze(Pipeline* pipeline = nullptr);
 	private:
 		int Parse();
 		int Check(); 

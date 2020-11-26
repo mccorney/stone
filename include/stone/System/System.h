@@ -17,7 +17,7 @@ class System final {
 		void BuildWorkQueue(); 
 	public:
 		System();
-		void Init(llvm::ArrayRef<const char*> Args);
+		void Init(llvm::ArrayRef<const char*> args);
 	public:
 		int Run(); 
 };

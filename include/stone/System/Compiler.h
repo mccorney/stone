@@ -10,18 +10,18 @@ namespace stone {
 
 class Pipeline; 
 class Compiler final {
-	Pipeline *P = nullptr; 
+	Pipeline *pipeline = nullptr; 
 	// Action that triggers the Compiler; 
 	//CompilerAction* Trigger; 
 	public: 
-	CompilerOptions CompilerOpts; 
-	std::unique_ptr<Analysis> AS;
+	CompilerOptions compilerOpts; 
+	std::unique_ptr<Analysis> analysis;
 	public:
 		Compiler(); 
 		void Init(llvm::ArrayRef<const char*> Args);
 		int Run(Pipeline* P = nullptr);
 	public:
-		Analysis &GetAnalysis() { return *AS.get(); } 
+		Analysis &GetAnalysis() { return *analysis.get(); } 
 };
 
 }

@@ -10,12 +10,17 @@
 
 using namespace stone; 
 
-int stone::Gen(stone::Module& M , const GenOptions& GenOpts, Pipeline* P) {
+int stone::Gen(stone::Module& langModule , const GenOptions& genOpts, Pipeline* pipeline) {
 
-	Transformer T;
-	llvm::Module *LM = T.ToIR(M, P); 
+	Transformer transformer;
+	llvm::Module *llvmModule = transformer.ToIR(langModule, pipeline); 
 	
-	Backend B;
+	Backend backend;
+
+	//Native native;
+
+	//backend.ToAssembly();
+	//backend.ToObject(); 
 	//B.ToNative(M.GetASTContext(), M, P); 
 
 	return ret::ok; 

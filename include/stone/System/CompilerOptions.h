@@ -8,8 +8,8 @@
 namespace stone {
 
 struct CompilerOptions final : public BuildOptions {
-	GenOptions				GenOpts; 
-	AnalyzeOptions		AnalyzeOpts;  
+	GenOptions				genOpts; 
+	AnalyzeOptions		analyzeOpts;  
 };
 
 }

@@ -6,7 +6,7 @@
 namespace stone {
 
 class Pipeline; 
-int Compile(llvm::ArrayRef<const char *> Args, const char *Arg0, 
-		void *MainAddr, Pipeline *P = nullptr);
+int Compile(llvm::ArrayRef<const char *> args, const char *arg0, 
+		void *mainAddr, Pipeline *pipeline = nullptr);
 }
 #endif 

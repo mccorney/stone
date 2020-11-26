@@ -34,18 +34,18 @@
 using namespace stone;
 using namespace llvm::opt;
 
-std::string GetExecutablePath(const char *Arg0) {
-  void *Path = (void *)(intptr_t)GetExecutablePath;
-  return llvm::sys::fs::getMainExecutable(Arg0, Path);
+std::string GetExecutablePath(const char *arg0) {
+  void *mainPath = (void *)(intptr_t)GetExecutablePath;
+  return llvm::sys::fs::getMainExecutable(arg0, mainPath);
 }
 
 namespace stone {
 
-int Run(llvm::ArrayRef<const char*> Args) {	
-	if(Args.size()  == 0) {
+int Run(llvm::ArrayRef<const char*> args) {	
+	if(args.size()  == 0) {
 		return ret::err; 
 	}
-	if(Args.size()  == 1) {
+	if(args.size()  == 1) {
 		return stone::Help(HelpMode::System);
 	}
 	if (llvm::sys::Process::FixupStandardFileDescriptors())
@@ -54,35 +54,35 @@ int Run(llvm::ArrayRef<const char*> Args) {
   llvm::InitializeAllTargets();
   //auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
 	// -compile ?
-  auto Arg0 = Args[1]; 
-	if(Arg0 == "-compile") { 
+  auto arg0 = args[1]; 
+	if(arg0 == "-compile") { 
 		//return stone::Compile(llvm::makeArrayRef(Args.data() +2,
                                                 //Args.data() + Args.size()), Arg0) 
 	}
 
-	System S;
-	S.Init(Args); 
-	return S.Run();
+	System system;
+	system.Init(args);
+	//system.Build(); 
+	return system.Run();
 }
 
 }
 int stone::Run(int argc, const char** args) {
 
-	llvm::InitLLVM LLVM(argc, args);
+	llvm::InitLLVM initLLVM(argc, args);
 
-	llvm::SmallVector<const char *, 256> InitialArgs(args, args + argc);
-	llvm::BumpPtrAllocator A;
-  llvm::StringSaver Saver(A);
+	llvm::SmallVector<const char *, 256> argsToExpand(args, args + argc);
+	llvm::BumpPtrAllocator ptrAlloc;
+  llvm::StringSaver strSaver(ptrAlloc);
 
 	llvm::cl::ExpandResponseFiles(
-      Saver,
+      strSaver,
       llvm::Triple(llvm::sys::getProcessTriple()).isOSWindows()
           ? llvm::cl::TokenizeWindowsCommandLine
-          : llvm::cl::TokenizeGNUCommandLine, InitialArgs);
+          : llvm::cl::TokenizeGNUCommandLine, argsToExpand);
 
-	llvm::ArrayRef<const char *> Args(InitialArgs);
-
-	return stone::Run(Args); 
+	llvm::ArrayRef<const char *> argsToProcess(argsToExpand);
+	return stone::Run(argsToProcess); 
 }
 
 

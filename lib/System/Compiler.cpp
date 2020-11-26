@@ -6,10 +6,10 @@ using namespace stone;
 
 Compiler::Compiler() {
 }
-void Compiler::Init(llvm::ArrayRef<const char*> Args) {
+void Compiler::Init(llvm::ArrayRef<const char*> args) {
 }
-int Compiler::Run(Pipeline* P) {
+int Compiler::Run(Pipeline* pipeline) {
 
-	return stone::Analyze(GetAnalysis(), P); 
+	return stone::Analyze(GetAnalysis(), pipeline); 
 }
 

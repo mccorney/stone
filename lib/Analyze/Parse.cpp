@@ -4,7 +4,7 @@
 #include "stone/Analyze/Parser.h"
 #include "stone/Analyze/Parse.h"
 
-int stone::Parse(Analysis& AS, Pipeline *P) {
+int stone::Parse(Analysis& analysis, Pipeline *pipeline) {
 	
 	return ret::ok; 
 }

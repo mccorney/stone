@@ -12,9 +12,9 @@ namespace stone {
 class Pipeline; 
 
 class Checker final {
-	Analysis& AS;
+	Analysis& analysis;
 	public:
-		Checker(Analysis& AS, Pipeline* P = nullptr);
+		Checker(Analysis& analysis, Pipeline* pipeline = nullptr);
 	public:
 		void CheckDecl(); 
 

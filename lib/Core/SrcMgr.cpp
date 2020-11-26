@@ -70,7 +70,7 @@ llvm::MemoryBuffer::BufferKind ContentCache::getMemoryBufferKind() const {
 ///  file is not lazily brought in from disk to satisfy this query.
 unsigned ContentCache::getSize() const {
   return Buffer.getPointer() ? (unsigned) Buffer.getPointer()->getBufferSize()
-                             : (unsigned) ContentsEntry->getSize();
+                             : (unsigned) ContentsEntry->GetSize();
 }
 
 void ContentCache::replaceBuffer(const llvm::MemoryBuffer *B, bool DoNotFree) {
@@ -104,23 +104,23 @@ const llvm::MemoryBuffer *ContentCache::getBuffer(Diag &DG,
   // Clang (including elsewhere in this file!) use 'unsigned' to represent file
   // offsets, line numbers, string literal lengths, and so on, and fail
   // miserably on large source files.
-  if ((uint64_t)ContentsEntry->getSize() >=
+  if ((uint64_t)ContentsEntry->GetSize() >=
       std::numeric_limits<unsigned>::max()) {
     // We can't make a memory buffer of the required size, so just make a small
     // one. We should never hit a situation where we've already parsed to a
     // later offset of the file, so it shouldn't matter that the buffer is
     // smaller than the file.
     Buffer.setPointer(
-        llvm::MemoryBuffer::getMemBuffer("", ContentsEntry->getName())
+        llvm::MemoryBuffer::getMemBuffer("", ContentsEntry->GetName())
             .release());
 
 /*
     if (DG.isDiagnosticInFlight())
       DG.SetDelayedDiagnostic(diag::err_file_too_large,
-                                ContentsEntry->getName());
+                                ContentsEntry->GetName());
     else
       DG.Report(Loc, diag::err_file_too_large)
-        << ContentsEntry->getName();
+        << ContentsEntry->GetName();
 
 */
 
@@ -146,20 +146,20 @@ const llvm::MemoryBuffer *ContentCache::getBuffer(Diag &DG,
   if (!BufferOrError) {
     StringRef FillStr("<<<MISSING SOURCE FILE>>>\n");
     auto BackupBuffer = llvm::WritableMemoryBuffer::getNewUninitMemBuffer(
-        ContentsEntry->getSize(), "<invalid>");
+        ContentsEntry->GetSize(), "<invalid>");
     char *Ptr = BackupBuffer->getBufferStart();
-    for (unsigned i = 0, e = ContentsEntry->getSize(); i != e; ++i)
+    for (unsigned i = 0, e = ContentsEntry->GetSize(); i != e; ++i)
       Ptr[i] = FillStr[i % FillStr.size()];
     Buffer.setPointer(BackupBuffer.release());
 
     if (DG.IsInFlight()){
       //Diag.SetDelayedDiagnostic(diag::err_cannot_open_file,
-                                //ContentsEntry->getName(),
+                                //ContentsEntry->GetName(),
                                 //BufferOrError.getError().message());
 		}
     else{
       //DG.Report(Loc, diag::err_cannot_open_file)
-      //    << ContentsEntry->getName() << BufferOrError.getError().message();
+      //    << ContentsEntry->GetName() << BufferOrError.getError().message();
 		}
 
     Buffer.setInt(Buffer.getInt() | InvalidFlag);
@@ -172,14 +172,14 @@ const llvm::MemoryBuffer *ContentCache::getBuffer(Diag &DG,
 
   // Check that the file's size is the same as in the file entry (which may
   // have come from a stat cache).
-  if (getRawBuffer()->getBufferSize() != (size_t)ContentsEntry->getSize()) {
+  if (getRawBuffer()->getBufferSize() != (size_t)ContentsEntry->GetSize()) {
     if (DG.IsInFlight()){
       //DG.SetDelayedDiagnostic(diag::err_file_modified,
-      //                          ContentsEntry->getName());
+      //                          ContentsEntry->GetName());
 		}
     else{
 			//DG.Report(Loc, diag::err_file_modified)
-       // << ContentsEntry->getName();
+       // << ContentsEntry->GetName();
 		}
 
     Buffer.setInt(Buffer.getInt() | InvalidFlag);
@@ -209,7 +209,7 @@ const llvm::MemoryBuffer *ContentCache::getBuffer(Diag &DG,
   if (InvalidBOM) {
 
     //DG.Report(Loc, diag::err_unsupported_bom)
-    //  << InvalidBOM << ContentsEntry->getName();
+    //  << InvalidBOM << ContentsEntry->GetName();
     Buffer.setInt(Buffer.getInt() | InvalidFlag);
   }
 
@@ -634,7 +634,7 @@ void SrcMgr::overrideFileContents(const SrcFile *SourceFile,
 
 void SrcMgr::overrideFileContents(const SrcFile *SourceFile,
                                          const SrcFile *NewFile) {
-  assert(SourceFile->getSize() == NewFile->getSize() &&
+  assert(SourceFile->GetSize() == NewFile->GetSize() &&
          "Different sizes, use the FileMgr to create a virtual file with "
          "the correct size");
   assert(SrcFileInfos.count(SourceFile) == 0 &&
@@ -1327,7 +1327,7 @@ PresumedLoc SrcMgr::getPresumedLoc(SrcLoc Loc,
   SrcID SID = LocInfo.first;
   StringRef Filename;
   if (C->OrigSrcFile)
-    Filename = C->OrigSrcFile->getName();
+    Filename = C->OrigSrcFile->GetName();
   else
     Filename = C->getBuffer(DG, *this)->getBufferIdentifier();
 
@@ -1438,7 +1438,7 @@ getActualFileUID(const SrcFile *File) {
     return None;
 
   llvm::sys::fs::UniqueID ID;
-  if (llvm::sys::fs::getUniqueID(File->getName(), ID))
+  if (llvm::sys::fs::getUniqueID(File->GetName(), ID))
     return None;
 
   return ID;
@@ -1489,8 +1489,8 @@ SrcID SrcMgr::translateFile(const SrcFile *SourceFile) const {
         // Fall back: check whether we have the same base name and inode
         // as the main file.
         const SrcFile *MainFile = MainContentCache->OrigSrcFile;
-        SourceFileName = llvm::sys::path::filename(SourceFile->getName());
-        if (*SourceFileName == llvm::sys::path::filename(MainFile->getName())) {
+        SourceFileName = llvm::sys::path::filename(SourceFile->GetName());
+        if (*SourceFileName == llvm::sys::path::filename(MainFile->GetName())) {
           SourceFileUID = getActualFileUID(SourceFile);
           if (SourceFileUID) {
             if (Optional<llvm::sys::fs::UniqueID> MainFileUID =
@@ -1541,7 +1541,7 @@ SrcID SrcMgr::translateFile(const SrcFile *SourceFile) const {
   // parsed the file.
   if (FirstSID.isInvalid() &&
       (SourceFileName ||
-       (SourceFileName = llvm::sys::path::filename(SourceFile->getName()))) &&
+       (SourceFileName = llvm::sys::path::filename(SourceFile->GetName()))) &&
       (SourceFileUID || (SourceFileUID = getActualFileUID(SourceFile)))) {
     bool Invalid = false;
     for (unsigned I = 0, N = local_sloc_entry_size(); I != N; ++I) {
@@ -1557,7 +1557,7 @@ SrcID SrcMgr::translateFile(const SrcFile *SourceFile) const {
         const SrcFile *Entry = FileContentCache ? FileContentCache->OrigSrcFile
                                                   : nullptr;
         if (Entry &&
-            *SourceFileName == llvm::sys::path::filename(Entry->getName())) {
+            *SourceFileName == llvm::sys::path::filename(Entry->GetName())) {
           if (Optional<llvm::sys::fs::UniqueID> EntryUID =
                   getActualFileUID(Entry)) {
             if (*SourceFileUID == *EntryUID) {
@@ -1832,13 +1832,13 @@ LLVM_DUMP_METHOD void SrcMgr::dump() const {
       if (FI.getIncludeLoc().isValid())
         out << "  included from " << FI.getIncludeLoc().getOffset() << "\n";
       if (auto *CC = FI.getContentCache()) {
-        out << "  for " << (CC->OrigSrcFile ? CC->OrigSrcFile->getName() : "<none>")
+        out << "  for " << (CC->OrigSrcFile ? CC->OrigSrcFile->GetName() : "<none>")
             << "\n";
         if (CC->BufferOverridden)
           out << "  contents overridden\n";
         if (CC->ContentsEntry != CC->OrigSrcFile) {
           out << "  contents from "
-              << (CC->ContentsEntry ? CC->ContentsEntry->getName() : "<none>")
+              << (CC->ContentsEntry ? CC->ContentsEntry->GetName() : "<none>")
               << "\n";
         }
       }

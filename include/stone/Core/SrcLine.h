@@ -40,13 +40,14 @@ struct SrcLine {
   static SrcLine GetSrcLine(unsigned Offs, unsigned Line, int Filename,
                        src::CharacteristicKind FileKind,
                        unsigned IncludeOffset) {
-    SrcLine E;
-    E.FileOffset = Offs;
-    E.LineNo = Line;
-    E.FilenameID = Filename;
-    E.FileKind = FileKind;
-    E.IncludeOffset = IncludeOffset;
-    return E;
+    SrcLine srcLine;
+
+    srcLine.FileOffset = Offs;
+    srcLine.LineNo = Line;
+    srcLine.FilenameID = Filename;
+    srcLine.FileKind = FileKind;
+    srcLine.IncludeOffset = IncludeOffset;
+    return srcLine;
   }
 };
 
@@ -60,8 +61,8 @@ inline bool operator<(const SrcLine &E, unsigned Offset) {
   return E.FileOffset < Offset;
 }
 
-inline bool operator<(unsigned Offset, const SrcLine &E) {
-  return Offset < E.FileOffset;
+inline bool operator<(unsigned Offset, const SrcLine &srcLine) {
+  return Offset < srcLine.FileOffset;
 }
 
 /// Used to hold and unique data used to represent \#line information.
@@ -95,9 +96,9 @@ public:
 
   unsigned getNumFilenames() const { return FilenamesByID.size(); }
 
-  void AddLineNote(SrcID FID, unsigned Offset,
-                   unsigned LineNo, int FilenameID,
-                   unsigned EntryExit, src::CharacteristicKind FileKind);
+  void AddLineNote(SrcID srcID, unsigned offset,
+                   unsigned lineNo, int filenameID,
+                   unsigned entryExit, src::CharacteristicKind fileKind);
 
 
   /// Find the line entry nearest to FID that is before it.
@@ -113,7 +114,7 @@ public:
 
   /// Add a new line entry that has already been encoded into
   /// the internal representation of the line table.
-  void AddLine(SrcID SID, const std::vector<SrcLine> &Lines);
+  void AddLine(SrcID srcID, const std::vector<SrcLine> &srcLines);
 };
 
 } // namespace clang

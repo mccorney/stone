@@ -7,7 +7,7 @@
 
 using namespace stone;
 
-Analyzer::Analyzer(Analysis& AS) : AS(AS) {
+Analyzer::Analyzer(Analysis& analysis) : analysis(analysis) {
 
 }
 

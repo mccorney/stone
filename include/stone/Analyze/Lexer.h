@@ -25,19 +25,19 @@ class LexerDiagClient final : public DiagClient {
 
 
 class Lexer final {
-	SrcID ID; 
-	Diag* DG = nullptr;
+	SrcID srcID; 
+	Diag* dg = nullptr;
 
-	const char *StartBuff; 
-	const char *CurPtr; 
-	const char *EndBuff;
+	const char *bufferStart; 
+	const char *curPtr; 
+	const char *bufferEnd;
 
 	private:
-		void Init(const char *StartBuff, const char *CurPtr, const char *EndBuff); 
+		void Init(const char *bufferStart, const char *curPtr, const char *bufferEnd); 
 	public:
-		Lexer(const SrcID ID, const SrcMgr& SM, const LangOptions& LO, Diag* DG = nullptr);
+		Lexer(const SrcID srcID, const SrcMgr& srcMgr, const LangOptions& langOpts, Diag* dg = nullptr);
 	public:
-		void Lex(Token& T);
+		void Lex(Token& token);
 	public:	
 		void LexIdentifier();
 		void LexNumber();
