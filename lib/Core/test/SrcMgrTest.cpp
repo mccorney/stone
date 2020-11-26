@@ -1,4 +1,5 @@
 #include "stone/Core/SrcMgr.h"
+#include "stone/Core/SrcID.h"
 #include "stone/Core/Diag.h"
 #include "stone/Core/FileSystemOptions.h"
 
@@ -41,6 +42,20 @@ protected:
 
 TEST_F(SrcMgrTest, GetColNumber) {
 
+	const char *source =
+    "int x;\n"
+    "int y;";
+
+
+	auto memBuffer = llvm::MemoryBuffer::getMemBuffer(source);
+  SrcID mainSrcID = srcMgr.createSrcID(std::move(memBuffer));
+  srcMgr.setMainSrcID(mainSrcID);
+
+  bool invalid = false; 
+
+	//GetColNumber()
+  EXPECT_EQ(1U, srcMgr.getColumnNumber(mainSrcID, 0, &invalid));
+  EXPECT_TRUE(!invalid);
 }
 
 }
