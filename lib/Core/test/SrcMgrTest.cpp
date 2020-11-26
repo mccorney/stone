@@ -1,5 +1,6 @@
 #include "stone/Core/SrcMgr.h"
-#include "stone/Core/FileSystem.h"
+#include "stone/Core/Diag.h"
+#include "stone/Core/FileSystemOptions.h"
 
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Config/llvm-config.h"
@@ -11,29 +12,35 @@
 
 
 using namespace stone; 
-
-
+namespace {
 class FakeDiagClient : public DiagClient {
 
 };
 
-
 class SrcMgrTest : public ::testing::Test {
 	protected:
-	//FileMgr fileMgr;
-	//SrcMgr srcMgr; 
-	//FileSystemOptions fileSysOpts;
-	//IntrusiveRefCntPtr<DiagIDs> diagIDs;
-  //Diag diag;
+	FileMgr fileMgr;
+	SrcMgr srcMgr; 
+	FileSystemOptions fileSysOpts;
+	IntrusiveRefCntPtr<DiagIDs> diagIDs;
+  Diag dg;
 
 protected:
-	SrcMgrTest() {
-
-
-	}
+	SrcMgrTest():
+			
+			fileMgr(fileSysOpts),
+      diagIDs(new DiagIDs()),
+      dg(diagIDs, new DiagOptions, new FakeDiagClient()),
+			srcMgr(dg, fileMgr){
+ 
+    //TargetOpts->Triple = "x86_64-apple-darwin11.1.0";
+    //Target = TargetInfo::CreateTargetInfo(Diags, TargetOpts);
+  }
 
 };
 
 TEST_F(SrcMgrTest, GetColNumber) {
+
+}
 
 }

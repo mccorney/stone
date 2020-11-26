@@ -1148,7 +1148,7 @@ public:
 
   /// Returns the "included/expanded in" decomposed location of the given
   /// SrcID.
-  std::pair<SrcID, unsigned> getDecomposedIncludedLoc(SrcID SID) const;
+  //std::pair<SrcID, unsigned> getDecomposedIncludedLoc(SrcID SID) const;
 
   /// Returns the offset from the start of the file that the
   /// specified SrcLoc represents.

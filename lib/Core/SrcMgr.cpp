@@ -600,7 +600,17 @@ SrcMgr::createExpansionLoc(SrcLoc SpellingLoc,
                                   unsigned LoadedOffset) {
   ExpansionInfo Info = ExpansionInfo::create(
       SpellingLoc, ExpansionLocStart, ExpansionLocEnd, ExpansionIsTokenRange);
+
   return createExpansionLocImpl(Info, TokLength, LoadedID, LoadedOffset);
+}
+
+//TODO: 
+SrcLoc SrcMgr::createExpansionLocImpl(const src::ExpansionInfo &expansion,
+                                        unsigned tokLength,
+                                        int loadedID,
+                                        unsigned loadedOffset) {
+
+	return SrcLoc();
 }
 
 SrcLoc SrcMgr::createTokenSplitLoc(SrcLoc Spelling,
@@ -1643,11 +1653,16 @@ SrcLoc SrcMgr::translateLineCol(SrcID SID,
 /// entry, return true and don't modify it.
 static bool MoveUpIncludeHierarchy(std::pair<SrcID, unsigned> &Loc,
                                    const SrcMgr &SM) {
+	//TODO: 
+	/*
   std::pair<SrcID, unsigned> UpperLoc = SM.getDecomposedIncludedLoc(Loc.first);
   if (UpperLoc.first.isInvalid())
     return true; // We reached the top.
 
   Loc = UpperLoc;
+	*/
+
+
   return false;
 }
 

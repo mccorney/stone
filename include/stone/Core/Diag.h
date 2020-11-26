@@ -21,9 +21,13 @@ namespace stone{
     };
 
 	class DiagOptions : public RefCountedBase<DiagOptions> {
+		public:
+			DiagOptions(){}
 	};
 	
 	class DiagIDs : public RefCountedBase<DiagIDs>{
+		public:
+			DiagIDs() {}
 	};
 	class Fix final {
 	};
@@ -33,7 +37,7 @@ namespace stone{
 		explicit Diag(IntrusiveRefCntPtr<DiagIDs> diagIDs,
                              IntrusiveRefCntPtr<DiagOptions> diagOpts,
                              DiagClient *diagClient = nullptr,
-                             bool shouldOwnClient = true);
+                             bool shouldOwnClient = true){}
 
   Diag(const Diag &) = delete;
   Diag &operator=(const Diag &) = delete;
@@ -52,9 +56,9 @@ namespace stone{
 		protected:
 			unsigned int ID = 0;
 		public:
-			DiagClient();
+			DiagClient(){}
 		public:
-			virtual unsigned int GetID()  = 0;
+			//virtual unsigned int GetID()  = 0;
 		public:
 	};
 }
