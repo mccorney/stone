@@ -24,6 +24,7 @@
 
 
 namespace stone{
+
 class Expr  : public ASTNode {
 public:
   enum Kind {

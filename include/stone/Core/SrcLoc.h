@@ -324,7 +324,7 @@ public:
   const char *getCharacterData(bool *Invalid = nullptr) const;
 
   unsigned getLineNumber(bool *Invalid = nullptr) const;
-  unsigned getColumnNumber(bool *Invalid = nullptr) const;
+  unsigned GetColNumber(bool *Invalid = nullptr) const;
 
   const SrcFile *getSrcFile() const;
 

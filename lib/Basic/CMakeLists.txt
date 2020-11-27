@@ -1,0 +1,39 @@
+set(LLVM_LINK_COMPONENTS
+  Analysis
+  BitReader
+  BitWriter
+  Core
+  Coroutines
+  Coverage
+  IPO
+  IRReader
+  AggressiveInstCombine
+  InstCombine
+  Instrumentation
+  LTO
+  Linker
+  MC
+  Object
+  Passes
+  ProfileData
+  Remarks
+  ScalarOpts
+  Support
+  Target
+  TransformUtils
+  )
+set(stone_gen_sources
+	FileManager.cpp
+	FileSystemStatCache.cpp
+	SourceLocation.cpp
+	SourceManager.cpp
+
+	LINK_LIBS
+	StoneBasic
+)
+add_stone_library(StoneBasic
+	${stone_gen_sources}
+)
+
+add_subdirectory(test)
+

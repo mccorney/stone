@@ -8,6 +8,3 @@ public:
 
 };
 
-TEST_F(DiagTest, Diagnose) {
-
-}

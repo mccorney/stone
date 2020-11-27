@@ -51,11 +51,20 @@ TEST_F(SrcMgrTest, GetColNumber) {
   SrcID mainSrcID = srcMgr.createSrcID(std::move(memBuffer));
   srcMgr.setMainSrcID(mainSrcID);
 
-  bool invalid = false; 
+  bool invalid; 
 
-	//GetColNumber()
-  EXPECT_EQ(1U, srcMgr.getColumnNumber(mainSrcID, 0, &invalid));
-  EXPECT_TRUE(!invalid);
+	invalid = false; 
+
+  //EXPECT_EQ(1U, srcMgr.GetColNumber(mainSrcID, 0, &invalid));
+  //EXPECT_TRUE(!invalid);
+
+	invalid = false;
+  EXPECT_EQ(5U, srcMgr.GetColNumber(mainSrcID, 4, &invalid));
+  //EXPECT_TRUE(!invalid);
+
+  //invalid = false;
+  //EXPECT_EQ(1U, srcMgr.GetColNumber(mainSrcID, 7, &invalid));
+  //EXPECT_TRUE(!invalid);
 }
 
 }

@@ -178,9 +178,9 @@ unsigned FullSrcLoc::getLineNumber(bool *Invalid) const {
   return SM->getLineNumber(getSrcID(), getFileOffset(), Invalid);
 }
 
-unsigned FullSrcLoc::getColumnNumber(bool *Invalid) const {
+unsigned FullSrcLoc::GetColNumber(bool *Invalid) const {
   assert(isValid());
-  return SM->getColumnNumber(getSrcID(), getFileOffset(), Invalid);
+  return SM->GetColNumber(getSrcID(), getFileOffset(), Invalid);
 }
 
 const SrcFile *FullSrcLoc::getSrcFile() const {
