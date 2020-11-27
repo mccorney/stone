@@ -1,25 +1,57 @@
-#ifndef STONE_CORE_SRCLOC_H
-#define STONE_CORE_SRCLOC_H
+#ifndef STONE_CORE_SOURCELOCATION_H
+#define STONE_CORE_SOURCELOCATION_H
 
 #include "stone/Core/LLVM.h"
-#include "stone/Core/SrcID.h"
-#include "stone/Core/SrcFile.h"
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/PointerLikeTypeTraits.h"
-
 #include <cassert>
 #include <cstdint>
 #include <string>
 #include <utility>
 
 namespace llvm {
+
 template <typename T> struct DenseMapInfo;
+
 } // namespace llvm
 
 namespace stone {
 
 class SrcMgr;
+
+/// An opaque identifier used by SrcMgr which refers to a
+/// source file (MemoryBuffer) along with its \#include path and \#line data.
+///
+class FileID {
+  /// A mostly-opaque identifier, where 0 is "invalid", >0 is
+  /// this module, and <-1 is something loaded from another module.
+  int ID = 0;
+
+public:
+  bool isValid() const { return ID != 0; }
+  bool isInvalid() const { return ID == 0; }
+
+  bool operator==(const FileID &RHS) const { return ID == RHS.ID; }
+  bool operator<(const FileID &RHS) const { return ID < RHS.ID; }
+  bool operator<=(const FileID &RHS) const { return ID <= RHS.ID; }
+  bool operator!=(const FileID &RHS) const { return !(*this == RHS); }
+  bool operator>(const FileID &RHS) const { return RHS < *this; }
+  bool operator>=(const FileID &RHS) const { return RHS <= *this; }
+
+  static FileID getSentinel() { return get(-1); }
+  unsigned getHashValue() const { return static_cast<unsigned>(ID); }
+
+private:
+  friend class SrcMgr;
+  static FileID get(int V) {
+    FileID F;
+    F.ID = V;
+    return F;
+  }
+  int getOpaqueValue() const { return ID; }
+};
+
 /// Encodes a location in the source. The SrcMgr can decode this
 /// to get at the full include stack, line and column information.
 ///
@@ -36,17 +68,20 @@ class SrcMgr;
 ///
 /// It is important that this type remains small. It is currently 32 bits wide.
 class SrcLoc {
+  friend class ASTReader;
+  friend class ASTWriter;
   friend class SrcMgr;
+
   unsigned ID = 0;
 
-	//TODO: Remove 
   enum : unsigned {
-    IDBit = 1U << 31
+    MacroIDBit = 1U << 31
   };
 
 public:
-  bool isSrcID() const  { return (ID & IDBit) == 0; }
- 
+  bool isFileID() const  { return (ID & MacroIDBit) == 0; }
+  bool isMacroID() const { return (ID & MacroIDBit) != 0; }
+
   /// Return true if this is a valid SrcLoc object.
   ///
   /// Invalid SrcLocs are often used when events have no corresponding
@@ -58,20 +93,28 @@ public:
 private:
   /// Return the offset into the manager's global input view.
   unsigned getOffset() const {
-    return ID & ~IDBit;
+    return ID & ~MacroIDBit;
   }
 
   static SrcLoc getFileLoc(unsigned ID) {
-    assert((ID & IDBit) == 0 && "Ran out of source locations!");
+    assert((ID & MacroIDBit) == 0 && "Ran out of source locations!");
     SrcLoc L;
     L.ID = ID;
     return L;
-  }	
+  }
+
+  static SrcLoc getMacroLoc(unsigned ID) {
+    assert((ID & MacroIDBit) == 0 && "Ran out of source locations!");
+    SrcLoc L;
+    L.ID = MacroIDBit | ID;
+    return L;
+  }
+
 public:
   /// Return a source location with the specified offset from this
   /// SrcLoc.
   SrcLoc getLocWithOffset(int Offset) const {
-    assert(((getOffset()+Offset) & IDBit) == 0 && "offset overflow");
+    assert(((getOffset()+Offset) & MacroIDBit) == 0 && "offset overflow");
     SrcLoc L;
     L.ID = ID+Offset;
     return L;
@@ -112,8 +155,8 @@ public:
   }
 
   static bool isPairOfFileLocations(SrcLoc Start, SrcLoc End) {
-    return Start.isValid() && Start.isSrcID() && End.isValid() &&
-           End.isSrcID();
+    return Start.isValid() && Start.isFileID() && End.isValid() &&
+           End.isFileID();
   }
 
   void print(raw_ostream &OS, const SrcMgr &SM) const;
@@ -172,7 +215,7 @@ public:
 /// last token of the range (a "token range").  In the token range case, the
 /// size of the last token must be measured to determine the actual end of the
 /// range.
-class CharSrcRange final {
+class CharSrcRange {
   SrcRange Range;
   bool IsTokenRange = false;
 
@@ -223,13 +266,13 @@ public:
 /// You can get a PresumedLoc from a SrcLoc with SrcMgr.
 class PresumedLoc {
   const char *Filename = nullptr;
-  SrcID ID;
+  FileID ID;
   unsigned Line, Col;
   SrcLoc IncludeLoc;
 
 public:
   PresumedLoc() = default;
-  PresumedLoc(const char *FN, SrcID FID, unsigned Ln, unsigned Co,
+  PresumedLoc(const char *FN, FileID FID, unsigned Ln, unsigned Co,
               SrcLoc IL)
       : Filename(FN), ID(FID), Line(Ln), Col(Co), IncludeLoc(IL) {}
 
@@ -248,7 +291,7 @@ public:
     return Filename;
   }
 
-  SrcID getSrcID() const {
+  FileID getFileID() const {
     assert(isValid());
     return ID;
   }
@@ -279,40 +322,41 @@ public:
 };
 
 class SrcFile;
+
 /// A SrcLoc and its associated SrcMgr.
 ///
 /// This is useful for argument passing to functions that expect both objects.
-class FullSrcLoc : public SrcLoc {
-  const SrcMgr *SM = nullptr;
+class FullSourceLoc : public SrcLoc {
+  const SrcMgr *srcMgr = nullptr;
 
 public:
-  /// Creates a FullSrcLoc where isValid() returns \c false.
-  FullSrcLoc() = default;
+  /// Creates a FullSourceLoc where isValid() returns \c false.
+  FullSourceLoc() = default;
 
-  explicit FullSrcLoc(SrcLoc Loc, const SrcMgr &SM)
-      : SrcLoc(Loc), SM(&SM) {}
+  explicit FullSourceLoc(SrcLoc Loc, const SrcMgr &SM)
+      : SrcLoc(Loc), srcMgr(&SM) {}
 
   bool hasManager() const {
-      bool hasSM =  SM != nullptr;
-      assert(hasSM == isValid() && "FullSrcLoc has location but no manager");
-      return hasSM;
+      bool hassrcMgr =  srcMgr != nullptr;
+      assert(hassrcMgr == isValid() && "FullSourceLoc has location but no manager");
+      return hassrcMgr;
   }
 
-  /// \pre This FullSrcLoc has an associated SrcMgr.
+  /// \pre This FullSourceLoc has an associated SrcMgr.
   const SrcMgr &getManager() const {
-    assert(SM && "SrcMgr is NULL.");
-    return *SM;
+    assert(srcMgr && "SrcMgr is NULL.");
+    return *srcMgr;
   }
 
-  SrcID getSrcID() const;
+  FileID getFileID() const;
 
-  FullSrcLoc getExpansionLoc() const;
-  FullSrcLoc getSpellingLoc() const;
-  FullSrcLoc getFileLoc() const;
+  FullSourceLoc getExpansionLoc() const;
+  FullSourceLoc getSpellingLoc() const;
+  FullSourceLoc getFileLoc() const;
   PresumedLoc getPresumedLoc(bool UseLineDirectives = true) const;
-  bool isMacroArgExpansion(FullSrcLoc *StartLoc = nullptr) const;
-  FullSrcLoc getImmediateMacroCallerLoc() const;
-  std::pair<FullSrcLoc, StringRef> getModuleImportLoc() const;
+  bool isMacroArgExpansion(FullSourceLoc *StartLoc = nullptr) const;
+  FullSourceLoc getImmediateMacroCallerLoc() const;
+  std::pair<FullSourceLoc, StringRef> getModuleImportLoc() const;
   unsigned getFileOffset() const;
 
   unsigned getExpansionLineNumber(bool *Invalid = nullptr) const;
@@ -324,19 +368,19 @@ public:
   const char *getCharacterData(bool *Invalid = nullptr) const;
 
   unsigned getLineNumber(bool *Invalid = nullptr) const;
-  unsigned GetColNumber(bool *Invalid = nullptr) const;
+  unsigned getColumnNumber(bool *Invalid = nullptr) const;
 
   const SrcFile *getSrcFile() const;
 
   /// Return a StringRef to the source buffer data for the
-  /// specified SrcID.
+  /// specified FileID.
   StringRef getBufferData(bool *Invalid = nullptr) const;
 
-  /// Decompose the specified location into a raw SrcID + Offset pair.
+  /// Decompose the specified location into a raw FileID + Offset pair.
   ///
-  /// The first element is the SrcID, the second is the offset from the
+  /// The first element is the FileID, the second is the offset from the
   /// start of the buffer of the location.
-  std::pair<SrcID, unsigned> getDecomposedLoc() const;
+  std::pair<FileID, unsigned> getDecomposedLoc() const;
 
   bool isInSystemHeader() const;
 
@@ -348,32 +392,32 @@ public:
   /// Determines the order of 2 source locations in the translation unit.
   ///
   /// \returns true if this source location comes before 'Loc', false otherwise.
-  bool isBeforeInTranslationUnitThan(FullSrcLoc Loc) const {
+  bool isBeforeInTranslationUnitThan(FullSourceLoc Loc) const {
     assert(Loc.isValid());
-    assert(SM == Loc.SM && "Loc comes from another SrcMgr!");
+    assert(srcMgr == Loc.srcMgr && "Loc comes from another SrcMgr!");
     return isBeforeInTranslationUnitThan((SrcLoc)Loc);
   }
 
-  /// Comparison function class, useful for sorting FullSrcLocs.
+  /// Comparison function class, useful for sorting FullSourceLocs.
   struct BeforeThanCompare {
-    bool operator()(const FullSrcLoc& lhs, const FullSrcLoc& rhs) const {
+    bool operator()(const FullSourceLoc& lhs, const FullSourceLoc& rhs) const {
       return lhs.isBeforeInTranslationUnitThan(rhs);
     }
   };
 
-  /// Prints information about this FullSrcLoc to stderr.
+  /// Prints information about this FullSourceLoc to stderr.
   ///
   /// This is useful for debugging.
   void dump() const;
 
   friend bool
-  operator==(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
+  operator==(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
     return LHS.getRawEncoding() == RHS.getRawEncoding() &&
-          LHS.SM == RHS.SM;
+          LHS.srcMgr == RHS.srcMgr;
   }
 
   friend bool
-  operator!=(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
+  operator!=(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
     return !(LHS == RHS);
   }
 };
@@ -382,23 +426,23 @@ public:
 
 namespace llvm {
 
-  /// Define DenseMapInfo so that SrcID's can be used as keys in DenseMap and
+  /// Define DenseMapInfo so that FileID's can be used as keys in DenseMap and
   /// DenseSets.
   template <>
-  struct DenseMapInfo<stone::SrcID> {
-    static stone::SrcID getEmptyKey() {
+  struct DenseMapInfo<stone::FileID> {
+    static stone::FileID getEmptyKey() {
       return {};
     }
 
-    static stone::SrcID getTombstoneKey() {
-      return stone::SrcID::getSentinel();
+    static stone::FileID getTombstoneKey() {
+      return stone::FileID::getSentinel();
     }
 
-    static unsigned getHashValue(stone::SrcID S) {
+    static unsigned getHashValue(stone::FileID S) {
       return S.getHashValue();
     }
 
-    static bool isEqual(stone::SrcID LHS, stone::SrcID RHS) {
+    static bool isEqual(stone::FileID LHS, stone::FileID RHS) {
       return LHS == RHS;
     }
   };
@@ -416,5 +460,7 @@ namespace llvm {
       return stone::SrcLoc::getFromRawEncoding((unsigned)(uintptr_t)P);
     }
   };
+
 } // namespace llvm
-#endif 
+
+#endif // LLVM_CLANG_BASIC_SOURCELOCATION_H

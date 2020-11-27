@@ -1,5 +1,5 @@
-#ifndef STONE_SRC_LINE_H
-#define STONE_SRC_LINE_H
+#ifndef STONE_CORE_SOURCEMANAGERINTERNALS_H
+#define STONE_CORE_SOURCEMANAGERINTERNALS_H
 
 #include "stone/Core/SrcLoc.h"
 #include "stone/Core/SrcMgr.h"
@@ -37,17 +37,16 @@ struct SrcLine {
   /// If this is 0 then there is no virtual \#includer.
   unsigned IncludeOffset;
 
-  static SrcLine GetSrcLine(unsigned Offs, unsigned Line, int Filename,
+  static SrcLine get(unsigned Offs, unsigned Line, int Filename,
                        src::CharacteristicKind FileKind,
                        unsigned IncludeOffset) {
-    SrcLine srcLine;
-
-    srcLine.FileOffset = Offs;
-    srcLine.LineNo = Line;
-    srcLine.FilenameID = Filename;
-    srcLine.FileKind = FileKind;
-    srcLine.IncludeOffset = IncludeOffset;
-    return srcLine;
+    SrcLine E;
+    E.FileOffset = Offs;
+    E.LineNo = Line;
+    E.FilenameID = Filename;
+    E.FileKind = FileKind;
+    E.IncludeOffset = IncludeOffset;
+    return E;
   }
 };
 
@@ -61,8 +60,8 @@ inline bool operator<(const SrcLine &E, unsigned Offset) {
   return E.FileOffset < Offset;
 }
 
-inline bool operator<(unsigned Offset, const SrcLine &srcLine) {
-  return Offset < srcLine.FileOffset;
+inline bool operator<(unsigned Offset, const SrcLine &E) {
+  return Offset < E.FileOffset;
 }
 
 /// Used to hold and unique data used to represent \#line information.
@@ -76,15 +75,15 @@ class SrcLineTable {
   llvm::StringMap<unsigned, llvm::BumpPtrAllocator> FilenameIDs;
   std::vector<llvm::StringMapEntry<unsigned>*> FilenamesByID;
 
-  /// Map from SrcIDs to a list of line entries (sorted by the offset
+  /// Map from FileIDs to a list of line entries (sorted by the offset
   /// at which they occur in the file).
-  std::map<SrcID, std::vector<SrcLine>> SrcLines;
+  std::map<FileID, std::vector<SrcLine>> LineEntries;
 
 public:
   void clear() {
     FilenameIDs.clear();
     FilenamesByID.clear();
-    SrcLines.clear();
+    LineEntries.clear();
   }
 
   unsigned getLineTableFilenameID(StringRef Str);
@@ -96,27 +95,27 @@ public:
 
   unsigned getNumFilenames() const { return FilenamesByID.size(); }
 
-  void AddLineNote(SrcID srcID, unsigned offset,
-                   unsigned lineNo, int filenameID,
-                   unsigned entryExit, src::CharacteristicKind fileKind);
+  void AddLineNote(FileID FID, unsigned Offset,
+                   unsigned LineNo, int FilenameID,
+                   unsigned EntryExit, src::CharacteristicKind FileKind);
 
 
   /// Find the line entry nearest to FID that is before it.
   ///
   /// If there is no line entry before \p Offset in \p FID, returns null.
-  const SrcLine *FindNearestSrcLine(SrcID FID, unsigned Offset);
+  const SrcLine *FindNearestSrcLine(FileID FID, unsigned Offset);
 
   // Low-level access
-  using iterator = std::map<SrcID, std::vector<SrcLine>>::iterator;
+  using iterator = std::map<FileID, std::vector<SrcLine>>::iterator;
 
-  iterator begin() { return SrcLines.begin(); }
-  iterator end() { return SrcLines.end(); }
+  iterator begin() { return LineEntries.begin(); }
+  iterator end() { return LineEntries.end(); }
 
   /// Add a new line entry that has already been encoded into
   /// the internal representation of the line table.
-  void AddLine(SrcID srcID, const std::vector<SrcLine> &srcLines);
+  void AddEntry(FileID FID, const std::vector<SrcLine> &Entries);
 };
 
-} // namespace clang
+} // namespace stone
 
-#endif 
+#endif // LLVM_CLANG_BASIC_SOURCEMANAGERINTERNALS_H

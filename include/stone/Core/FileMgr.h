@@ -1,10 +1,8 @@
-#ifndef STONE_CORE_FILEMGR_H
-#define STONE_CORE_FILEMGR_H
+#ifndef STONE_CORE_FILEMANAGER_H
+#define STONE_CORE_FILEMANAGER_H
 
 #include "stone/Core/FileSystemOptions.h"
-#include "stone/Core/SrcFile.h"
 #include "stone/Core/LLVM.h"
-#include "stone/Core/FileSystemStatCache.h"
 
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
@@ -15,27 +13,84 @@
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/VirtualFileSystem.h"
-
 #include <ctime>
 #include <map>
 #include <memory>
 #include <string>
 
 namespace llvm {
+
 class MemoryBuffer;
+
 } // end namespace llvm
 
 namespace stone {
 
-//class FileSysStatCache;
+class FileSystemStatCache;
 
 /// Cached information about one directory (either on disk or in
 /// the virtual file system).
-class Directory final {
+class SrcDir {
   friend class FileMgr;
-  StringRef dirName; // Name of the directory.
+	llvm::StringRef Name; // Name of the directory.
+
 public:
-  StringRef GetName() const { return dirName; }
+  StringRef getName() const { return Name; }
+};
+
+/// Cached information about one file (either on disk
+/// or in the virtual file system).
+///
+/// If the 'File' member is valid, then this SrcFile has an open file
+/// descriptor for the file.
+class SrcFile {
+  friend class FileMgr;
+
+  StringRef Name;             // Name of the file.
+  std::string RealPathName;   // Real path to the file; could be empty.
+  off_t Size;                 // File size in bytes.
+  time_t ModTime;             // Modification time of file.
+  const SrcDir *Dir;  // Directory file lives in.
+  unsigned UID;               // A unique (small) ID for the file.
+  llvm::sys::fs::UniqueID UniqueID;
+  bool IsNamedPipe;
+  bool IsValid;               // Is this \c SrcFile initialized and valid?
+
+  /// The open file, if it is owned by the \p SrcFile.
+  mutable std::unique_ptr<llvm::vfs::File> File;
+
+public:
+  SrcFile()
+      : UniqueID(0, 0), IsNamedPipe(false), IsValid(false)
+  {}
+
+  SrcFile(const SrcFile &) = delete;
+  SrcFile &operator=(const SrcFile &) = delete;
+
+  StringRef getName() const { return Name; }
+  StringRef tryGetRealPathName() const { return RealPathName; }
+  bool isValid() const { return IsValid; }
+  off_t getSize() const { return Size; }
+  unsigned getUID() const { return UID; }
+  const llvm::sys::fs::UniqueID &getUniqueID() const { return UniqueID; }
+  time_t getModificationTime() const { return ModTime; }
+
+  /// Return the directory the file lives in.
+  const SrcDir *getDir() const { return Dir; }
+
+  bool operator<(const SrcFile &RHS) const { return UniqueID < RHS.UniqueID; }
+
+  /// Check whether the file is a named pipe (and thus can't be opened by
+  /// the native FileMgr methods).
+  bool isNamedPipe() const { return IsNamedPipe; }
+
+  void closeFile() const {
+    File.reset(); // rely on destructor to close File
+  }
+
+  // Only for use in tests to see if deferred opens are happening, rather than
+  // relying on RealPathName being empty.
+  bool isOpenForTests() const { return File != nullptr; }
 };
 
 /// Implements support for file system lookup, file system caching,
@@ -45,23 +100,23 @@ public:
 /// on "inode", so that a file with two names (e.g. symlinked) will be treated
 /// as a single file.
 ///
-class FileMgr final : public RefCountedBase<FileMgr> {
-  IntrusiveRefCntPtr<llvm::vfs::FileSystem> fileSys;
-  FileSystemOptions fileSysOpts;
+class FileMgr : public RefCountedBase<FileMgr> {
+  IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS;
+  FileSystemOptions FileSystemOpts;
 
   /// Cache for existing real directories.
-  std::map<llvm::sys::fs::UniqueID, Directory> uniqueRealDirs;
+  std::map<llvm::sys::fs::UniqueID, SrcDir> UniqueRealDirs;
 
   /// Cache for existing real files.
-  std::map<llvm::sys::fs::UniqueID, SrcFile> uniqueRealFiles;
+  std::map<llvm::sys::fs::UniqueID, SrcFile> UniqueRealFiles;
 
   /// The virtual directories that we have allocated.
   ///
   /// For each virtual file (e.g. foo/bar/baz.cpp), we add all of its parent
   /// directories (foo/ and foo/bar/) here.
-  SmallVector<std::unique_ptr<Directory>, 4> virtDirs;
+  SmallVector<std::unique_ptr<SrcDir>, 4> VirtualDirectoryEntries;
   /// The virtual files that we have allocated.
-  SmallVector<std::unique_ptr<SrcFile>, 4> virtFiles;
+  SmallVector<std::unique_ptr<SrcFile>, 4> VirtualFileEntries;
 
   /// A cache that maps paths to directory entries (either real or
   /// virtual) we have looked up
@@ -69,52 +124,50 @@ class FileMgr final : public RefCountedBase<FileMgr> {
   /// The actual Entries for real directories/files are
   /// owned by UniqueRealDirs/UniqueRealFiles above, while the Entries
   /// for virtual directories/files are owned by
-  /// VirtDirs/VirtSrcFiles above.
+  /// VirtualDirectoryEntries/VirtualFileEntries above.
   ///
-  llvm::StringMap<Directory*, llvm::BumpPtrAllocator> seenDirs;
+  llvm::StringMap<SrcDir*, llvm::BumpPtrAllocator> SeenDirEntries;
 
   /// A cache that maps paths to file entries (either real or
   /// virtual) we have looked up.
   ///
   /// \see SeenDirEntries
-  llvm::StringMap<SrcFile*, llvm::BumpPtrAllocator> seenFiles;
+  llvm::StringMap<SrcFile*, llvm::BumpPtrAllocator> SeenFileEntries;
 
   /// The canonical names of directories.
-  llvm::DenseMap<const Directory *, llvm::StringRef> canonicalDirNames;
+  llvm::DenseMap<const SrcDir *, llvm::StringRef> CanonicalDirNames;
 
   /// Storage for canonical names that we have computed.
-  llvm::BumpPtrAllocator canonicalNameStorage;
+  llvm::BumpPtrAllocator CanonicalNameStorage;
 
   /// Each SrcFile we create is assigned a unique ID #.
   ///
-  unsigned nextFileUID;
+  unsigned NextFileUID;
 
   // Statistics.
-  unsigned numDirLookups;
-	unsigned numFileLookups;
-  unsigned numDirCacheMisses;
-	unsigned numFileCacheMisses;
+  unsigned NumDirLookups, NumFileLookups;
+  unsigned NumDirCacheMisses, NumFileCacheMisses;
 
   // Caching.
-	std::unique_ptr<FileSystemStatCache> statCache;
+  std::unique_ptr<FileSystemStatCache> StatCache;
 
-  bool GetStatValue(StringRef Path, llvm::vfs::Status &status, bool isFile,
-                    std::unique_ptr<llvm::vfs::File> *file);
+  bool getStatValue(StringRef Path, llvm::vfs::Status &Status, bool isFile,
+                    std::unique_ptr<llvm::vfs::File> *F);
 
   /// Add all ancestors of the given path (pointing to either a file
   /// or a directory) as virtual directories.
-  void AddAncestorsAsVirtualDirs(StringRef path);
+  void addAncestorsAsVirtualDirs(StringRef Path);
 
   /// Fills the RealPathName in file entry.
-  void FillRealPathName(SrcFile *srcFile, llvm::StringRef fileName);
+  void fillRealPathName(SrcFile *UFE, llvm::StringRef FileName);
 
 public:
   /// Construct a file manager, optionally with a custom VFS.
   ///
   /// \param FS if non-null, the VFS to use.  Otherwise uses
   /// llvm::vfs::getRealFileSystem().
-  FileMgr(const FileSystemOptions &fileSysOpts,
-              IntrusiveRefCntPtr<llvm::vfs::FileSystem> fileSys = nullptr);
+  FileMgr(const FileSystemOptions &FileSystemOpts,
+              IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS = nullptr);
   ~FileMgr();
 
   /// Installs the provided FileSystemStatCache object within
@@ -124,10 +177,10 @@ public:
   ///
   /// \param statCache the new stat cache to install. Ownership of this
   /// object is transferred to the FileMgr.
-  void SetStatCache(std::unique_ptr<FileSystemStatCache> statCache);
+  void setStatCache(std::unique_ptr<FileSystemStatCache> statCache);
 
   /// Removes the FileSystemStatCache object from the manager.
-  void ClearStatCache();
+  void clearStatCache();
 
   /// Lookup, cache, and verify the specified directory (real or
   /// virtual).
@@ -136,7 +189,8 @@ public:
   ///
   /// \param CacheFailure If true and the file does not exist, we'll cache
   /// the failure to find this file.
-  const Directory *GetDir(StringRef dirName, bool cacheFailure = true);
+  const SrcDir *getDirectory(StringRef DirName,
+                                     bool CacheFailure = true);
 
   /// Lookup, cache, and verify the specified file (real or
   /// virtual).
@@ -147,30 +201,29 @@ public:
   ///
   /// \param CacheFailure If true and the file does not exist, we'll cache
   /// the failure to find this file.
-  const SrcFile *GetFile(StringRef filename, bool openFile = false,
-                           bool cacheFailure = true);
+  const SrcFile *getFile(StringRef Filename, bool OpenFile = false,
+                           bool CacheFailure = true);
 
   /// Returns the current file system options
-  FileSystemOptions &GetFileSystemOpts() { return fileSysOpts; }
-  const FileSystemOptions &GetFileSystemOpts() const { return fileSysOpts; }
+  FileSystemOptions &getFileSystemOpts() { return FileSystemOpts; }
+  const FileSystemOptions &getFileSystemOpts() const { return FileSystemOpts; }
 
-  llvm::vfs::FileSystem &GetVirtualFileSystem() const { return *fileSys; }
+  llvm::vfs::FileSystem &getVirtualFileSystem() const { return *FS; }
 
   /// Retrieve a file entry for a "virtual" file that acts as
   /// if there were a file with the given name on disk.
   ///
   /// The file itself is not accessed.
-  const SrcFile *GetVirtualFile(StringRef filename, off_t fileSize,
-                                  time_t modificationTime);
+  const SrcFile *getVirtualFile(StringRef Filename, off_t Size,
+                                  time_t ModificationTime);
 
   /// Open the specified file as a MemoryBuffer, returning a new
   /// MemoryBuffer if successful, otherwise returning null.
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
-  GetBufferForFile(const SrcFile *srcFile, bool isVolatile = false,
+  getBufferForFile(const SrcFile *Entry, bool isVolatile = false,
                    bool ShouldCloseOpenFile = true);
-
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
-  GetBufferForFile(StringRef filename, bool isVolatile = false);
+  getBufferForFile(StringRef Filename, bool isVolatile = false);
 
   /// Get the 'stat' information for the given \p Path.
   ///
@@ -178,10 +231,10 @@ public:
   /// FileMgr's FileSystemOptions.
   ///
   /// \returns false on success, true on error.
-  bool GetNoncachedStatValue(llvm::StringRef path, llvm::vfs::Status &status);
+  bool getNoncachedStatValue(StringRef Path, llvm::vfs::Status &Result);
 
   /// Remove the real file \p Entry from the cache.
-  void InvalidateCache(const SrcFile *srcFile);
+  void invalidateCache(const SrcFile *Entry);
 
   /// If path is not absolute and FileSystemOptions set the working
   /// directory, the path is modified to be relative to the given
@@ -192,26 +245,28 @@ public:
   /// Makes \c Path absolute taking into account FileSystemOptions and the
   /// working directory option.
   /// \returns true if \c Path changed to absolute.
-  bool MakeAbsolutePath(SmallVectorImpl<char> &path) const;
+  bool makeAbsolutePath(SmallVectorImpl<char> &Path) const;
 
   /// Produce an array mapping from the unique IDs assigned to each
   /// file to the corresponding SrcFile pointer.
-  void GetUniqueIDMapping(llvm::SmallVectorImpl<const SrcFile *> &uidToFiles) const;
+  void GetUniqueIDMapping(
+                    SmallVectorImpl<const SrcFile *> &UIDToFiles) const;
 
   /// Modifies the size and modification time of a previously created
   /// SrcFile. Use with caution.
-  static void ModifySrcFile(SrcFile *srcFile, off_t fileSize, time_t modificationTime);
+  static void modifySrcFile(SrcFile *File, off_t Size,
+                              time_t ModificationTime);
 
   /// Retrieve the canonical name for a given directory.
   ///
   /// This is a very expensive operation, despite its results being cached,
   /// and should only be used when the physical layout of the file system is
   /// required, which is (almost) never.
-	llvm::StringRef GetCanonicalName(const Directory *directory);
+  StringRef getCanonicalName(const SrcDir *Dir);
 
   void PrintStats() const;
 };
 
 } // end namespace stone
 
-#endif
+#endif // LLVM_CLANG_BASIC_FILEMANAGER_H

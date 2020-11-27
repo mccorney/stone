@@ -1,4 +1,18 @@
+//===- FileSystemStatCache.cpp - Caching for 'stat' calls -----------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file defines the FileSystemStatCache interface.
+//
+//===----------------------------------------------------------------------===//
+
 #include "stone/Core/FileSystemStatCache.h"
+
+
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/Path.h"
@@ -7,7 +21,7 @@
 
 using namespace stone;
 
-
+void FileSystemStatCache::anchor() {}
 
 /// FileSystemStatCache::get - Get the 'stat' information for the specified
 /// path, using the cache to accelerate it if possible.  This returns true if
@@ -19,10 +33,8 @@ using namespace stone;
 /// implementation can optionally fill in FileDescriptor with a valid
 /// descriptor and the client guarantees that it will close it.
 std::error_code
-FileSystemStatCache::Get(llvm::StringRef Path, 
-												 llvm::vfs::Status &Status,
-                         bool isFile, 
-												 std::unique_ptr<llvm::vfs::File> *F,
+FileSystemStatCache::get(StringRef Path, llvm::vfs::Status &Status,
+                         bool isFile, std::unique_ptr<llvm::vfs::File> *F,
                          FileSystemStatCache *Cache,
                          llvm::vfs::FileSystem &FS) {
   bool isForDir = !isFile;
@@ -30,7 +42,7 @@ FileSystemStatCache::Get(llvm::StringRef Path,
 
   // If we have a cache, use it to resolve the stat query.
   if (Cache)
-    RetCode = Cache->GetStat(Path, Status, isFile, F, FS);
+    RetCode = Cache->getStat(Path, Status, isFile, F, FS);
   else if (isForDir || !F) {
     // If this is a directory or a file descriptor is not needed and we have
     // no cache, just go to the file system.
@@ -89,19 +101,16 @@ FileSystemStatCache::Get(llvm::StringRef Path,
 }
 
 std::error_code
-MemorizeStatCalls::GetStat(StringRef Path, 
-													 llvm::vfs::Status &Status,
+MemorizeStatCalls::getStat(StringRef Path, llvm::vfs::Status &Status,
                            bool isFile,
                            std::unique_ptr<llvm::vfs::File> *F,
                            llvm::vfs::FileSystem &FS) {
-
-	//TODO: May be an issue
-  auto err = FileSystemStatCache::Get(Path, Status, isFile, F, nullptr, FS);
+  auto err = get(Path, Status, isFile, F, nullptr, FS);
   if (err) {
     // Do not cache failed stats, it is easy to construct common inconsistent
     // situations if we do, and they are not important for PCH performance
     // (which currently only needs the stats to construct the initial
-    // FileManager entries).
+    // FileMgr entries).
     return err;
   }
 

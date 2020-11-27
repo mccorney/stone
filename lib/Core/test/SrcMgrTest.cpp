@@ -1,6 +1,7 @@
 #include "stone/Core/SrcMgr.h"
-#include "stone/Core/SrcID.h"
-#include "stone/Core/Diag.h"
+#include "stone/Core/Diagnostics.h"
+//#include "stone/Core/DiagnosticOptions.h"
+#include "stone/Core/FileMgr.h"
 #include "stone/Core/FileSystemOptions.h"
 
 #include "llvm/ADT/SmallString.h"
@@ -13,58 +14,67 @@
 
 
 using namespace stone; 
-namespace {
-class FakeDiagClient : public DiagClient {
-
-};
 
 class SrcMgrTest : public ::testing::Test {
-	protected:
-	FileMgr fileMgr;
-	SrcMgr srcMgr; 
-	FileSystemOptions fileSysOpts;
-	IntrusiveRefCntPtr<DiagIDs> diagIDs;
-  Diag dg;
+protected:
+	FileSystemOptions fmOpts;
+  FileMgr fm;
+	Diagnostics diags;
+  SrcMgr sm;
 
 protected:
-	SrcMgrTest():
-			
-			fileMgr(fileSysOpts),
-      diagIDs(new DiagIDs()),
-      dg(diagIDs, new DiagOptions, new FakeDiagClient()),
-			srcMgr(dg, fileMgr){
- 
-    //TargetOpts->Triple = "x86_64-apple-darwin11.1.0";
-    //Target = TargetInfo::CreateTargetInfo(Diags, TargetOpts);
-  }
-
+	SrcMgrTest() : fm(fmOpts), sm(diags, fm){
+	}
 };
 
 TEST_F(SrcMgrTest, GetColNumber) {
 
-	const char *source =
+	const char *Source =
     "int x;\n"
-    "int y;";
+		"int y;";
 
 
-	auto memBuffer = llvm::MemoryBuffer::getMemBuffer(source);
-  SrcID mainSrcID = srcMgr.createSrcID(std::move(memBuffer));
-  srcMgr.setMainSrcID(mainSrcID);
+	std::unique_ptr<llvm::MemoryBuffer> Buf =
+      llvm::MemoryBuffer::getMemBuffer(Source);
+  FileID MainFileID = sm.createFileID(std::move(Buf));
+  sm.setMainFileID(MainFileID);
 
-  bool invalid; 
+  bool Invalid;
 
-	invalid = false; 
+  Invalid = false;
+  EXPECT_EQ(1U, sm.getColumnNumber(MainFileID, 0, &Invalid));
+  EXPECT_TRUE(!Invalid);
 
-  //EXPECT_EQ(1U, srcMgr.GetColNumber(mainSrcID, 0, &invalid));
-  //EXPECT_TRUE(!invalid);
+	Invalid = false;
+  EXPECT_EQ(5U, sm.getColumnNumber(MainFileID, 4, &Invalid));
+  EXPECT_TRUE(!Invalid);
 
-	invalid = false;
-  EXPECT_EQ(5U, srcMgr.GetColNumber(mainSrcID, 4, &invalid));
-  //EXPECT_TRUE(!invalid);
+  Invalid = false;
+  EXPECT_EQ(1U, sm.getColumnNumber(MainFileID, 7, &Invalid));
+  EXPECT_TRUE(!Invalid);
 
-  //invalid = false;
-  //EXPECT_EQ(1U, srcMgr.GetColNumber(mainSrcID, 7, &invalid));
-  //EXPECT_TRUE(!invalid);
-}
+  Invalid = false;
+  EXPECT_EQ(5U, sm.getColumnNumber(MainFileID, 11, &Invalid));
+  EXPECT_TRUE(!Invalid);
 
+  Invalid = false;
+  EXPECT_EQ(7U, sm.getColumnNumber(MainFileID, strlen(Source),
+                                         &Invalid));
+  EXPECT_TRUE(!Invalid);
+
+  Invalid = false;
+  sm.getColumnNumber(MainFileID, strlen(Source)+1, &Invalid);
+  EXPECT_TRUE(Invalid);
+
+  // Test invalid files
+  Invalid = false;
+  sm.getColumnNumber(FileID(), 0, &Invalid);
+  EXPECT_TRUE(Invalid);
+
+  Invalid = false;
+  sm.getColumnNumber(FileID(), 1, &Invalid);
+  EXPECT_TRUE(Invalid);
+
+  // Test with no invalid flag.
+  EXPECT_EQ(1U, sm.getColumnNumber(MainFileID, 0, nullptr));
 }

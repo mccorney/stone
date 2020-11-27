@@ -1,12 +1,13 @@
-#ifndef STONE_CORE_FILESYSTEM_OPTIONS_H
-#define STONE_CORE_FILESYSTEM_OPTIONS_H
+#ifndef STONE_CORE_FILESYSTEMOPTIONS_H
+#define STONE_CORE_FILESYSTEMOPTIONS_H
 
 #include <string>
 
 namespace stone{
 
-struct FileSystemOptions final {
-	std::string workingDir;
+class FileSystemOptions final {
+	public: 
+		std::string WorkingDir;
 };
 
 }

@@ -2,7 +2,7 @@
 #define STONE_ANALYZE_LEXER_H
 
 #include "stone/Core/SrcLoc.h"
-#include "stone/Core/Diag.h"
+#include "stone/Core/Diagnostics.h"
 
 namespace stone {
 
@@ -13,6 +13,7 @@ class LangOptions;
 class Token;
 class Diag;
 
+/*
 class LexerDiagClient final : public DiagClient {
 		public:
 		unsigned int GetID() {
@@ -23,10 +24,12 @@ class LexerDiagClient final : public DiagClient {
 		}
 };
 
+*/
+
 
 class Lexer final {
-	SrcID srcID; 
-	Diag* dg = nullptr;
+	FileID srcID; 
+	Diagnostics* dg = nullptr;
 
 	const char *bufferStart; 
 	const char *curPtr; 
@@ -35,7 +38,8 @@ class Lexer final {
 	private:
 		void Init(const char *bufferStart, const char *curPtr, const char *bufferEnd); 
 	public:
-		Lexer(const SrcID srcID, const SrcMgr& srcMgr, const LangOptions& langOpts, Diag* dg = nullptr);
+		Lexer(const FileID srcID, const SrcMgr& srcMgr, const LangOptions& langOpts, 
+				Diagnostics* dg = nullptr);
 	public:
 		void Lex(Token& token);
 	public:	

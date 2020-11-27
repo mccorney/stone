@@ -1,7 +1,7 @@
-#ifndef LLVM_CLANG_BASIC_DIAGNOSTICS_H
-#define LLVM_CLANG_BASIC_DIAGNOSTICS_H
+#ifndef STONE_CORE_DIAGNOSTICS_H
+#define STONE_CORE_DIAGNOSTICS_H
 
-#include "stone/Basic/SrcLoc.h"
+#include "stone/Core/SrcLoc.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
@@ -30,7 +30,7 @@ namespace stone {
 /// as errors" and passes them off to the DiagnosticConsumer for reporting to
 /// the user. Diagnostics is tied to one translation unit and one
 /// SrcMgr.
-class Diagnostics : public llvm::RefCountedBase<Diagnostics> {
+class Diagnostics final : public llvm::RefCountedBase<Diagnostics> {
 public:
 
 

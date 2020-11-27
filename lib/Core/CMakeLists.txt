@@ -11,7 +11,7 @@ set(stone_core_sources
 	Builtin.cpp
 	Decl.cpp
 	DeclContext.cpp
-	Diag.cpp
+	Diagnostics.cpp
 	Expr.cpp
 	FileMgr.cpp
 	FileSystemStatCache.cpp
@@ -19,7 +19,6 @@ set(stone_core_sources
 	Identifier.cpp
 	IdentifierTable.cpp
 	Module.cpp
-	SrcFile.cpp
 	SrcLoc.cpp
 	SrcMgr.cpp
 	Stats.cpp

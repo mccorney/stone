@@ -1,9 +1,21 @@
+//===- SrcLoc.cpp - Compact identifier for Source Files -----------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+//  This file defines accessor methods for the FullSourceLoc class.
+//
+//===----------------------------------------------------------------------===//
+
 #include "stone/Core/SrcLoc.h"
 #include "stone/Core/LLVM.h"
-#include "stone/Core/SrcMgr.h"
-#include "stone/Core/SrcFile.h"
-
 //#include "stone/Core/PrettyStackTrace.h"
+#include "stone/Core/SrcMgr.h"
+
+
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
@@ -19,6 +31,7 @@ using namespace stone;
 // PrettyStackTraceLoc
 //===----------------------------------------------------------------------===//
 
+
 /*
 void PrettyStackTraceLoc::print(raw_ostream &OS) const {
   if (Loc.isValid()) {
@@ -28,10 +41,8 @@ void PrettyStackTraceLoc::print(raw_ostream &OS) const {
   OS << Message << '\n';
 }
 */
-
-
 //===----------------------------------------------------------------------===//
-// SrcLocation
+// SrcLoc
 //===----------------------------------------------------------------------===//
 
 void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM)const{
@@ -40,7 +51,7 @@ void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM)const{
     return;
   }
 
-  if (isSrcID()) {
+  if (isFileID()) {
     PresumedLoc PLoc = SM.getPresumedLoc(*this);
 
     if (PLoc.isInvalid()) {
@@ -80,7 +91,7 @@ LLVM_DUMP_METHOD void SrcRange::dump(const SrcMgr &SM) const {
 
 static PresumedLoc PrintDifference(raw_ostream &OS, const SrcMgr &SM,
                                    SrcLoc Loc, PresumedLoc Previous) {
-  if (Loc.isSrcID()) {
+  if (Loc.isFileID()) {
 
     PresumedLoc PLoc = SM.getPresumedLoc(Loc);
 
@@ -128,110 +139,120 @@ SrcRange::printToString(const SrcMgr &SM) const {
 }
 
 //===----------------------------------------------------------------------===//
-// FullSrcLoc
+// FullSourceLoc
 //===----------------------------------------------------------------------===//
 
-SrcID FullSrcLoc::getSrcID() const {
+FileID FullSourceLoc::getFileID() const {
   assert(isValid());
-  return SM->getSrcID(*this);
+  return srcMgr->getFileID(*this);
 }
 
-FullSrcLoc FullSrcLoc::getExpansionLoc() const {
+FullSourceLoc FullSourceLoc::getExpansionLoc() const {
   assert(isValid());
-  return FullSrcLoc(SM->getExpansionLoc(*this), *SM);
+  return FullSourceLoc(srcMgr->getExpansionLoc(*this), *srcMgr);
 }
 
-FullSrcLoc FullSrcLoc::getSpellingLoc() const {
+FullSourceLoc FullSourceLoc::getSpellingLoc() const {
   assert(isValid());
-  return FullSrcLoc(SM->getSpellingLoc(*this), *SM);
+  return FullSourceLoc(srcMgr->getSpellingLoc(*this), *srcMgr);
 }
 
-FullSrcLoc FullSrcLoc::getFileLoc() const {
+FullSourceLoc FullSourceLoc::getFileLoc() const {
   assert(isValid());
-  return FullSrcLoc(SM->getFileLoc(*this), *SM);
+  return FullSourceLoc(srcMgr->getFileLoc(*this), *srcMgr);
 }
 
-PresumedLoc FullSrcLoc::getPresumedLoc(bool UseLineDirectives) const {
+PresumedLoc FullSourceLoc::getPresumedLoc(bool UseLineDirectives) const {
   if (!isValid())
     return PresumedLoc();
 
-  return SM->getPresumedLoc(*this, UseLineDirectives);
+  return srcMgr->getPresumedLoc(*this, UseLineDirectives);
 }
 
-std::pair<FullSrcLoc, StringRef> FullSrcLoc::getModuleImportLoc() const {
+bool FullSourceLoc::isMacroArgExpansion(FullSourceLoc *StartLoc) const {
+  assert(isValid());
+  return srcMgr->isMacroArgExpansion(*this, StartLoc);
+}
+
+FullSourceLoc FullSourceLoc::getImmediateMacroCallerLoc() const {
+  assert(isValid());
+  return FullSourceLoc(srcMgr->getImmediateMacroCallerLoc(*this), *srcMgr);
+}
+
+std::pair<FullSourceLoc, StringRef> FullSourceLoc::getModuleImportLoc() const {
   if (!isValid())
-    return std::make_pair(FullSrcLoc(), StringRef());
+    return std::make_pair(FullSourceLoc(), StringRef());
 
   std::pair<SrcLoc, StringRef> ImportLoc =
-      SM->getModuleImportLoc(*this);
-  return std::make_pair(FullSrcLoc(ImportLoc.first, *SM),
+      srcMgr->getModuleImportLoc(*this);
+  return std::make_pair(FullSourceLoc(ImportLoc.first, *srcMgr),
                         ImportLoc.second);
 }
 
-unsigned FullSrcLoc::getFileOffset() const {
+unsigned FullSourceLoc::getFileOffset() const {
   assert(isValid());
-  return SM->getFileOffset(*this);
+  return srcMgr->getFileOffset(*this);
 }
 
-unsigned FullSrcLoc::getLineNumber(bool *Invalid) const {
+unsigned FullSourceLoc::getLineNumber(bool *Invalid) const {
   assert(isValid());
-  return SM->getLineNumber(getSrcID(), getFileOffset(), Invalid);
+  return srcMgr->getLineNumber(getFileID(), getFileOffset(), Invalid);
 }
 
-unsigned FullSrcLoc::GetColNumber(bool *Invalid) const {
+unsigned FullSourceLoc::getColumnNumber(bool *Invalid) const {
   assert(isValid());
-  return SM->GetColNumber(getSrcID(), getFileOffset(), Invalid);
+  return srcMgr->getColumnNumber(getFileID(), getFileOffset(), Invalid);
 }
 
-const SrcFile *FullSrcLoc::getSrcFile() const {
+const SrcFile *FullSourceLoc::getSrcFile() const {
   assert(isValid());
-  return SM->getSrcFileForID(getSrcID());
+  return srcMgr->getSrcFileForID(getFileID());
 }
 
-unsigned FullSrcLoc::getExpansionLineNumber(bool *Invalid) const {
+unsigned FullSourceLoc::getExpansionLineNumber(bool *Invalid) const {
   assert(isValid());
-  return SM->getExpansionLineNumber(*this, Invalid);
+  return srcMgr->getExpansionLineNumber(*this, Invalid);
 }
 
-unsigned FullSrcLoc::getExpansionColumnNumber(bool *Invalid) const {
+unsigned FullSourceLoc::getExpansionColumnNumber(bool *Invalid) const {
   assert(isValid());
-  return SM->getExpansionColumnNumber(*this, Invalid);
+  return srcMgr->getExpansionColumnNumber(*this, Invalid);
 }
 
-unsigned FullSrcLoc::getSpellingLineNumber(bool *Invalid) const {
+unsigned FullSourceLoc::getSpellingLineNumber(bool *Invalid) const {
   assert(isValid());
-  return SM->getSpellingLineNumber(*this, Invalid);
+  return srcMgr->getSpellingLineNumber(*this, Invalid);
 }
 
-unsigned FullSrcLoc::getSpellingColumnNumber(bool *Invalid) const {
+unsigned FullSourceLoc::getSpellingColumnNumber(bool *Invalid) const {
   assert(isValid());
-  return SM->getSpellingColumnNumber(*this, Invalid);
+  return srcMgr->getSpellingColumnNumber(*this, Invalid);
 }
 
-bool FullSrcLoc::isInSystemHeader() const {
+bool FullSourceLoc::isInSystemHeader() const {
   assert(isValid());
-  return SM->isInSystemHeader(*this);
+  return srcMgr->isInSystemHeader(*this);
 }
 
-bool FullSrcLoc::isBeforeInTranslationUnitThan(SrcLoc Loc) const {
+bool FullSourceLoc::isBeforeInTranslationUnitThan(SrcLoc Loc) const {
   assert(isValid());
-  return SM->isBeforeInTranslationUnit(*this, Loc);
+  return srcMgr->isBeforeInTranslationUnit(*this, Loc);
 }
 
-LLVM_DUMP_METHOD void FullSrcLoc::dump() const {
-  SrcLoc::dump(*SM);
+LLVM_DUMP_METHOD void FullSourceLoc::dump() const {
+  SrcLoc::dump(*srcMgr);
 }
 
-const char *FullSrcLoc::getCharacterData(bool *Invalid) const {
+const char *FullSourceLoc::getCharacterData(bool *Invalid) const {
   assert(isValid());
-  return SM->getCharacterData(*this, Invalid);
+  return srcMgr->getCharacterData(*this, Invalid);
 }
 
-StringRef FullSrcLoc::getBufferData(bool *Invalid) const {
+StringRef FullSourceLoc::getBufferData(bool *Invalid) const {
   assert(isValid());
-  return SM->getBuffer(SM->getSrcID(*this), Invalid)->getBuffer();
+  return srcMgr->getBuffer(srcMgr->getFileID(*this), Invalid)->getBuffer();
 }
 
-std::pair<SrcID, unsigned> FullSrcLoc::getDecomposedLoc() const {
-  return SM->getDecomposedLoc(*this);
+std::pair<FileID, unsigned> FullSourceLoc::getDecomposedLoc() const {
+  return srcMgr->getDecomposedLoc(*this);
 }

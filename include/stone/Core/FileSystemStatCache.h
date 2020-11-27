@@ -1,16 +1,3 @@
-//===- FileSystemStatCache.h - Caching for 'stat' calls ---------*- C++ -*-===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-//
-/// \file
-/// Defines the FileSystemStatCache interface.
-//
-//===----------------------------------------------------------------------===//
-
 #ifndef STONE_CORE_FILESYSTEMSTATCACHE_H
 #define STONE_CORE_FILESYSTEMSTATCACHE_H
 
@@ -29,12 +16,15 @@
 
 namespace stone {
 
-/// Abstract interface for introducing a FileManager cache for 'stat'
+/// Abstract interface for introducing a FileMgr cache for 'stat'
 /// system calls, which is used by precompiled and pretokenized headers to
 /// improve performance.
 class FileSystemStatCache {
+  virtual void anchor();
+
 public:
   virtual ~FileSystemStatCache() = default;
+
   /// Get the 'stat' information for the specified path, using the cache
   /// to accelerate it if possible.
   ///
@@ -46,21 +36,21 @@ public:
   /// implementation can optionally fill in \p F with a valid \p File object and
   /// the client guarantees that it will close it.
   static std::error_code
-  Get(llvm::StringRef path, llvm::vfs::Status &status, bool isFile,
-      std::unique_ptr<llvm::vfs::File> *file,
-      FileSystemStatCache *statCache, llvm::vfs::FileSystem &fileSys);
+  get(StringRef Path, llvm::vfs::Status &Status, bool isFile,
+      std::unique_ptr<llvm::vfs::File> *F,
+      FileSystemStatCache *Cache, llvm::vfs::FileSystem &FS);
 
 protected:
   // FIXME: The pointer here is a non-owning/optional reference to the
   // unique_ptr. Optional<unique_ptr<vfs::File>&> might be nicer, but
   // Optional needs some work to support references so this isn't possible yet.
-  virtual std::error_code GetStat(llvm::StringRef path, llvm::vfs::Status &status,
+  virtual std::error_code getStat(StringRef Path, llvm::vfs::Status &Status,
                                   bool isFile,
-                                  std::unique_ptr<llvm::vfs::File> *file,
-                                  llvm::vfs::FileSystem &fileSys) = 0;
+                                  std::unique_ptr<llvm::vfs::File> *F,
+                                  llvm::vfs::FileSystem &FS) = 0;
 };
 
-/// A stat "cache" that can be used by FileManager to keep
+/// A stat "cache" that can be used by FileMgr to keep
 /// track of the results of stat() calls that occur throughout the
 /// execution of the front end.
 class MemorizeStatCalls : public FileSystemStatCache {
@@ -75,12 +65,12 @@ public:
   iterator begin() const { return StatCalls.begin(); }
   iterator end() const { return StatCalls.end(); }
 
-  std::error_code GetStat(StringRef Path, llvm::vfs::Status &status,
+  std::error_code getStat(StringRef Path, llvm::vfs::Status &Status,
                           bool isFile,
-                          std::unique_ptr<llvm::vfs::File> *file,
-                          llvm::vfs::FileSystem &fileSys) override;
+                          std::unique_ptr<llvm::vfs::File> *F,
+                          llvm::vfs::FileSystem &FS) override;
 };
 
 } // namespace stone
 
-#endif
+#endif // LLVM_CLANG_BASIC_FILESYSTEMSTATCACHE_H
