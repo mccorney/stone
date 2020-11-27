@@ -1,4 +1,4 @@
-//===- SourceLocation.cpp - Compact identifier for Source Files -----------===//
+//===- SrcLoc.cpp - Compact identifier for Source Files -----------===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -42,10 +42,10 @@ void PrettyStackTraceLoc::print(raw_ostream &OS) const {
 }
 */
 //===----------------------------------------------------------------------===//
-// SourceLocation
+// SrcLoc
 //===----------------------------------------------------------------------===//
 
-void SourceLocation::print(raw_ostream &OS, const SrcMgr &SM)const{
+void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM)const{
   if (!isValid()) {
     OS << "<invalid loc>";
     return;
@@ -72,14 +72,14 @@ void SourceLocation::print(raw_ostream &OS, const SrcMgr &SM)const{
 }
 
 LLVM_DUMP_METHOD std::string
-SourceLocation::printToString(const SrcMgr &SM) const {
+SrcLoc::printToString(const SrcMgr &SM) const {
   std::string S;
   llvm::raw_string_ostream OS(S);
   print(OS, SM);
   return OS.str();
 }
 
-LLVM_DUMP_METHOD void SourceLocation::dump(const SrcMgr &SM) const {
+LLVM_DUMP_METHOD void SrcLoc::dump(const SrcMgr &SM) const {
   print(llvm::errs(), SM);
   llvm::errs() << '\n';
 }
@@ -90,7 +90,7 @@ LLVM_DUMP_METHOD void SourceRange::dump(const SrcMgr &SM) const {
 }
 
 static PresumedLoc PrintDifference(raw_ostream &OS, const SrcMgr &SM,
-                                   SourceLocation Loc, PresumedLoc Previous) {
+                                   SrcLoc Loc, PresumedLoc Previous) {
   if (Loc.isFileID()) {
 
     PresumedLoc PLoc = SM.getPresumedLoc(Loc);
@@ -183,7 +183,7 @@ std::pair<FullSourceLoc, StringRef> FullSourceLoc::getModuleImportLoc() const {
   if (!isValid())
     return std::make_pair(FullSourceLoc(), StringRef());
 
-  std::pair<SourceLocation, StringRef> ImportLoc =
+  std::pair<SrcLoc, StringRef> ImportLoc =
       srcMgr->getModuleImportLoc(*this);
   return std::make_pair(FullSourceLoc(ImportLoc.first, *srcMgr),
                         ImportLoc.second);
@@ -234,13 +234,13 @@ bool FullSourceLoc::isInSystemHeader() const {
   return srcMgr->isInSystemHeader(*this);
 }
 
-bool FullSourceLoc::isBeforeInTranslationUnitThan(SourceLocation Loc) const {
+bool FullSourceLoc::isBeforeInTranslationUnitThan(SrcLoc Loc) const {
   assert(isValid());
   return srcMgr->isBeforeInTranslationUnit(*this, Loc);
 }
 
 LLVM_DUMP_METHOD void FullSourceLoc::dump() const {
-  SourceLocation::dump(*srcMgr);
+  SrcLoc::dump(*srcMgr);
 }
 
 const char *FullSourceLoc::getCharacterData(bool *Invalid) const {

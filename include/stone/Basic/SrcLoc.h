@@ -1,4 +1,4 @@
-//===- SourceLocation.h - Compact identifier for Source Files ---*- C++ -*-===//
+//===- SrcLoc.h - Compact identifier for Source Files ---*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 //
 /// \file
-/// Defines the stone::SourceLocation class and associated facilities.
+/// Defines the stone::SrcLoc class and associated facilities.
 //
 //===----------------------------------------------------------------------===//
 
@@ -80,11 +80,11 @@ private:
 /// starting at the highest possible offset and growing downwards, contains
 /// buffers of loaded modules.
 ///
-/// In addition, one bit of SourceLocation is used for quick access to the
+/// In addition, one bit of SrcLoc is used for quick access to the
 /// information whether the location is in a file or a macro expansion.
 ///
 /// It is important that this type remains small. It is currently 32 bits wide.
-class SourceLocation {
+class SrcLoc {
   friend class ASTReader;
   friend class ASTWriter;
   friend class SrcMgr;
@@ -99,9 +99,9 @@ public:
   bool isFileID() const  { return (ID & MacroIDBit) == 0; }
   bool isMacroID() const { return (ID & MacroIDBit) != 0; }
 
-  /// Return true if this is a valid SourceLocation object.
+  /// Return true if this is a valid SrcLoc object.
   ///
-  /// Invalid SourceLocations are often used when events have no corresponding
+  /// Invalid SrcLocs are often used when events have no corresponding
   /// location in the source (e.g. a diagnostic is required for a command line
   /// option).
   bool isValid() const { return ID != 0; }
@@ -113,51 +113,51 @@ private:
     return ID & ~MacroIDBit;
   }
 
-  static SourceLocation getFileLoc(unsigned ID) {
+  static SrcLoc getFileLoc(unsigned ID) {
     assert((ID & MacroIDBit) == 0 && "Ran out of source locations!");
-    SourceLocation L;
+    SrcLoc L;
     L.ID = ID;
     return L;
   }
 
-  static SourceLocation getMacroLoc(unsigned ID) {
+  static SrcLoc getMacroLoc(unsigned ID) {
     assert((ID & MacroIDBit) == 0 && "Ran out of source locations!");
-    SourceLocation L;
+    SrcLoc L;
     L.ID = MacroIDBit | ID;
     return L;
   }
 
 public:
   /// Return a source location with the specified offset from this
-  /// SourceLocation.
-  SourceLocation getLocWithOffset(int Offset) const {
+  /// SrcLoc.
+  SrcLoc getLocWithOffset(int Offset) const {
     assert(((getOffset()+Offset) & MacroIDBit) == 0 && "offset overflow");
-    SourceLocation L;
+    SrcLoc L;
     L.ID = ID+Offset;
     return L;
   }
 
-  /// When a SourceLocation itself cannot be used, this returns
+  /// When a SrcLoc itself cannot be used, this returns
   /// an (opaque) 32-bit integer encoding for it.
   ///
-  /// This should only be passed to SourceLocation::getFromRawEncoding, it
+  /// This should only be passed to SrcLoc::getFromRawEncoding, it
   /// should not be inspected directly.
   unsigned getRawEncoding() const { return ID; }
 
-  /// Turn a raw encoding of a SourceLocation object into
-  /// a real SourceLocation.
+  /// Turn a raw encoding of a SrcLoc object into
+  /// a real SrcLoc.
   ///
   /// \see getRawEncoding.
-  static SourceLocation getFromRawEncoding(unsigned Encoding) {
-    SourceLocation X;
+  static SrcLoc getFromRawEncoding(unsigned Encoding) {
+    SrcLoc X;
     X.ID = Encoding;
     return X;
   }
 
-  /// When a SourceLocation itself cannot be used, this returns
+  /// When a SrcLoc itself cannot be used, this returns
   /// an (opaque) pointer encoding for it.
   ///
-  /// This should only be passed to SourceLocation::getFromPtrEncoding, it
+  /// This should only be passed to SrcLoc::getFromPtrEncoding, it
   /// should not be inspected directly.
   void* getPtrEncoding() const {
     // Double cast to avoid a warning "cast to pointer from integer of different
@@ -165,13 +165,13 @@ public:
     return (void*)(uintptr_t)getRawEncoding();
   }
 
-  /// Turn a pointer encoding of a SourceLocation object back
-  /// into a real SourceLocation.
-  static SourceLocation getFromPtrEncoding(const void *Encoding) {
+  /// Turn a pointer encoding of a SrcLoc object back
+  /// into a real SrcLoc.
+  static SrcLoc getFromPtrEncoding(const void *Encoding) {
     return getFromRawEncoding((unsigned)(uintptr_t)Encoding);
   }
 
-  static bool isPairOfFileLocations(SourceLocation Start, SourceLocation End) {
+  static bool isPairOfFileLocations(SrcLoc Start, SrcLoc End) {
     return Start.isValid() && Start.isFileID() && End.isValid() &&
            End.isFileID();
   }
@@ -181,33 +181,33 @@ public:
   void dump(const SrcMgr &SM) const;
 };
 
-inline bool operator==(const SourceLocation &LHS, const SourceLocation &RHS) {
+inline bool operator==(const SrcLoc &LHS, const SrcLoc &RHS) {
   return LHS.getRawEncoding() == RHS.getRawEncoding();
 }
 
-inline bool operator!=(const SourceLocation &LHS, const SourceLocation &RHS) {
+inline bool operator!=(const SrcLoc &LHS, const SrcLoc &RHS) {
   return !(LHS == RHS);
 }
 
-inline bool operator<(const SourceLocation &LHS, const SourceLocation &RHS) {
+inline bool operator<(const SrcLoc &LHS, const SrcLoc &RHS) {
   return LHS.getRawEncoding() < RHS.getRawEncoding();
 }
 
 /// A trivial tuple used to represent a source range.
 class SourceRange {
-  SourceLocation B;
-  SourceLocation E;
+  SrcLoc B;
+  SrcLoc E;
 
 public:
   SourceRange() = default;
-  SourceRange(SourceLocation loc) : B(loc), E(loc) {}
-  SourceRange(SourceLocation begin, SourceLocation end) : B(begin), E(end) {}
+  SourceRange(SrcLoc loc) : B(loc), E(loc) {}
+  SourceRange(SrcLoc begin, SrcLoc end) : B(begin), E(end) {}
 
-  SourceLocation getBegin() const { return B; }
-  SourceLocation getEnd() const { return E; }
+  SrcLoc getBegin() const { return B; }
+  SrcLoc getEnd() const { return E; }
 
-  void setBegin(SourceLocation b) { B = b; }
-  void setEnd(SourceLocation e) { E = e; }
+  void setBegin(SrcLoc b) { B = b; }
+  void setEnd(SrcLoc e) { E = e; }
 
   bool isValid() const { return B.isValid() && E.isValid(); }
   bool isInvalid() const { return !isValid(); }
@@ -248,11 +248,11 @@ public:
     return CharSourceRange(R, false);
   }
 
-  static CharSourceRange getTokenRange(SourceLocation B, SourceLocation E) {
+  static CharSourceRange getTokenRange(SrcLoc B, SrcLoc E) {
     return getTokenRange(SourceRange(B, E));
   }
 
-  static CharSourceRange getCharRange(SourceLocation B, SourceLocation E) {
+  static CharSourceRange getCharRange(SrcLoc B, SrcLoc E) {
     return getCharRange(SourceRange(B, E));
   }
 
@@ -262,12 +262,12 @@ public:
   bool isTokenRange() const { return IsTokenRange; }
   bool isCharRange() const { return !IsTokenRange; }
 
-  SourceLocation getBegin() const { return Range.getBegin(); }
-  SourceLocation getEnd() const { return Range.getEnd(); }
+  SrcLoc getBegin() const { return Range.getBegin(); }
+  SrcLoc getEnd() const { return Range.getEnd(); }
   SourceRange getAsRange() const { return Range; }
 
-  void setBegin(SourceLocation b) { Range.setBegin(b); }
-  void setEnd(SourceLocation e) { Range.setEnd(e); }
+  void setBegin(SrcLoc b) { Range.setBegin(b); }
+  void setEnd(SrcLoc e) { Range.setEnd(e); }
   void setTokenRange(bool TR) { IsTokenRange = TR; }
 
   bool isValid() const { return Range.isValid(); }
@@ -280,17 +280,17 @@ public:
 /// A 'presumed' location can be modified by \#line and GNU line marker
 /// directives and is always the expansion point of a normal location.
 ///
-/// You can get a PresumedLoc from a SourceLocation with SrcMgr.
+/// You can get a PresumedLoc from a SrcLoc with SrcMgr.
 class PresumedLoc {
   const char *Filename = nullptr;
   FileID ID;
   unsigned Line, Col;
-  SourceLocation IncludeLoc;
+  SrcLoc IncludeLoc;
 
 public:
   PresumedLoc() = default;
   PresumedLoc(const char *FN, FileID FID, unsigned Ln, unsigned Co,
-              SourceLocation IL)
+              SrcLoc IL)
       : Filename(FN), ID(FID), Line(Ln), Col(Co), IncludeLoc(IL) {}
 
   /// Return true if this object is invalid or uninitialized.
@@ -332,7 +332,7 @@ public:
   /// Return the presumed include location of this location.
   ///
   /// This can be affected by GNU linemarker directives.
-  SourceLocation getIncludeLoc() const {
+  SrcLoc getIncludeLoc() const {
     assert(isValid());
     return IncludeLoc;
   }
@@ -340,18 +340,18 @@ public:
 
 class FileEntry;
 
-/// A SourceLocation and its associated SrcMgr.
+/// A SrcLoc and its associated SrcMgr.
 ///
 /// This is useful for argument passing to functions that expect both objects.
-class FullSourceLoc : public SourceLocation {
+class FullSourceLoc : public SrcLoc {
   const SrcMgr *srcMgr = nullptr;
 
 public:
   /// Creates a FullSourceLoc where isValid() returns \c false.
   FullSourceLoc() = default;
 
-  explicit FullSourceLoc(SourceLocation Loc, const SrcMgr &SM)
-      : SourceLocation(Loc), srcMgr(&SM) {}
+  explicit FullSourceLoc(SrcLoc Loc, const SrcMgr &SM)
+      : SrcLoc(Loc), srcMgr(&SM) {}
 
   bool hasManager() const {
       bool hassrcMgr =  srcMgr != nullptr;
@@ -404,7 +404,7 @@ public:
   /// Determines the order of 2 source locations in the translation unit.
   ///
   /// \returns true if this source location comes before 'Loc', false otherwise.
-  bool isBeforeInTranslationUnitThan(SourceLocation Loc) const;
+  bool isBeforeInTranslationUnitThan(SrcLoc Loc) const;
 
   /// Determines the order of 2 source locations in the translation unit.
   ///
@@ -412,7 +412,7 @@ public:
   bool isBeforeInTranslationUnitThan(FullSourceLoc Loc) const {
     assert(Loc.isValid());
     assert(srcMgr == Loc.srcMgr && "Loc comes from another SrcMgr!");
-    return isBeforeInTranslationUnitThan((SourceLocation)Loc);
+    return isBeforeInTranslationUnitThan((SrcLoc)Loc);
   }
 
   /// Comparison function class, useful for sorting FullSourceLocs.
@@ -464,17 +464,17 @@ namespace llvm {
     }
   };
 
-  // Teach SmallPtrSet how to handle SourceLocation.
+  // Teach SmallPtrSet how to handle SrcLoc.
   template<>
-  struct PointerLikeTypeTraits<stone::SourceLocation> {
+  struct PointerLikeTypeTraits<stone::SrcLoc> {
     enum { NumLowBitsAvailable = 0 };
 
-    static void *getAsVoidPointer(stone::SourceLocation L) {
+    static void *getAsVoidPointer(stone::SrcLoc L) {
       return L.getPtrEncoding();
     }
 
-    static stone::SourceLocation getFromVoidPointer(void *P) {
-      return stone::SourceLocation::getFromRawEncoding((unsigned)(uintptr_t)P);
+    static stone::SrcLoc getFromVoidPointer(void *P) {
+      return stone::SrcLoc::getFromRawEncoding((unsigned)(uintptr_t)P);
     }
   };
 
