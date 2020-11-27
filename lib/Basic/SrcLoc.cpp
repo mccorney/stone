@@ -45,7 +45,7 @@ void PrettyStackTraceLoc::print(raw_ostream &OS) const {
 // SourceLocation
 //===----------------------------------------------------------------------===//
 
-void SourceLocation::print(raw_ostream &OS, const SourceManager &SM)const{
+void SourceLocation::print(raw_ostream &OS, const SrcMgr &SM)const{
   if (!isValid()) {
     OS << "<invalid loc>";
     return;
@@ -72,24 +72,24 @@ void SourceLocation::print(raw_ostream &OS, const SourceManager &SM)const{
 }
 
 LLVM_DUMP_METHOD std::string
-SourceLocation::printToString(const SourceManager &SM) const {
+SourceLocation::printToString(const SrcMgr &SM) const {
   std::string S;
   llvm::raw_string_ostream OS(S);
   print(OS, SM);
   return OS.str();
 }
 
-LLVM_DUMP_METHOD void SourceLocation::dump(const SourceManager &SM) const {
+LLVM_DUMP_METHOD void SourceLocation::dump(const SrcMgr &SM) const {
   print(llvm::errs(), SM);
   llvm::errs() << '\n';
 }
 
-LLVM_DUMP_METHOD void SourceRange::dump(const SourceManager &SM) const {
+LLVM_DUMP_METHOD void SourceRange::dump(const SrcMgr &SM) const {
   print(llvm::errs(), SM);
   llvm::errs() << '\n';
 }
 
-static PresumedLoc PrintDifference(raw_ostream &OS, const SourceManager &SM,
+static PresumedLoc PrintDifference(raw_ostream &OS, const SrcMgr &SM,
                                    SourceLocation Loc, PresumedLoc Previous) {
   if (Loc.isFileID()) {
 
@@ -119,7 +119,7 @@ static PresumedLoc PrintDifference(raw_ostream &OS, const SourceManager &SM,
   return PrintedLoc;
 }
 
-void SourceRange::print(raw_ostream &OS, const SourceManager &SM) const {
+void SourceRange::print(raw_ostream &OS, const SrcMgr &SM) const {
 
   OS << '<';
   auto PrintedLoc = PrintDifference(OS, SM, B, {});
@@ -131,7 +131,7 @@ void SourceRange::print(raw_ostream &OS, const SourceManager &SM) const {
 }
 
 LLVM_DUMP_METHOD std::string
-SourceRange::printToString(const SourceManager &SM) const {
+SourceRange::printToString(const SrcMgr &SM) const {
   std::string S;
   llvm::raw_string_ostream OS(S);
   print(OS, SM);

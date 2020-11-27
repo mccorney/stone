@@ -31,9 +31,9 @@ template <typename T> struct DenseMapInfo;
 
 namespace stone {
 
-class SourceManager;
+class SrcMgr;
 
-/// An opaque identifier used by SourceManager which refers to a
+/// An opaque identifier used by SrcMgr which refers to a
 /// source file (MemoryBuffer) along with its \#include path and \#line data.
 ///
 class FileID {
@@ -58,7 +58,7 @@ public:
 private:
   friend class ASTWriter;
   friend class ASTReader;
-  friend class SourceManager;
+  friend class SrcMgr;
 
   static FileID get(int V) {
     FileID F;
@@ -69,7 +69,7 @@ private:
   int getOpaqueValue() const { return ID; }
 };
 
-/// Encodes a location in the source. The SourceManager can decode this
+/// Encodes a location in the source. The SrcMgr can decode this
 /// to get at the full include stack, line and column information.
 ///
 /// Technically, a source location is simply an offset into the manager's view
@@ -87,7 +87,7 @@ private:
 class SourceLocation {
   friend class ASTReader;
   friend class ASTWriter;
-  friend class SourceManager;
+  friend class SrcMgr;
 
   unsigned ID = 0;
 
@@ -176,9 +176,9 @@ public:
            End.isFileID();
   }
 
-  void print(raw_ostream &OS, const SourceManager &SM) const;
-  std::string printToString(const SourceManager &SM) const;
-  void dump(const SourceManager &SM) const;
+  void print(raw_ostream &OS, const SrcMgr &SM) const;
+  std::string printToString(const SrcMgr &SM) const;
+  void dump(const SrcMgr &SM) const;
 };
 
 inline bool operator==(const SourceLocation &LHS, const SourceLocation &RHS) {
@@ -220,9 +220,9 @@ public:
     return B != X.B || E != X.E;
   }
 
-  void print(raw_ostream &OS, const SourceManager &SM) const;
-  std::string printToString(const SourceManager &SM) const;
-  void dump(const SourceManager &SM) const;
+  void print(raw_ostream &OS, const SrcMgr &SM) const;
+  std::string printToString(const SrcMgr &SM) const;
+  void dump(const SrcMgr &SM) const;
 };
 
 /// Represents a character-granular source range.
@@ -280,7 +280,7 @@ public:
 /// A 'presumed' location can be modified by \#line and GNU line marker
 /// directives and is always the expansion point of a normal location.
 ///
-/// You can get a PresumedLoc from a SourceLocation with SourceManager.
+/// You can get a PresumedLoc from a SourceLocation with SrcMgr.
 class PresumedLoc {
   const char *Filename = nullptr;
   FileID ID;
@@ -340,17 +340,17 @@ public:
 
 class FileEntry;
 
-/// A SourceLocation and its associated SourceManager.
+/// A SourceLocation and its associated SrcMgr.
 ///
 /// This is useful for argument passing to functions that expect both objects.
 class FullSourceLoc : public SourceLocation {
-  const SourceManager *srcMgr = nullptr;
+  const SrcMgr *srcMgr = nullptr;
 
 public:
   /// Creates a FullSourceLoc where isValid() returns \c false.
   FullSourceLoc() = default;
 
-  explicit FullSourceLoc(SourceLocation Loc, const SourceManager &SM)
+  explicit FullSourceLoc(SourceLocation Loc, const SrcMgr &SM)
       : SourceLocation(Loc), srcMgr(&SM) {}
 
   bool hasManager() const {
@@ -359,9 +359,9 @@ public:
       return hassrcMgr;
   }
 
-  /// \pre This FullSourceLoc has an associated SourceManager.
-  const SourceManager &getManager() const {
-    assert(srcMgr && "SourceManager is NULL.");
+  /// \pre This FullSourceLoc has an associated SrcMgr.
+  const SrcMgr &getManager() const {
+    assert(srcMgr && "SrcMgr is NULL.");
     return *srcMgr;
   }
 
@@ -411,7 +411,7 @@ public:
   /// \returns true if this source location comes before 'Loc', false otherwise.
   bool isBeforeInTranslationUnitThan(FullSourceLoc Loc) const {
     assert(Loc.isValid());
-    assert(srcMgr == Loc.srcMgr && "Loc comes from another SourceManager!");
+    assert(srcMgr == Loc.srcMgr && "Loc comes from another SrcMgr!");
     return isBeforeInTranslationUnitThan((SourceLocation)Loc);
   }
 

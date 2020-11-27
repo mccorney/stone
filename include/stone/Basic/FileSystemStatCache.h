@@ -29,7 +29,7 @@
 
 namespace stone {
 
-/// Abstract interface for introducing a FileManager cache for 'stat'
+/// Abstract interface for introducing a FileMgr cache for 'stat'
 /// system calls, which is used by precompiled and pretokenized headers to
 /// improve performance.
 class FileSystemStatCache {
@@ -63,7 +63,7 @@ protected:
                                   llvm::vfs::FileSystem &FS) = 0;
 };
 
-/// A stat "cache" that can be used by FileManager to keep
+/// A stat "cache" that can be used by FileMgr to keep
 /// track of the results of stat() calls that occur throughout the
 /// execution of the front end.
 class MemorizeStatCalls : public FileSystemStatCache {

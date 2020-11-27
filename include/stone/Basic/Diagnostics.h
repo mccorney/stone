@@ -29,7 +29,7 @@ namespace stone {
 /// This massages the diagnostics (e.g. handling things like "report warnings
 /// as errors" and passes them off to the DiagnosticConsumer for reporting to
 /// the user. Diagnostics is tied to one translation unit and one
-/// SourceManager.
+/// SrcMgr.
 class Diagnostics : public llvm::RefCountedBase<Diagnostics> {
 public:
 

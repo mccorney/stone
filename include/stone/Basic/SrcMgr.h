@@ -1,4 +1,4 @@
-//===- SourceManager.h - Track and cache source files -----------*- C++ -*-===//
+//===- SrcMgr.h - Track and cache source files -----------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 //
 /// \file
-/// Defines the SourceManager interface.
+/// Defines the SrcMgr interface.
 ///
 /// There are three different types of locations in a %file: a spelling
 /// location, an expansion location, and a presumed location.
@@ -60,10 +60,10 @@
 namespace stone {
 
 class LineTableInfo;
-class SourceManager;
+class SrcMgr;
 class Diagnostics;
 /// Public enums and private classes that are part of the
-/// SourceManager implementation.
+/// SrcMgr implementation.
 namespace src {
 
   /// Indicates whether a file or directory holds normal user code,
@@ -123,7 +123,7 @@ namespace src {
 
     /// A bump pointer allocated array of offsets for each source line.
     ///
-    /// This is lazily computed.  This is owned by the SourceManager
+    /// This is lazily computed.  This is owned by the SrcMgr
     /// BumpPointerAllocator object.
     unsigned *SourceLineCache = nullptr;
 
@@ -184,7 +184,7 @@ namespace src {
     ///
     /// \param Invalid If non-NULL, will be set \c true if an error occurred.
     const llvm::MemoryBuffer *getBuffer(Diagnostics &Diag,
-                                        const SourceManager &SM,
+                                        const SrcMgr &SM,
                                         SourceLocation Loc = SourceLocation(),
                                         bool *Invalid = nullptr) const;
 
@@ -242,7 +242,7 @@ namespace src {
   /// FileInfos contain a "ContentCache *", with the contents of the file.
   ///
   class FileInfo {
-    friend class stone::SourceManager;
+    friend class stone::SrcMgr;
     /// The location of the \#include that brought in this file.
     ///
     /// This is an invalid SLOC for the main file (top of the \#include chain).
@@ -417,7 +417,7 @@ namespace src {
 
   /// This is a discriminated union of FileInfo and ExpansionInfo.
   ///
-  /// SourceManager keeps an array of these objects, and they are uniquely
+  /// SrcMgr keeps an array of these objects, and they are uniquely
   /// identified by the FileID datatype.
   class SLocEntry {
     unsigned Offset : 31;
@@ -487,7 +487,7 @@ public:
 /// Holds the cache used by isBeforeInTranslationUnit.
 ///
 /// The cache structure is complex enough to be worth breaking out of
-/// SourceManager.
+/// SrcMgr.
 class InBeforeInTUCacheEntry {
   /// The FileID's of the cached query.
   ///
@@ -569,23 +569,23 @@ using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSourceLoc>>;
 /// This object owns the MemoryBuffer objects for all of the loaded
 /// files and assigns unique FileID's for each unique \#include chain.
 ///
-/// The SourceManager can be queried for information about SourceLocation
+/// The SrcMgr can be queried for information about SourceLocation
 /// objects, turning them into either spelling or expansion locations. Spelling
 /// locations represent where the bytes corresponding to a token came from and
 /// expansion locations represent where the location is in the user's view. In
 /// the case of a macro expansion, for example, the spelling location indicates
 /// where the expanded token came from and the expansion location specifies
 /// where it was expanded.
-class SourceManager : public RefCountedBase<SourceManager> {
+class SrcMgr : public RefCountedBase<SrcMgr> {
   /// Diagnostics object.
   Diagnostics &Diag;
 
-  FileManager &fileMgr;
+  FileMgr &fileMgr;
 
   mutable llvm::BumpPtrAllocator ContentCacheAlloc;
 
   /// Memoized information about all of the files tracked by this
-  /// SourceManager.
+  /// SrcMgr.
   ///
   /// This map allows us to merge ContentCache entries based
   /// on their FileEntry*.  All ContentCache objects will thus have unique,
@@ -739,23 +739,23 @@ class SourceManager : public RefCountedBase<SourceManager> {
   SmallVector<std::pair<std::string, FullSourceLoc>, 2> StoredModuleBuildStack;
 
 public:
-  SourceManager(Diagnostics &Diag, FileManager &fileMgr,
+  SrcMgr(Diagnostics &Diag, FileMgr &fileMgr,
                 bool UserFilesAreVolatile = false);
-  explicit SourceManager(const SourceManager &) = delete;
-  SourceManager &operator=(const SourceManager &) = delete;
-  ~SourceManager();
+  explicit SrcMgr(const SrcMgr &) = delete;
+  SrcMgr &operator=(const SrcMgr &) = delete;
+  ~SrcMgr();
 
   void clearIDTables();
 
   /// Initialize this source manager suitably to replay the compilation
   /// described by \p Old. Requires that \p Old outlive \p *this.
-  void initializeForReplay(const SourceManager &Old);
+  void initializeForReplay(const SrcMgr &Old);
 
   Diagnostics &getDiagnostics() const { return Diag; }
 
-  FileManager &getFileManager() const { return fileMgr; }
+  FileMgr &getFileMgr() const { return fileMgr; }
 
-  /// Set true if the SourceManager should report the original file name
+  /// Set true if the SrcMgr should report the original file name
   /// for contents of files that were overridden by other files. Defaults to
   /// true.
   void setOverridenFilesKeepOriginalName(bool value) {
@@ -838,7 +838,7 @@ public:
   /// Create a new FileID that represents the specified memory buffer.
   ///
   /// This does not take ownership of the MemoryBuffer. The memory buffer must
-  /// outlive the SourceManager.
+  /// outlive the SrcMgr.
   FileID createFileID(UnownedTag, const llvm::MemoryBuffer *Buffer,
                       src::CharacteristicKind FileCharacter = src::C_User,
                       int LoadedID = 0, unsigned LoadedOffset = 0,
@@ -1039,7 +1039,7 @@ public:
 
   /// Return the FileID for a SourceLocation.
   ///
-  /// This is a very hot method that is used for all SourceManager queries
+  /// This is a very hot method that is used for all SrcMgr queries
   /// that start with a SourceLocation object.  It is responsible for finding
   /// the entry in SLocEntryTable which contains the specified location.
   ///
@@ -1535,7 +1535,7 @@ public:
   MemoryBufferSizes getMemoryBufferSizes() const;
 
   /// Return the amount of memory used for various side tables and
-  /// data structures in the SourceManager.
+  /// data structures in the SrcMgr.
   size_t getDataStructureSizes() const;
 
   //===--------------------------------------------------------------------===//
@@ -1822,10 +1822,10 @@ class BeforeThanCompare;
 /// Compare two source locations.
 template<>
 class BeforeThanCompare<SourceLocation> {
-  SourceManager &SM;
+  SrcMgr &SM;
 
 public:
-  explicit BeforeThanCompare(SourceManager &SM) : SM(SM) {}
+  explicit BeforeThanCompare(SrcMgr &SM) : SM(SM) {}
 
   bool operator()(SourceLocation LHS, SourceLocation RHS) const {
     return SM.isBeforeInTranslationUnit(LHS, RHS);
@@ -1835,36 +1835,36 @@ public:
 /// Compare two non-overlapping source ranges.
 template<>
 class BeforeThanCompare<SourceRange> {
-  SourceManager &SM;
+  SrcMgr &SM;
 
 public:
-  explicit BeforeThanCompare(SourceManager &SM) : SM(SM) {}
+  explicit BeforeThanCompare(SrcMgr &SM) : SM(SM) {}
 
   bool operator()(SourceRange LHS, SourceRange RHS) const {
     return SM.isBeforeInTranslationUnit(LHS.getBegin(), RHS.getBegin());
   }
 };
 
-/// SourceManager and necessary depdencies (e.g. VFS, FileManager) for a single
+/// SrcMgr and necessary depdencies (e.g. VFS, FileMgr) for a single
 /// in-memorty file.
-class SourceManagerForFile {
+class SrcMgrForFile {
 public:
-  /// Creates SourceManager and necessary depdencies (e.g. VFS, FileManager).
-  /// The main file in the SourceManager will be \p FileName with \p Content.
-  SourceManagerForFile(StringRef FileName, StringRef Content);
+  /// Creates SrcMgr and necessary depdencies (e.g. VFS, FileMgr).
+  /// The main file in the SrcMgr will be \p FileName with \p Content.
+  SrcMgrForFile(StringRef FileName, StringRef Content);
 
-  SourceManager &get() {
+  SrcMgr &get() {
     assert(SourceMgr);
     return *SourceMgr;
   }
 
 private:
   // The order of these fields are important - they should be in the same order
-  // as they are created in `createSourceManagerForFile` so that they can be
+  // as they are created in `createSrcMgrForFile` so that they can be
   // deleted in the reverse order as they are created.
-  std::unique_ptr<FileManager> fileMgr;
+  std::unique_ptr<FileMgr> fileMgr;
   //std::unique_ptr<Diagnostics> Diagnostics;
-  std::unique_ptr<SourceManager> SourceMgr;
+  std::unique_ptr<SrcMgr> SourceMgr;
 };
 
 } // namespace stone

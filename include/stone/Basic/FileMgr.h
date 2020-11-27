@@ -1,4 +1,4 @@
-//===--- FileManager.h - File System Probing and Caching --------*- C++ -*-===//
+//===--- FileMgr.h - File System Probing and Caching --------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// Defines the stone::FileManager interface and associated types.
+/// Defines the stone::FileMgr interface and associated types.
 ///
 //===----------------------------------------------------------------------===//
 
@@ -44,7 +44,7 @@ class FileSystemStatCache;
 /// Cached information about one directory (either on disk or in
 /// the virtual file system).
 class DirectoryEntry {
-  friend class FileManager;
+  friend class FileMgr;
 
   StringRef Name; // Name of the directory.
 
@@ -58,7 +58,7 @@ public:
 /// If the 'File' member is valid, then this FileEntry has an open file
 /// descriptor for the file.
 class FileEntry {
-  friend class FileManager;
+  friend class FileMgr;
 
   StringRef Name;             // Name of the file.
   std::string RealPathName;   // Real path to the file; could be empty.
@@ -95,7 +95,7 @@ public:
   bool operator<(const FileEntry &RHS) const { return UniqueID < RHS.UniqueID; }
 
   /// Check whether the file is a named pipe (and thus can't be opened by
-  /// the native FileManager methods).
+  /// the native FileMgr methods).
   bool isNamedPipe() const { return IsNamedPipe; }
 
   void closeFile() const {
@@ -114,7 +114,7 @@ public:
 /// on "inode", so that a file with two names (e.g. symlinked) will be treated
 /// as a single file.
 ///
-class FileManager : public RefCountedBase<FileManager> {
+class FileMgr : public RefCountedBase<FileMgr> {
   IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS;
   FileSystemOptions FileSystemOpts;
 
@@ -180,17 +180,17 @@ public:
   ///
   /// \param FS if non-null, the VFS to use.  Otherwise uses
   /// llvm::vfs::getRealFileSystem().
-  FileManager(const FileSystemOptions &FileSystemOpts,
+  FileMgr(const FileSystemOptions &FileSystemOpts,
               IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS = nullptr);
-  ~FileManager();
+  ~FileMgr();
 
   /// Installs the provided FileSystemStatCache object within
-  /// the FileManager.
+  /// the FileMgr.
   ///
-  /// Ownership of this object is transferred to the FileManager.
+  /// Ownership of this object is transferred to the FileMgr.
   ///
   /// \param statCache the new stat cache to install. Ownership of this
-  /// object is transferred to the FileManager.
+  /// object is transferred to the FileMgr.
   void setStatCache(std::unique_ptr<FileSystemStatCache> statCache);
 
   /// Removes the FileSystemStatCache object from the manager.
@@ -242,7 +242,7 @@ public:
   /// Get the 'stat' information for the given \p Path.
   ///
   /// If the path is relative, it will be resolved against the WorkingDir of the
-  /// FileManager's FileSystemOptions.
+  /// FileMgr's FileSystemOptions.
   ///
   /// \returns false on success, true on error.
   bool getNoncachedStatValue(StringRef Path, llvm::vfs::Status &Result);

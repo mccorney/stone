@@ -1,4 +1,4 @@
-//===- SourceManagerInternals.h - SourceManager Internals -------*- C++ -*-===//
+//===- SrcMgrInternals.h - SrcMgr Internals -------*- C++ -*-===//
 //
 // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
@@ -7,7 +7,7 @@
 //===----------------------------------------------------------------------===//
 //
 /// \file
-/// Defines implementation details of the stone::SourceManager class.
+/// Defines implementation details of the stone::SrcMgr class.
 //
 //===----------------------------------------------------------------------===//
 

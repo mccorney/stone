@@ -108,7 +108,7 @@ MemorizeStatCalls::getStat(StringRef Path, llvm::vfs::Status &Status,
     // Do not cache failed stats, it is easy to construct common inconsistent
     // situations if we do, and they are not important for PCH performance
     // (which currently only needs the stats to construct the initial
-    // FileManager entries).
+    // FileMgr entries).
     return err;
   }
 
