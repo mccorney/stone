@@ -30,7 +30,7 @@ namespace stone {
 /// as errors" and passes them off to the DiagnosticConsumer for reporting to
 /// the user. DiagnosticsEngine is tied to one translation unit and one
 /// SourceManager.
-class DiagnosticsEngine : public llvm::RefCountedBase<DiagnosticsEngine> {
+class Diagnostics : public llvm::RefCountedBase<Diagnostics> {
 public:
 
 

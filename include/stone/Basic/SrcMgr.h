@@ -34,7 +34,7 @@
 #ifndef LLVM_CLANG_BASIC_SOURCEMANAGER_H
 #define LLVM_CLANG_BASIC_SOURCEMANAGER_H
 
-//#include "stone/Basic/Diagnostic.h"
+#include "stone/Basic/Diagnostics.h"
 #include "stone/Basic/FileMgr.h"
 #include "stone/Basic/SrcLoc.h"
 
