@@ -1,7 +1,7 @@
 #include "stone/Basic/SrcMgr.h"
 #include "stone/Basic/Diagnostics.h"
 //#include "stone/Basic/DiagnosticOptions.h"
-#include "stone/Basic/fileMgr.h"
+#include "stone/Basic/FileMgr.h"
 #include "stone/Basic/FileSystemOptions.h"
 
 #include "llvm/ADT/SmallString.h"
@@ -18,7 +18,7 @@ using namespace stone;
 class SrcMgrTest : public ::testing::Test {
 protected:
 	FileSystemOptions fmOpts;
-  fileMgr fm;
+  FileMgr fm;
 	Diagnostics diags;
   SrcMgr sm;
 

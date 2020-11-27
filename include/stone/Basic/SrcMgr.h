@@ -59,11 +59,9 @@
 
 namespace stone {
 
-class ASTReader;
-class ASTWriter;
 class LineTableInfo;
 class SourceManager;
-class DiagnosticsEngine;
+class Diagnostics;
 /// Public enums and private classes that are part of the
 /// SourceManager implementation.
 namespace src {
@@ -185,7 +183,7 @@ namespace src {
     ///   will be emitted at.
     ///
     /// \param Invalid If non-NULL, will be set \c true if an error occurred.
-    const llvm::MemoryBuffer *getBuffer(DiagnosticsEngine &Diag,
+    const llvm::MemoryBuffer *getBuffer(Diagnostics &Diag,
                                         const SourceManager &SM,
                                         SourceLocation Loc = SourceLocation(),
                                         bool *Invalid = nullptr) const;
@@ -245,9 +243,6 @@ namespace src {
   ///
   class FileInfo {
     friend class stone::SourceManager;
-    friend class stone::ASTWriter;
-    friend class stone::ASTReader;
-
     /// The location of the \#include that brought in this file.
     ///
     /// This is an invalid SLOC for the main file (top of the \#include chain).
@@ -469,7 +464,7 @@ namespace src {
     }
   };
 
-} // namespace SrcMgr
+} // namespace srcMgr
 
 /// External source of source location entries.
 class ExternalSLocEntrySource {
@@ -582,8 +577,8 @@ using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSourceLoc>>;
 /// where the expanded token came from and the expansion location specifies
 /// where it was expanded.
 class SourceManager : public RefCountedBase<SourceManager> {
-  /// DiagnosticsEngine object.
-  DiagnosticsEngine &Diag;
+  /// Diagnostics object.
+  Diagnostics &Diag;
 
   FileManager &fileMgr;
 
@@ -744,7 +739,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   SmallVector<std::pair<std::string, FullSourceLoc>, 2> StoredModuleBuildStack;
 
 public:
-  SourceManager(DiagnosticsEngine &Diag, FileManager &fileMgr,
+  SourceManager(Diagnostics &Diag, FileManager &fileMgr,
                 bool UserFilesAreVolatile = false);
   explicit SourceManager(const SourceManager &) = delete;
   SourceManager &operator=(const SourceManager &) = delete;
@@ -756,7 +751,7 @@ public:
   /// described by \p Old. Requires that \p Old outlive \p *this.
   void initializeForReplay(const SourceManager &Old);
 
-  DiagnosticsEngine &getDiagnostics() const { return Diag; }
+  Diagnostics &getDiagnostics() const { return Diag; }
 
   FileManager &getFileManager() const { return fileMgr; }
 
@@ -1868,7 +1863,7 @@ private:
   // as they are created in `createSourceManagerForFile` so that they can be
   // deleted in the reverse order as they are created.
   std::unique_ptr<FileManager> fileMgr;
-  //std::unique_ptr<DiagnosticsEngine> Diagnostics;
+  //std::unique_ptr<Diagnostics> Diagnostics;
   std::unique_ptr<SourceManager> SourceMgr;
 };
 

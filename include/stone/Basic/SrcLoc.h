@@ -344,25 +344,25 @@ class FileEntry;
 ///
 /// This is useful for argument passing to functions that expect both objects.
 class FullSourceLoc : public SourceLocation {
-  const SourceManager *SrcMgr = nullptr;
+  const SourceManager *srcMgr = nullptr;
 
 public:
   /// Creates a FullSourceLoc where isValid() returns \c false.
   FullSourceLoc() = default;
 
   explicit FullSourceLoc(SourceLocation Loc, const SourceManager &SM)
-      : SourceLocation(Loc), SrcMgr(&SM) {}
+      : SourceLocation(Loc), srcMgr(&SM) {}
 
   bool hasManager() const {
-      bool hasSrcMgr =  SrcMgr != nullptr;
-      assert(hasSrcMgr == isValid() && "FullSourceLoc has location but no manager");
-      return hasSrcMgr;
+      bool hassrcMgr =  srcMgr != nullptr;
+      assert(hassrcMgr == isValid() && "FullSourceLoc has location but no manager");
+      return hassrcMgr;
   }
 
   /// \pre This FullSourceLoc has an associated SourceManager.
   const SourceManager &getManager() const {
-    assert(SrcMgr && "SourceManager is NULL.");
-    return *SrcMgr;
+    assert(srcMgr && "SourceManager is NULL.");
+    return *srcMgr;
   }
 
   FileID getFileID() const;
@@ -411,7 +411,7 @@ public:
   /// \returns true if this source location comes before 'Loc', false otherwise.
   bool isBeforeInTranslationUnitThan(FullSourceLoc Loc) const {
     assert(Loc.isValid());
-    assert(SrcMgr == Loc.SrcMgr && "Loc comes from another SourceManager!");
+    assert(srcMgr == Loc.srcMgr && "Loc comes from another SourceManager!");
     return isBeforeInTranslationUnitThan((SourceLocation)Loc);
   }
 
@@ -430,7 +430,7 @@ public:
   friend bool
   operator==(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
     return LHS.getRawEncoding() == RHS.getRawEncoding() &&
-          LHS.SrcMgr == RHS.SrcMgr;
+          LHS.srcMgr == RHS.srcMgr;
   }
 
   friend bool

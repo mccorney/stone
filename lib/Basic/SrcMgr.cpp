@@ -97,7 +97,7 @@ void ContentCache::replaceBuffer(const llvm::MemoryBuffer *B, bool DoNotFree) {
   Buffer.setInt((B && DoNotFree) ? DoNotFreeFlag : 0);
 }
 
-const llvm::MemoryBuffer *ContentCache::getBuffer(DiagnosticsEngine &Diag,
+const llvm::MemoryBuffer *ContentCache::getBuffer(Diagnostics &Diag,
                                                   const SourceManager &SM,
                                                   SourceLocation Loc,
                                                   bool *Invalid) const {
@@ -350,7 +350,7 @@ LineTableInfo &SourceManager::getLineTable() {
 // Private 'Create' methods.
 //===----------------------------------------------------------------------===//
 
-SourceManager::SourceManager(DiagnosticsEngine &Diag, FileManager &fileMgr,
+SourceManager::SourceManager(Diagnostics &Diag, FileManager &fileMgr,
                              bool UserFilesAreVolatile)
   : Diag(Diag), fileMgr(fileMgr), UserFilesAreVolatile(UserFilesAreVolatile) {
   clearIDTables();
@@ -1233,10 +1233,10 @@ unsigned SourceManager::getPresumedColumnNumber(SourceLocation Loc,
 #endif
 
 static LLVM_ATTRIBUTE_NOINLINE void
-ComputeLineNumbers(DiagnosticsEngine &Diag, ContentCache *FI,
+ComputeLineNumbers(Diagnostics &Diag, ContentCache *FI,
                    llvm::BumpPtrAllocator &Alloc,
                    const SourceManager &SM, bool &Invalid);
-static void ComputeLineNumbers(DiagnosticsEngine &Diag, ContentCache *FI,
+static void ComputeLineNumbers(Diagnostics &Diag, ContentCache *FI,
                                llvm::BumpPtrAllocator &Alloc,
                                const SourceManager &SM, bool &Invalid) {
   // Note that calling 'getBuffer()' may lazily page in the file.
@@ -2274,7 +2274,7 @@ SourceManagerForFile::SourceManagerForFile(StringRef FileName,
 /*
   // This is passed to `SM` as reference, so the pointer has to be referenced
   // by `Environment` due to the same reason above.
-  Diagnostics = llvm::make_unique<DiagnosticsEngine>(
+  Diagnostics = llvm::make_unique<Diagnostics>(
       IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
       new DiagnosticOptions);
 */

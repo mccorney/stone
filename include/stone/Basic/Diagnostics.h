@@ -28,7 +28,7 @@ namespace stone {
 ///
 /// This massages the diagnostics (e.g. handling things like "report warnings
 /// as errors" and passes them off to the DiagnosticConsumer for reporting to
-/// the user. DiagnosticsEngine is tied to one translation unit and one
+/// the user. Diagnostics is tied to one translation unit and one
 /// SourceManager.
 class Diagnostics : public llvm::RefCountedBase<Diagnostics> {
 public:

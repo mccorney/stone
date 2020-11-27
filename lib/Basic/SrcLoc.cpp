@@ -144,39 +144,39 @@ SourceRange::printToString(const SourceManager &SM) const {
 
 FileID FullSourceLoc::getFileID() const {
   assert(isValid());
-  return SrcMgr->getFileID(*this);
+  return srcMgr->getFileID(*this);
 }
 
 FullSourceLoc FullSourceLoc::getExpansionLoc() const {
   assert(isValid());
-  return FullSourceLoc(SrcMgr->getExpansionLoc(*this), *SrcMgr);
+  return FullSourceLoc(srcMgr->getExpansionLoc(*this), *srcMgr);
 }
 
 FullSourceLoc FullSourceLoc::getSpellingLoc() const {
   assert(isValid());
-  return FullSourceLoc(SrcMgr->getSpellingLoc(*this), *SrcMgr);
+  return FullSourceLoc(srcMgr->getSpellingLoc(*this), *srcMgr);
 }
 
 FullSourceLoc FullSourceLoc::getFileLoc() const {
   assert(isValid());
-  return FullSourceLoc(SrcMgr->getFileLoc(*this), *SrcMgr);
+  return FullSourceLoc(srcMgr->getFileLoc(*this), *srcMgr);
 }
 
 PresumedLoc FullSourceLoc::getPresumedLoc(bool UseLineDirectives) const {
   if (!isValid())
     return PresumedLoc();
 
-  return SrcMgr->getPresumedLoc(*this, UseLineDirectives);
+  return srcMgr->getPresumedLoc(*this, UseLineDirectives);
 }
 
 bool FullSourceLoc::isMacroArgExpansion(FullSourceLoc *StartLoc) const {
   assert(isValid());
-  return SrcMgr->isMacroArgExpansion(*this, StartLoc);
+  return srcMgr->isMacroArgExpansion(*this, StartLoc);
 }
 
 FullSourceLoc FullSourceLoc::getImmediateMacroCallerLoc() const {
   assert(isValid());
-  return FullSourceLoc(SrcMgr->getImmediateMacroCallerLoc(*this), *SrcMgr);
+  return FullSourceLoc(srcMgr->getImmediateMacroCallerLoc(*this), *srcMgr);
 }
 
 std::pair<FullSourceLoc, StringRef> FullSourceLoc::getModuleImportLoc() const {
@@ -184,75 +184,75 @@ std::pair<FullSourceLoc, StringRef> FullSourceLoc::getModuleImportLoc() const {
     return std::make_pair(FullSourceLoc(), StringRef());
 
   std::pair<SourceLocation, StringRef> ImportLoc =
-      SrcMgr->getModuleImportLoc(*this);
-  return std::make_pair(FullSourceLoc(ImportLoc.first, *SrcMgr),
+      srcMgr->getModuleImportLoc(*this);
+  return std::make_pair(FullSourceLoc(ImportLoc.first, *srcMgr),
                         ImportLoc.second);
 }
 
 unsigned FullSourceLoc::getFileOffset() const {
   assert(isValid());
-  return SrcMgr->getFileOffset(*this);
+  return srcMgr->getFileOffset(*this);
 }
 
 unsigned FullSourceLoc::getLineNumber(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getLineNumber(getFileID(), getFileOffset(), Invalid);
+  return srcMgr->getLineNumber(getFileID(), getFileOffset(), Invalid);
 }
 
 unsigned FullSourceLoc::getColumnNumber(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getColumnNumber(getFileID(), getFileOffset(), Invalid);
+  return srcMgr->getColumnNumber(getFileID(), getFileOffset(), Invalid);
 }
 
 const FileEntry *FullSourceLoc::getFileEntry() const {
   assert(isValid());
-  return SrcMgr->getFileEntryForID(getFileID());
+  return srcMgr->getFileEntryForID(getFileID());
 }
 
 unsigned FullSourceLoc::getExpansionLineNumber(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getExpansionLineNumber(*this, Invalid);
+  return srcMgr->getExpansionLineNumber(*this, Invalid);
 }
 
 unsigned FullSourceLoc::getExpansionColumnNumber(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getExpansionColumnNumber(*this, Invalid);
+  return srcMgr->getExpansionColumnNumber(*this, Invalid);
 }
 
 unsigned FullSourceLoc::getSpellingLineNumber(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getSpellingLineNumber(*this, Invalid);
+  return srcMgr->getSpellingLineNumber(*this, Invalid);
 }
 
 unsigned FullSourceLoc::getSpellingColumnNumber(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getSpellingColumnNumber(*this, Invalid);
+  return srcMgr->getSpellingColumnNumber(*this, Invalid);
 }
 
 bool FullSourceLoc::isInSystemHeader() const {
   assert(isValid());
-  return SrcMgr->isInSystemHeader(*this);
+  return srcMgr->isInSystemHeader(*this);
 }
 
 bool FullSourceLoc::isBeforeInTranslationUnitThan(SourceLocation Loc) const {
   assert(isValid());
-  return SrcMgr->isBeforeInTranslationUnit(*this, Loc);
+  return srcMgr->isBeforeInTranslationUnit(*this, Loc);
 }
 
 LLVM_DUMP_METHOD void FullSourceLoc::dump() const {
-  SourceLocation::dump(*SrcMgr);
+  SourceLocation::dump(*srcMgr);
 }
 
 const char *FullSourceLoc::getCharacterData(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getCharacterData(*this, Invalid);
+  return srcMgr->getCharacterData(*this, Invalid);
 }
 
 StringRef FullSourceLoc::getBufferData(bool *Invalid) const {
   assert(isValid());
-  return SrcMgr->getBuffer(SrcMgr->getFileID(*this), Invalid)->getBuffer();
+  return srcMgr->getBuffer(srcMgr->getFileID(*this), Invalid)->getBuffer();
 }
 
 std::pair<FileID, unsigned> FullSourceLoc::getDecomposedLoc() const {
-  return SrcMgr->getDecomposedLoc(*this);
+  return srcMgr->getDecomposedLoc(*this);
 }
