@@ -338,7 +338,7 @@ public:
   }
 };
 
-class FileEntry;
+class SrcFile;
 
 /// A SrcLoc and its associated SrcMgr.
 ///
@@ -387,7 +387,7 @@ public:
   unsigned getLineNumber(bool *Invalid = nullptr) const;
   unsigned getColumnNumber(bool *Invalid = nullptr) const;
 
-  const FileEntry *getFileEntry() const;
+  const SrcFile *getSrcFile() const;
 
   /// Return a StringRef to the source buffer data for the
   /// specified FileID.

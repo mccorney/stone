@@ -109,17 +109,17 @@ namespace src {
   public:
     /// Reference to the file entry representing this ContentCache.
     ///
-    /// This reference does not own the FileEntry object.
+    /// This reference does not own the SrcFile object.
     ///
     /// It is possible for this to be NULL if the ContentCache encapsulates
     /// an imaginary text buffer.
-    const FileEntry *OrigEntry;
+    const SrcFile *OrigEntry;
 
     /// References the file which the contents were actually loaded from.
     ///
     /// Can be different from 'Entry' if we overridden the contents of one file
     /// with the contents of another file.
-    const FileEntry *ContentsEntry;
+    const SrcFile *ContentsEntry;
 
     /// A bump pointer allocated array of offsets for each source line.
     ///
@@ -148,9 +148,9 @@ namespace src {
     /// after serialization and deserialization.
     unsigned IsTransient : 1;
 
-    ContentCache(const FileEntry *Ent = nullptr) : ContentCache(Ent, Ent) {}
+    ContentCache(const SrcFile *Ent = nullptr) : ContentCache(Ent, Ent) {}
 
-    ContentCache(const FileEntry *Ent, const FileEntry *contentEnt)
+    ContentCache(const SrcFile *Ent, const SrcFile *contentEnt)
       : Buffer(nullptr, false), OrigEntry(Ent), ContentsEntry(contentEnt),
         BufferOverridden(false), IsSystemFile(false), IsTransient(false) {}
 
@@ -193,7 +193,7 @@ namespace src {
     ///
     /// This can be the size of the source file or the size of an
     /// arbitrary scratch buffer.  If the ContentCache encapsulates a source
-    /// file this size is retrieved from the file's FileEntry.
+    /// file this size is retrieved from the file's SrcFile.
     unsigned getSize() const;
 
     /// Returns the number of bytes actually mapped for this
@@ -588,9 +588,9 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   /// SrcMgr.
   ///
   /// This map allows us to merge ContentCache entries based
-  /// on their FileEntry*.  All ContentCache objects will thus have unique,
-  /// non-null, FileEntry pointers.
-  llvm::DenseMap<const FileEntry*, src::ContentCache*> FileInfos;
+  /// on their SrcFile*.  All ContentCache objects will thus have unique,
+  /// non-null, SrcFile pointers.
+  llvm::DenseMap<const SrcFile*, src::ContentCache*> FileInfos;
 
   /// True if the ContentCache for files that are overridden by other
   /// files, should report the original file name. Defaults to true.
@@ -608,10 +608,10 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   struct OverriddenFilesInfoTy {
     /// Files that have been overridden with the contents from another
     /// file.
-    llvm::DenseMap<const FileEntry *, const FileEntry *> OverriddenFiles;
+    llvm::DenseMap<const SrcFile *, const SrcFile *> OverriddenFiles;
 
     /// Files that were overridden with a memory buffer.
-    llvm::DenseSet<const FileEntry *> OverriddenFilesWithBuffer;
+    llvm::DenseSet<const SrcFile *> OverriddenFilesWithBuffer;
   };
 
   /// Lazily create the object keeping overridden files info, since
@@ -626,7 +626,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
 
   /// Information about various memory buffers that we have read in.
   ///
-  /// All FileEntry* within the stored ContentCache objects are NULL,
+  /// All SrcFile* within the stored ContentCache objects are NULL,
   /// as they do not refer to a file.
   std::vector<src::ContentCache*> MemBufferInfos;
 
@@ -811,7 +811,7 @@ public:
   /// being \#included from the specified IncludePosition.
   ///
   /// This translates NULL into standard input.
-  FileID createFileID(const FileEntry *SourceFile, SrcLoc IncludePos,
+  FileID createFileID(const SrcFile *SourceFile, SrcLoc IncludePos,
                       src::CharacteristicKind FileCharacter,
                       int LoadedID = 0, unsigned LoadedOffset = 0) {
     const src::ContentCache *IR =
@@ -849,7 +849,7 @@ public:
 
   /// Get the FileID for \p SourceFile if it exists. Otherwise, create a
   /// new FileID for the \p SourceFile.
-  FileID getOrCreateFileID(const FileEntry *SourceFile,
+  FileID getOrCreateFileID(const SrcFile *SourceFile,
                            src::CharacteristicKind FileCharacter) {
     FileID ID = translateFile(SourceFile);
     return ID.isValid() ? ID : createFileID(SourceFile, SrcLoc(),
@@ -885,7 +885,7 @@ public:
   ///
   /// \param Invalid If non-NULL, will be set \c true if an error
   /// occurs while retrieving the memory buffer.
-  const llvm::MemoryBuffer *getMemoryBufferForFile(const FileEntry *File,
+  const llvm::MemoryBuffer *getMemoryBufferForFile(const SrcFile *File,
                                                    bool *Invalid = nullptr);
 
   /// Override the contents of the given source file by providing an
@@ -898,9 +898,9 @@ public:
   ///
   /// \param DoNotFree If true, then the buffer will not be freed when the
   /// source manager is destroyed.
-  void overrideFileContents(const FileEntry *SourceFile,
+  void overrideFileContents(const SrcFile *SourceFile,
                             llvm::MemoryBuffer *Buffer, bool DoNotFree);
-  void overrideFileContents(const FileEntry *SourceFile,
+  void overrideFileContents(const SrcFile *SourceFile,
                             std::unique_ptr<llvm::MemoryBuffer> Buffer) {
     overrideFileContents(SourceFile, Buffer.release(), /*DoNotFree*/ false);
   }
@@ -911,11 +911,11 @@ public:
   ///
   /// \param NewFile the file whose contents will be used as the
   /// data instead of the contents of the given source file.
-  void overrideFileContents(const FileEntry *SourceFile,
-                            const FileEntry *NewFile);
+  void overrideFileContents(const SrcFile *SourceFile,
+                            const SrcFile *NewFile);
 
   /// Returns true if the file contents have been overridden.
-  bool isFileOverridden(const FileEntry *File) const {
+  bool isFileOverridden(const SrcFile *File) const {
     if (OverriddenFilesInfo) {
       if (OverriddenFilesInfo->OverriddenFilesWithBuffer.count(File))
         return true;
@@ -930,10 +930,10 @@ public:
   /// with #overrideFileContents.
   ///
   /// This should be called before parsing has begun.
-  void disableFileContentsOverride(const FileEntry *File);
+  void disableFileContentsOverride(const SrcFile *File);
 
   /// Specify that a file is transient.
-  void setFileIsTransient(const FileEntry *SourceFile);
+  void setFileIsTransient(const SrcFile *SourceFile);
 
   /// Specify that all files that are read during this compilation are
   /// transient.
@@ -980,8 +980,8 @@ public:
                                                         Invalid);
   }
 
-  /// Returns the FileEntry record for the provided FileID.
-  const FileEntry *getFileEntryForID(FileID FID) const {
+  /// Returns the SrcFile record for the provided FileID.
+  const SrcFile *getSrcFileForID(FileID FID) const {
     bool MyInvalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
     if (MyInvalid || !Entry.isFile())
@@ -993,8 +993,8 @@ public:
     return Content->OrigEntry;
   }
 
-  /// Returns the FileEntry record for the provided SLocEntry.
-  const FileEntry *getFileEntryForSLocEntry(const src::SLocEntry &sloc) const
+  /// Returns the SrcFile record for the provided SLocEntry.
+  const SrcFile *getSrcFileForSLocEntry(const src::SLocEntry &sloc) const
   {
     const src::ContentCache *Content = sloc.getFile().getContentCache();
     if (!Content)
@@ -1055,7 +1055,7 @@ public:
 
   /// Return the filename of the file containing a SrcLoc.
   StringRef getFilename(SrcLoc SpellingLoc) const {
-    if (const FileEntry *F = getFileEntryForID(getFileID(SpellingLoc)))
+    if (const SrcFile *F = getSrcFileForID(getFileID(SpellingLoc)))
       return F->getName();
     return StringRef();
   }
@@ -1503,7 +1503,7 @@ public:
   ///
   /// If FilenameID is -1, it is considered to be unspecified.
   void AddLineNote(SrcLoc Loc, unsigned LineNo, int FilenameID,
-                   bool IsFileEntry, bool IsFileExit,
+                   bool IsSrcFile, bool IsFileExit,
                    src::CharacteristicKind FileKind);
 
   /// Determine if the source manager has a line table.
@@ -1546,14 +1546,14 @@ public:
   ///
   /// If the source file is included multiple times, the source location will
   /// be based upon the first inclusion.
-  SrcLoc translateFileLineCol(const FileEntry *SourceFile,
+  SrcLoc translateFileLineCol(const SrcFile *SourceFile,
                                       unsigned Line, unsigned Col) const;
 
   /// Get the FileID for the given file.
   ///
   /// If the source file is included multiple times, the FileID will be the
   /// first inclusion.
-  FileID translateFile(const FileEntry *SourceFile) const;
+  FileID translateFile(const SrcFile *SourceFile) const;
 
   /// Get the source location in \p FID for the given line:col.
   /// Returns null location if \p FID is not a file SLocEntry.
@@ -1617,11 +1617,11 @@ public:
 
   // Iterators over FileInfos.
   using fileinfo_iterator =
-      llvm::DenseMap<const FileEntry*, src::ContentCache*>::const_iterator;
+      llvm::DenseMap<const SrcFile*, src::ContentCache*>::const_iterator;
 
   fileinfo_iterator fileinfo_begin() const { return FileInfos.begin(); }
   fileinfo_iterator fileinfo_end() const { return FileInfos.end(); }
-  bool hasFileInfo(const FileEntry *File) const {
+  bool hasFileInfo(const SrcFile *File) const {
     return FileInfos.find(File) != FileInfos.end();
   }
 
@@ -1787,7 +1787,7 @@ private:
                       int LoadedID, unsigned LoadedOffset);
 
   const src::ContentCache *
-    getOrCreateContentCache(const FileEntry *SourceFile,
+    getOrCreateContentCache(const SrcFile *SourceFile,
                             bool isSystemFile = false);
 
   /// Create a new ContentCache for the specified  memory buffer.

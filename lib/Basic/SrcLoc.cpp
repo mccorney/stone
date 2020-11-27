@@ -204,9 +204,9 @@ unsigned FullSourceLoc::getColumnNumber(bool *Invalid) const {
   return srcMgr->getColumnNumber(getFileID(), getFileOffset(), Invalid);
 }
 
-const FileEntry *FullSourceLoc::getFileEntry() const {
+const SrcFile *FullSourceLoc::getSrcFile() const {
   assert(isValid());
-  return srcMgr->getFileEntryForID(getFileID());
+  return srcMgr->getSrcFileForID(getFileID());
 }
 
 unsigned FullSourceLoc::getExpansionLineNumber(bool *Invalid) const {

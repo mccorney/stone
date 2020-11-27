@@ -168,7 +168,7 @@ const SrcDir *FileMgr::getDirectory(StringRef DirName,
   return &UDE;
 }
 
-const FileEntry *FileMgr::getFile(StringRef Filename, bool openFile,
+const SrcFile *FileMgr::getFile(StringRef Filename, bool openFile,
                                       bool CacheFailure) {
   ++NumFileLookups;
 
@@ -218,7 +218,7 @@ const FileEntry *FileMgr::getFile(StringRef Filename, bool openFile,
 
   // It exists.  See if we have already opened a file with the same inode.
   // This occurs when one dir is symlinked to another, for example.
-  FileEntry &UFE = UniqueRealFiles[Status.getUniqueID()];
+  SrcFile &UFE = UniqueRealFiles[Status.getUniqueID()];
 
   NamedFileEnt.second = &UFE;
 
@@ -247,7 +247,7 @@ const FileEntry *FileMgr::getFile(StringRef Filename, bool openFile,
     // FIXME: Neither this nor always using the first name is correct; we want
     // to switch towards a design where we return a FileName object that
     // encapsulates both the name by which the file was accessed and the
-    // corresponding FileEntry.
+    // corresponding SrcFile.
     UFE.Name = InterndFileName;
 
     return &UFE;
@@ -274,7 +274,7 @@ const FileEntry *FileMgr::getFile(StringRef Filename, bool openFile,
   return &UFE;
 }
 
-const FileEntry *
+const SrcFile *
 FileMgr::getVirtualFile(StringRef Filename, off_t Size,
                             time_t ModificationTime) {
   ++NumFileLookups;
@@ -287,7 +287,7 @@ FileMgr::getVirtualFile(StringRef Filename, off_t Size,
   // We've not seen this before, or the file is cached as non-existent.
   ++NumFileCacheMisses;
   addAncestorsAsVirtualDirs(Filename);
-  FileEntry *UFE = nullptr;
+  SrcFile *UFE = nullptr;
 
   // Now that all ancestors of Filename are in the cache, the
   // following call is guaranteed to find the SrcDir from the
@@ -324,7 +324,7 @@ FileMgr::getVirtualFile(StringRef Filename, off_t Size,
     UFE->IsNamedPipe = Status.getType() == llvm::sys::fs::file_type::fifo_file;
     fillRealPathName(UFE, Status.getName());
   } else {
-    VirtualFileEntries.push_back(llvm::make_unique<FileEntry>());
+    VirtualFileEntries.push_back(llvm::make_unique<SrcFile>());
     UFE = VirtualFileEntries.back().get();
     NamedFileEnt.second = UFE;
   }
@@ -363,7 +363,7 @@ bool FileMgr::makeAbsolutePath(SmallVectorImpl<char> &Path) const {
   return Changed;
 }
 
-void FileMgr::fillRealPathName(FileEntry *UFE, llvm::StringRef FileName) {
+void FileMgr::fillRealPathName(SrcFile *UFE, llvm::StringRef FileName) {
   llvm::SmallString<128> AbsPath(FileName);
   // This is not the same as `VFS::getRealPath()`, which resolves symlinks
   // but can be very expensive on real file systems.
@@ -375,7 +375,7 @@ void FileMgr::fillRealPathName(FileEntry *UFE, llvm::StringRef FileName) {
 }
 
 llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
-FileMgr::getBufferForFile(const FileEntry *Entry, bool isVolatile,
+FileMgr::getBufferForFile(const SrcFile *Entry, bool isVolatile,
                               bool ShouldCloseOpenFile) {
   uint64_t FileSize = Entry->getSize();
   // If there's a high enough chance that the file have changed since we
@@ -390,7 +390,7 @@ FileMgr::getBufferForFile(const FileEntry *Entry, bool isVolatile,
         Entry->File->getBuffer(Filename, FileSize,
                                /*RequiresNullTerminator=*/true, isVolatile);
     // FIXME: we need a set of APIs that can make guarantees about whether a
-    // FileEntry is open or not.
+    // SrcFile is open or not.
     if (ShouldCloseOpenFile)
       Entry->closeFile();
     return Result;
@@ -451,27 +451,27 @@ bool FileMgr::getNoncachedStatValue(StringRef Path,
   return false;
 }
 
-void FileMgr::invalidateCache(const FileEntry *Entry) {
-  assert(Entry && "Cannot invalidate a NULL FileEntry");
+void FileMgr::invalidateCache(const SrcFile *Entry) {
+  assert(Entry && "Cannot invalidate a NULL SrcFile");
 
   SeenFileEntries.erase(Entry->getName());
 
-  // FileEntry invalidation should not block future optimizations in the file
+  // SrcFile invalidation should not block future optimizations in the file
   // caches. Possible alternatives are cache truncation (invalidate last N) or
   // invalidation of the whole cache.
   //
-  // FIXME: This is broken. We sometimes have the same FileEntry* shared
+  // FIXME: This is broken. We sometimes have the same SrcFile* shared
   // betweeen multiple SeenFileEntries, so this can leave dangling pointers.
   UniqueRealFiles.erase(Entry->getUniqueID());
 }
 
 void FileMgr::GetUniqueIDMapping(
-                   SmallVectorImpl<const FileEntry *> &UIDToFiles) const {
+                   SmallVectorImpl<const SrcFile *> &UIDToFiles) const {
   UIDToFiles.clear();
   UIDToFiles.resize(NextFileUID);
 
   // Map file entries
-  for (llvm::StringMap<FileEntry*, llvm::BumpPtrAllocator>::const_iterator
+  for (llvm::StringMap<SrcFile*, llvm::BumpPtrAllocator>::const_iterator
          FE = SeenFileEntries.begin(), FEEnd = SeenFileEntries.end();
        FE != FEEnd; ++FE)
     if (FE->getValue())
@@ -482,7 +482,7 @@ void FileMgr::GetUniqueIDMapping(
     UIDToFiles[VFE->getUID()] = VFE.get();
 }
 
-void FileMgr::modifyFileEntry(FileEntry *File,
+void FileMgr::modifySrcFile(SrcFile *File,
                                   off_t Size, time_t ModificationTime) {
   File->Size = Size;
   File->ModTime = ModificationTime;

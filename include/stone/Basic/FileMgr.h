@@ -45,8 +45,7 @@ class FileSystemStatCache;
 /// the virtual file system).
 class SrcDir {
   friend class FileMgr;
-
-  StringRef Name; // Name of the directory.
+	llvm::StringRef Name; // Name of the directory.
 
 public:
   StringRef getName() const { return Name; }
@@ -55,9 +54,9 @@ public:
 /// Cached information about one file (either on disk
 /// or in the virtual file system).
 ///
-/// If the 'File' member is valid, then this FileEntry has an open file
+/// If the 'File' member is valid, then this SrcFile has an open file
 /// descriptor for the file.
-class FileEntry {
+class SrcFile {
   friend class FileMgr;
 
   StringRef Name;             // Name of the file.
@@ -68,18 +67,18 @@ class FileEntry {
   unsigned UID;               // A unique (small) ID for the file.
   llvm::sys::fs::UniqueID UniqueID;
   bool IsNamedPipe;
-  bool IsValid;               // Is this \c FileEntry initialized and valid?
+  bool IsValid;               // Is this \c SrcFile initialized and valid?
 
-  /// The open file, if it is owned by the \p FileEntry.
+  /// The open file, if it is owned by the \p SrcFile.
   mutable std::unique_ptr<llvm::vfs::File> File;
 
 public:
-  FileEntry()
+  SrcFile()
       : UniqueID(0, 0), IsNamedPipe(false), IsValid(false)
   {}
 
-  FileEntry(const FileEntry &) = delete;
-  FileEntry &operator=(const FileEntry &) = delete;
+  SrcFile(const SrcFile &) = delete;
+  SrcFile &operator=(const SrcFile &) = delete;
 
   StringRef getName() const { return Name; }
   StringRef tryGetRealPathName() const { return RealPathName; }
@@ -92,7 +91,7 @@ public:
   /// Return the directory the file lives in.
   const SrcDir *getDir() const { return Dir; }
 
-  bool operator<(const FileEntry &RHS) const { return UniqueID < RHS.UniqueID; }
+  bool operator<(const SrcFile &RHS) const { return UniqueID < RHS.UniqueID; }
 
   /// Check whether the file is a named pipe (and thus can't be opened by
   /// the native FileMgr methods).
@@ -122,7 +121,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   std::map<llvm::sys::fs::UniqueID, SrcDir> UniqueRealDirs;
 
   /// Cache for existing real files.
-  std::map<llvm::sys::fs::UniqueID, FileEntry> UniqueRealFiles;
+  std::map<llvm::sys::fs::UniqueID, SrcFile> UniqueRealFiles;
 
   /// The virtual directories that we have allocated.
   ///
@@ -130,7 +129,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   /// directories (foo/ and foo/bar/) here.
   SmallVector<std::unique_ptr<SrcDir>, 4> VirtualDirectoryEntries;
   /// The virtual files that we have allocated.
-  SmallVector<std::unique_ptr<FileEntry>, 4> VirtualFileEntries;
+  SmallVector<std::unique_ptr<SrcFile>, 4> VirtualFileEntries;
 
   /// A cache that maps paths to directory entries (either real or
   /// virtual) we have looked up
@@ -146,7 +145,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   /// virtual) we have looked up.
   ///
   /// \see SeenDirEntries
-  llvm::StringMap<FileEntry*, llvm::BumpPtrAllocator> SeenFileEntries;
+  llvm::StringMap<SrcFile*, llvm::BumpPtrAllocator> SeenFileEntries;
 
   /// The canonical names of directories.
   llvm::DenseMap<const SrcDir *, llvm::StringRef> CanonicalDirNames;
@@ -154,7 +153,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   /// Storage for canonical names that we have computed.
   llvm::BumpPtrAllocator CanonicalNameStorage;
 
-  /// Each FileEntry we create is assigned a unique ID #.
+  /// Each SrcFile we create is assigned a unique ID #.
   ///
   unsigned NextFileUID;
 
@@ -173,7 +172,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   void addAncestorsAsVirtualDirs(StringRef Path);
 
   /// Fills the RealPathName in file entry.
-  void fillRealPathName(FileEntry *UFE, llvm::StringRef FileName);
+  void fillRealPathName(SrcFile *UFE, llvm::StringRef FileName);
 
 public:
   /// Construct a file manager, optionally with a custom VFS.
@@ -215,7 +214,7 @@ public:
   ///
   /// \param CacheFailure If true and the file does not exist, we'll cache
   /// the failure to find this file.
-  const FileEntry *getFile(StringRef Filename, bool OpenFile = false,
+  const SrcFile *getFile(StringRef Filename, bool OpenFile = false,
                            bool CacheFailure = true);
 
   /// Returns the current file system options
@@ -228,13 +227,13 @@ public:
   /// if there were a file with the given name on disk.
   ///
   /// The file itself is not accessed.
-  const FileEntry *getVirtualFile(StringRef Filename, off_t Size,
+  const SrcFile *getVirtualFile(StringRef Filename, off_t Size,
                                   time_t ModificationTime);
 
   /// Open the specified file as a MemoryBuffer, returning a new
   /// MemoryBuffer if successful, otherwise returning null.
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
-  getBufferForFile(const FileEntry *Entry, bool isVolatile = false,
+  getBufferForFile(const SrcFile *Entry, bool isVolatile = false,
                    bool ShouldCloseOpenFile = true);
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
   getBufferForFile(StringRef Filename, bool isVolatile = false);
@@ -248,7 +247,7 @@ public:
   bool getNoncachedStatValue(StringRef Path, llvm::vfs::Status &Result);
 
   /// Remove the real file \p Entry from the cache.
-  void invalidateCache(const FileEntry *Entry);
+  void invalidateCache(const SrcFile *Entry);
 
   /// If path is not absolute and FileSystemOptions set the working
   /// directory, the path is modified to be relative to the given
@@ -262,13 +261,13 @@ public:
   bool makeAbsolutePath(SmallVectorImpl<char> &Path) const;
 
   /// Produce an array mapping from the unique IDs assigned to each
-  /// file to the corresponding FileEntry pointer.
+  /// file to the corresponding SrcFile pointer.
   void GetUniqueIDMapping(
-                    SmallVectorImpl<const FileEntry *> &UIDToFiles) const;
+                    SmallVectorImpl<const SrcFile *> &UIDToFiles) const;
 
   /// Modifies the size and modification time of a previously created
-  /// FileEntry. Use with caution.
-  static void modifyFileEntry(FileEntry *File, off_t Size,
+  /// SrcFile. Use with caution.
+  static void modifySrcFile(SrcFile *File, off_t Size,
                               time_t ModificationTime);
 
   /// Retrieve the canonical name for a given directory.

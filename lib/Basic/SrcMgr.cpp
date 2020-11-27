@@ -313,7 +313,7 @@ unsigned SrcMgr::getLineTableFilenameID(StringRef Name) {
 /// specified by Loc.  If FilenameID is -1, it is considered to be
 /// unspecified.
 void SrcMgr::AddLineNote(SrcLoc Loc, unsigned LineNo,
-                                int FilenameID, bool IsFileEntry,
+                                int FilenameID, bool IsSrcFile,
                                 bool IsFileExit,
                                 src::CharacteristicKind FileKind) {
   std::pair<FileID, unsigned> LocInfo = getDecomposedExpansionLoc(Loc);
@@ -331,7 +331,7 @@ void SrcMgr::AddLineNote(SrcLoc Loc, unsigned LineNo,
   (void) getLineTable();
 
   unsigned EntryExit = 0;
-  if (IsFileEntry)
+  if (IsSrcFile)
     EntryExit = 1;
   else if (IsFileExit)
     EntryExit = 2;
@@ -358,7 +358,7 @@ SrcMgr::SrcMgr(Diagnostics &Diag, FileMgr &fileMgr,
 }
 
 SrcMgr::~SrcMgr() {
-  // Delete FileEntry objects corresponding to content caches.  Since the actual
+  // Delete SrcFile objects corresponding to content caches.  Since the actual
   // content cache objects are bump pointer allocated, we just have to run the
   // dtors, but we call the deallocate method for completeness.
   for (unsigned i = 0, e = MemBufferInfos.size(); i != e; ++i) {
@@ -367,7 +367,7 @@ SrcMgr::~SrcMgr() {
       ContentCacheAlloc.Deallocate(MemBufferInfos[i]);
     }
   }
-  for (llvm::DenseMap<const FileEntry*, src::ContentCache*>::iterator
+  for (llvm::DenseMap<const SrcFile*, src::ContentCache*>::iterator
        I = FileInfos.begin(), E = FileInfos.end(); I != E; ++I) {
     if (I->second) {
       I->second->~ContentCache();
@@ -425,7 +425,7 @@ void SrcMgr::initializeForReplay(const SrcMgr &Old) {
 /// getOrCreateContentCache - Create or return a cached ContentCache for the
 /// specified file.
 const ContentCache *
-SrcMgr::getOrCreateContentCache(const FileEntry *FileEnt,
+SrcMgr::getOrCreateContentCache(const SrcFile *FileEnt,
                                        bool isSystemFile) {
   assert(FileEnt && "Didn't specify a file entry to use?");
 
@@ -439,7 +439,7 @@ SrcMgr::getOrCreateContentCache(const FileEntry *FileEnt,
   if (OverriddenFilesInfo) {
     // If the file contents are overridden with contents from another file,
     // pass that file to ContentCache.
-    llvm::DenseMap<const FileEntry *, const FileEntry *>::iterator
+    llvm::DenseMap<const SrcFile *, const SrcFile *>::iterator
         overI = OverriddenFilesInfo->OverriddenFiles.find(FileEnt);
     if (overI == OverriddenFilesInfo->OverriddenFiles.end())
       new (Entry) ContentCache(FileEnt);
@@ -656,13 +656,13 @@ SrcMgr::createExpansionLocImpl(const ExpansionInfo &Info,
 }
 
 const llvm::MemoryBuffer *
-SrcMgr::getMemoryBufferForFile(const FileEntry *File, bool *Invalid) {
+SrcMgr::getMemoryBufferForFile(const SrcFile *File, bool *Invalid) {
   const src::ContentCache *IR = getOrCreateContentCache(File);
   assert(IR && "getOrCreateContentCache() cannot return NULL");
   return IR->getBuffer(Diag, *this, SrcLoc(), Invalid);
 }
 
-void SrcMgr::overrideFileContents(const FileEntry *SourceFile,
+void SrcMgr::overrideFileContents(const SrcFile *SourceFile,
                                          llvm::MemoryBuffer *Buffer,
                                          bool DoNotFree) {
   const src::ContentCache *IR = getOrCreateContentCache(SourceFile);
@@ -674,8 +674,8 @@ void SrcMgr::overrideFileContents(const FileEntry *SourceFile,
   getOverriddenFilesInfo().OverriddenFilesWithBuffer.insert(SourceFile);
 }
 
-void SrcMgr::overrideFileContents(const FileEntry *SourceFile,
-                                         const FileEntry *NewFile) {
+void SrcMgr::overrideFileContents(const SrcFile *SourceFile,
+                                         const SrcFile *NewFile) {
   assert(SourceFile->getSize() == NewFile->getSize() &&
          "Different sizes, use the FileMgr to create a virtual file with "
          "the correct size");
@@ -685,7 +685,7 @@ void SrcMgr::overrideFileContents(const FileEntry *SourceFile,
   getOverriddenFilesInfo().OverriddenFiles[SourceFile] = NewFile;
 }
 
-void SrcMgr::disableFileContentsOverride(const FileEntry *File) {
+void SrcMgr::disableFileContentsOverride(const SrcFile *File) {
   if (!isFileOverridden(File))
     return;
 
@@ -698,7 +698,7 @@ void SrcMgr::disableFileContentsOverride(const FileEntry *File) {
   OverriddenFilesInfo->OverriddenFilesWithBuffer.erase(File);
 }
 
-void SrcMgr::setFileIsTransient(const FileEntry *File) {
+void SrcMgr::setFileIsTransient(const SrcFile *File) {
   const src::ContentCache *CC = getOrCreateContentCache(File);
   const_cast<src::ContentCache *>(CC)->IsTransient = true;
 }
@@ -1464,7 +1464,7 @@ PresumedLoc SrcMgr::getPresumedLoc(SrcLoc Loc,
   const src::FileInfo &FI = Entry.getFile();
   const src::ContentCache *C = FI.getContentCache();
 
-  // To get the source name, first consult the FileEntry (if one exists)
+  // To get the source name, first consult the SrcFile (if one exists)
   // before the MemBuffer as this will avoid unnecessarily paging in the
   // MemBuffer.
   FileID FID = LocInfo.first;
@@ -1576,7 +1576,7 @@ unsigned SrcMgr::getFileIDSize(FileID FID) const {
 /// This routine involves a system call, and therefore should only be used
 /// in non-performance-critical code.
 static Optional<llvm::sys::fs::UniqueID>
-getActualFileUID(const FileEntry *File) {
+getActualFileUID(const SrcFile *File) {
   if (!File)
     return None;
 
@@ -1591,7 +1591,7 @@ getActualFileUID(const FileEntry *File) {
 ///
 /// If the source file is included multiple times, the source location will
 /// be based upon an arbitrary inclusion.
-SrcLoc SrcMgr::translateFileLineCol(const FileEntry *SourceFile,
+SrcLoc SrcMgr::translateFileLineCol(const SrcFile *SourceFile,
                                                   unsigned Line,
                                                   unsigned Col) const {
   assert(SourceFile && "Null source file!");
@@ -1605,7 +1605,7 @@ SrcLoc SrcMgr::translateFileLineCol(const FileEntry *SourceFile,
 ///
 /// If the source file is included multiple times, the FileID will be the
 /// first inclusion.
-FileID SrcMgr::translateFile(const FileEntry *SourceFile) const {
+FileID SrcMgr::translateFile(const SrcFile *SourceFile) const {
   assert(SourceFile && "Null source file!");
 
   // Find the first file ID that corresponds to the given file.
@@ -1631,7 +1631,7 @@ FileID SrcMgr::translateFile(const FileEntry *SourceFile) const {
       } else {
         // Fall back: check whether we have the same base name and inode
         // as the main file.
-        const FileEntry *MainFile = MainContentCache->OrigEntry;
+        const SrcFile *MainFile = MainContentCache->OrigEntry;
         SourceFileName = llvm::sys::path::filename(SourceFile->getName());
         if (*SourceFileName == llvm::sys::path::filename(MainFile->getName())) {
           SourceFileUID = getActualFileUID(SourceFile);
@@ -1697,7 +1697,7 @@ FileID SrcMgr::translateFile(const FileEntry *SourceFile) const {
       if (SLoc.isFile()) {
         const ContentCache *FileContentCache
           = SLoc.getFile().getContentCache();
-        const FileEntry *Entry = FileContentCache ? FileContentCache->OrigEntry
+        const SrcFile *Entry = FileContentCache ? FileContentCache->OrigEntry
                                                   : nullptr;
         if (Entry &&
             *SourceFileName == llvm::sys::path::filename(Entry->getName())) {
