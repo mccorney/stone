@@ -23,10 +23,10 @@ set(LLVM_LINK_COMPONENTS
   TransformUtils
   )
 set(stone_gen_sources
-	FileManager.cpp
+	FileMgr.cpp
 	FileSystemStatCache.cpp
-	SourceLocation.cpp
-	SourceManager.cpp
+	SrcLoc.cpp
+	SrcMgr.cpp
 
 	LINK_LIBS
 	StoneBasic
