@@ -35,8 +35,9 @@
 #define LLVM_CLANG_BASIC_SOURCEMANAGER_H
 
 //#include "stone/Basic/Diagnostic.h"
-#include "stone/Basic/FileManager.h"
-#include "stone/Basic/SourceLocation.h"
+#include "stone/Basic/FileMgr.h"
+#include "stone/Basic/SrcLoc.h"
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/DenseMap.h"

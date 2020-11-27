@@ -16,7 +16,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "stone/Basic/FileManager.h"
+#include "stone/Basic/FileMgr.h"
 #include "stone/Basic/FileSystemStatCache.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Config/llvm-config.h"

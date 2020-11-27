@@ -10,10 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "stone/Basic/SourceLocation.h"
+#include "stone/Basic/SrcLoc.h"
 #include "stone/Core/LLVM.h"
 //#include "stone/Core/PrettyStackTrace.h"
-#include "stone/Basic/SourceManager.h"
+#include "stone/Basic/SrcMgr.h"
+
+
+
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"

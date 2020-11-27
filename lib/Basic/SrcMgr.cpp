@@ -10,12 +10,14 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "stone/Basic/SourceManager.h"
+#include "stone/Basic/SrcMgr.h"
 #include "stone/Basic/Diagnostics.h"
-#include "stone/Basic/FileManager.h"
+#include "stone/Basic/FileMgr.h"
 #include "stone/Core/LLVM.h"
-#include "stone/Basic/SourceLocation.h"
-#include "stone/Basic/SourceManagerInternals.h"
+#include "stone/Basic/SrcLoc.h"
+#include "stone/Basic/SrcMgrInternals.h"
+
+
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/Optional.h"
 #include "llvm/ADT/None.h"

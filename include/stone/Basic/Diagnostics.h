@@ -1,7 +1,8 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTICS_H
 #define LLVM_CLANG_BASIC_DIAGNOSTICS_H
 
-#include "stone/Basic/SourceLocation.h"
+#include "stone/Basic/SrcLoc.h"
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"

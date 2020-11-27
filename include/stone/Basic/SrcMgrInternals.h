@@ -14,8 +14,8 @@
 #ifndef LLVM_CLANG_BASIC_SOURCEMANAGERINTERNALS_H
 #define LLVM_CLANG_BASIC_SOURCEMANAGERINTERNALS_H
 
-#include "stone/Basic/SourceLocation.h"
-#include "stone/Basic/SourceManager.h"
+#include "stone/Basic/SrcLoc.h"
+#include "stone/Basic/SrcMgr.h"
 
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
