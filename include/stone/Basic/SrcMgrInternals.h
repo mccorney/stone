@@ -78,7 +78,7 @@ inline bool operator<(unsigned Offset, const SrcLine &E) {
 }
 
 /// Used to hold and unique data used to represent \#line information.
-class LineTableInfo {
+class SrcLineTable {
   /// Map used to assign unique IDs to filenames in \#line directives.
   ///
   /// This allows us to unique the filenames that

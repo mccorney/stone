@@ -232,7 +232,7 @@ const llvm::MemoryBuffer *ContentCache::getBuffer(Diagnostics &Diag,
   return Buffer.getPointer();
 }
 
-unsigned LineTableInfo::getLineTableFilenameID(StringRef Name) {
+unsigned SrcLineTable::getLineTableFilenameID(StringRef Name) {
   auto IterBool = FilenameIDs.try_emplace(Name, FilenamesByID.size());
   if (IterBool.second)
     FilenamesByID.push_back(&*IterBool.first);
@@ -245,7 +245,7 @@ unsigned LineTableInfo::getLineTableFilenameID(StringRef Name) {
 /// change the presumed \#include stack.  If it is 1, this is a file entry, if
 /// it is 2 then this is a file exit. FileKind specifies whether this is a
 /// system header or extern C system header.
-void LineTableInfo::AddLineNote(FileID FID, unsigned Offset, unsigned LineNo,
+void SrcLineTable::AddLineNote(FileID FID, unsigned Offset, unsigned LineNo,
                                 int FilenameID, unsigned EntryExit,
                                 src::CharacteristicKind FileKind) {
   std::vector<SrcLine> &Entries = LineEntries[FID];
@@ -280,7 +280,7 @@ void LineTableInfo::AddLineNote(FileID FID, unsigned Offset, unsigned LineNo,
 
 /// FindNearestSrcLine - Find the line entry nearest to FID that is before
 /// it.  If there is no line entry before Offset in FID, return null.
-const SrcLine *LineTableInfo::FindNearestSrcLine(FileID FID,
+const SrcLine *SrcLineTable::FindNearestSrcLine(FileID FID,
                                                      unsigned Offset) {
   const std::vector<SrcLine> &Entries = LineEntries[FID];
   assert(!Entries.empty() && "No #line entries for this FID after all!");
@@ -299,7 +299,7 @@ const SrcLine *LineTableInfo::FindNearestSrcLine(FileID FID,
 
 /// Add a new line entry that has already been encoded into
 /// the internal representation of the line table.
-void LineTableInfo::AddEntry(FileID FID,
+void SrcLineTable::AddEntry(FileID FID,
                              const std::vector<SrcLine> &Entries) {
   LineEntries[FID] = Entries;
 }
@@ -340,9 +340,9 @@ void SrcMgr::AddLineNote(SrcLoc Loc, unsigned LineNo,
                          EntryExit, FileKind);
 }
 
-LineTableInfo &SrcMgr::getLineTable() {
+SrcLineTable &SrcMgr::getLineTable() {
   if (!LineTable)
-    LineTable.reset(new LineTableInfo());
+    LineTable.reset(new SrcLineTable());
   return *LineTable;
 }
 
@@ -378,8 +378,8 @@ SrcMgr::~SrcMgr() {
 
 void SrcMgr::clearIDTables() {
   MainFileID = FileID();
-  LocalSLocEntryTable.clear();
-  LoadedSLocEntryTable.clear();
+  LocalSrcLocTable.clear();
+  LoadedSrcLocTable.clear();
   SLocEntryLoaded.clear();
   LastLineNoFileIDQuery = FileID();
   LastLineNoContentCache = nullptr;
@@ -409,7 +409,7 @@ void SrcMgr::initializeForReplay(const SrcMgr &Old) {
   };
 
   // Ensure all SLocEntries are loaded from the external source.
-  for (unsigned I = 0, N = Old.LoadedSLocEntryTable.size(); I != N; ++I)
+  for (unsigned I = 0, N = Old.LoadedSrcLocTable.size(); I != N; ++I)
     if (!Old.SLocEntryLoaded[I])
       Old.loadSLocEntry(I, nullptr);
 
@@ -479,14 +479,14 @@ const src::SLocEntry &SrcMgr::loadSLocEntry(unsigned Index,
     // If the file of the SLocEntry changed we could still have loaded it.
     if (!SLocEntryLoaded[Index]) {
       // Try to recover; create a SLocEntry so the rest of stone can handle it.
-      LoadedSLocEntryTable[Index] = SLocEntry::get(0,
+      LoadedSrcLocTable[Index] = SLocEntry::get(0,
                                  FileInfo::get(SrcLoc(),
                                                getFakeContentCacheForRecovery(),
                                                src::C_User));
     }
   }
 
-  return LoadedSLocEntryTable[Index];
+  return LoadedSrcLocTable[Index];
 }
 
 std::pair<int, unsigned>
@@ -496,10 +496,10 @@ SrcMgr::AllocateLoadedSLocEntries(unsigned NumSLocEntries,
   // Make sure we're not about to run out of source locations.
   if (CurrentLoadedOffset - TotalSize < NextLocalOffset)
     return std::make_pair(0, 0);
-  LoadedSLocEntryTable.resize(LoadedSLocEntryTable.size() + NumSLocEntries);
-  SLocEntryLoaded.resize(LoadedSLocEntryTable.size());
+  LoadedSrcLocTable.resize(LoadedSrcLocTable.size() + NumSLocEntries);
+  SLocEntryLoaded.resize(LoadedSrcLocTable.size());
   CurrentLoadedOffset -= TotalSize;
-  int ID = LoadedSLocEntryTable.size();
+  int ID = LoadedSrcLocTable.size();
   return std::make_pair(-ID - 1, CurrentLoadedOffset);
 }
 
@@ -538,7 +538,7 @@ FileID SrcMgr::getPreviousFileID(FileID FID) const {
   if (ID > 0) {
     if (ID-1 == 0)
       return FileID();
-  } else if (unsigned(-(ID-1) - 2) >= LoadedSLocEntryTable.size()) {
+  } else if (unsigned(-(ID-1) - 2) >= LoadedSrcLocTable.size()) {
     return FileID();
   }
 
@@ -576,14 +576,14 @@ FileID SrcMgr::createFileID(const ContentCache *File,
   if (LoadedID < 0) {
     assert(LoadedID != -1 && "Loading sentinel FileID");
     unsigned Index = unsigned(-LoadedID) - 2;
-    assert(Index < LoadedSLocEntryTable.size() && "FileID out of range");
+    assert(Index < LoadedSrcLocTable.size() && "FileID out of range");
     assert(!SLocEntryLoaded[Index] && "FileID already loaded");
-    LoadedSLocEntryTable[Index] = SLocEntry::get(LoadedOffset,
+    LoadedSrcLocTable[Index] = SLocEntry::get(LoadedOffset,
         FileInfo::get(IncludePos, File, FileCharacter));
     SLocEntryLoaded[Index] = true;
     return FileID::get(LoadedID);
   }
-  LocalSLocEntryTable.push_back(SLocEntry::get(NextLocalOffset,
+  LocalSrcLocTable.push_back(SLocEntry::get(NextLocalOffset,
                                                FileInfo::get(IncludePos, File,
                                                              FileCharacter)));
   unsigned FileSize = File->getSize();
@@ -596,7 +596,7 @@ FileID SrcMgr::createFileID(const ContentCache *File,
 
   // Set LastFileIDLookup to the newly created file.  The next getFileID call is
   // almost guaranteed to be from that file.
-  FileID FID = FileID::get(LocalSLocEntryTable.size()-1);
+  FileID FID = FileID::get(LocalSrcLocTable.size()-1);
   return LastFileIDLookup = FID;
 }
 
@@ -640,13 +640,13 @@ SrcMgr::createExpansionLocImpl(const ExpansionInfo &Info,
   if (LoadedID < 0) {
     assert(LoadedID != -1 && "Loading sentinel FileID");
     unsigned Index = unsigned(-LoadedID) - 2;
-    assert(Index < LoadedSLocEntryTable.size() && "FileID out of range");
+    assert(Index < LoadedSrcLocTable.size() && "FileID out of range");
     assert(!SLocEntryLoaded[Index] && "FileID already loaded");
-    LoadedSLocEntryTable[Index] = SLocEntry::get(LoadedOffset, Info);
+    LoadedSrcLocTable[Index] = SLocEntry::get(LoadedOffset, Info);
     SLocEntryLoaded[Index] = true;
     return SrcLoc::getMacroLoc(LoadedOffset);
   }
-  LocalSLocEntryTable.push_back(SLocEntry::get(NextLocalOffset, Info));
+  LocalSrcLocTable.push_back(SLocEntry::get(NextLocalOffset, Info));
   assert(NextLocalOffset + TokLength + 1 > NextLocalOffset &&
          NextLocalOffset + TokLength + 1 <= CurrentLoadedOffset &&
          "Ran out of source locations!");
@@ -764,12 +764,12 @@ FileID SrcMgr::getFileIDLocal(unsigned SLocOffset) const {
   const src::SLocEntry *I;
 
   if (LastFileIDLookup.ID < 0 ||
-      LocalSLocEntryTable[LastFileIDLookup.ID].getOffset() < SLocOffset) {
+      LocalSrcLocTable[LastFileIDLookup.ID].getOffset() < SLocOffset) {
     // Neither loc prunes our search.
-    I = LocalSLocEntryTable.end();
+    I = LocalSrcLocTable.end();
   } else {
     // Perhaps it is near the file point.
-    I = LocalSLocEntryTable.begin()+LastFileIDLookup.ID;
+    I = LocalSrcLocTable.begin()+LastFileIDLookup.ID;
   }
 
   // Find the FileID that contains this.  "I" is an iterator that points to a
@@ -778,7 +778,7 @@ FileID SrcMgr::getFileIDLocal(unsigned SLocOffset) const {
   while (true) {
     --I;
     if (I->getOffset() <= SLocOffset) {
-      FileID Res = FileID::get(int(I - LocalSLocEntryTable.begin()));
+      FileID Res = FileID::get(int(I - LocalSrcLocTable.begin()));
 
       // If this isn't an expansion, remember it.  We have good locality across
       // FileID lookups.
@@ -793,7 +793,7 @@ FileID SrcMgr::getFileIDLocal(unsigned SLocOffset) const {
 
   // Convert "I" back into an index.  We know that it is an entry whose index is
   // larger than the offset we are looking for.
-  unsigned GreaterIndex = I - LocalSLocEntryTable.begin();
+  unsigned GreaterIndex = I - LocalSrcLocTable.begin();
   // LessIndex - This is the lower bound of the range that we're searching.
   // We know that the offset corresponding to the FileID is is less than
   // SLocOffset.
@@ -823,7 +823,7 @@ FileID SrcMgr::getFileIDLocal(unsigned SLocOffset) const {
 
       // If this isn't a macro expansion, remember it.  We have good locality
       // across FileID lookups.
-      if (!LocalSLocEntryTable[MiddleIndex].isExpansion())
+      if (!LocalSrcLocTable[MiddleIndex].isExpansion())
         LastFileIDLookup = Res;
       NumBinaryProbes += NumProbes;
       return Res;
@@ -874,7 +874,7 @@ FileID SrcMgr::getFileIDLoaded(unsigned SLocOffset) const {
   // table: GreaterIndex is the one where the offset is greater, which is
   // actually a lower index!
   unsigned GreaterIndex = I;
-  unsigned LessIndex = LoadedSLocEntryTable.size();
+  unsigned LessIndex = LoadedSrcLocTable.size();
   NumProbes = 0;
   while (true) {
     ++NumProbes;
@@ -2140,11 +2140,11 @@ void SrcMgr::PrintStats() const {
   llvm::errs() << "\n*** Source Manager Stats:\n";
   llvm::errs() << FileInfos.size() << " files mapped, " << MemBufferInfos.size()
                << " mem buffers mapped.\n";
-  llvm::errs() << LocalSLocEntryTable.size() << " local SLocEntry's allocated ("
-               << llvm::capacity_in_bytes(LocalSLocEntryTable)
+  llvm::errs() << LocalSrcLocTable.size() << " local SLocEntry's allocated ("
+               << llvm::capacity_in_bytes(LocalSrcLocTable)
                << " bytes of capacity), "
                << NextLocalOffset << "B of Sloc address space used.\n";
-  llvm::errs() << LoadedSLocEntryTable.size()
+  llvm::errs() << LoadedSrcLocTable.size()
                << " loaded SLocEntries allocated, "
                << MaxLoadedOffset - CurrentLoadedOffset
                << "B of Sloc address space used.\n";
@@ -2203,18 +2203,18 @@ LLVM_DUMP_METHOD void SrcMgr::dump() const {
   };
 
   // Dump local SLocEntries.
-  for (unsigned ID = 0, NumIDs = LocalSLocEntryTable.size(); ID != NumIDs; ++ID) {
-    DumpSLocEntry(ID, LocalSLocEntryTable[ID],
+  for (unsigned ID = 0, NumIDs = LocalSrcLocTable.size(); ID != NumIDs; ++ID) {
+    DumpSLocEntry(ID, LocalSrcLocTable[ID],
                   ID == NumIDs - 1 ? NextLocalOffset
-                                   : LocalSLocEntryTable[ID + 1].getOffset());
+                                   : LocalSrcLocTable[ID + 1].getOffset());
   }
   // Dump loaded SLocEntries.
   llvm::Optional<unsigned> NextStart;
-  for (unsigned Index = 0; Index != LoadedSLocEntryTable.size(); ++Index) {
+  for (unsigned Index = 0; Index != LoadedSrcLocTable.size(); ++Index) {
     int ID = -(int)Index - 2;
     if (SLocEntryLoaded[Index]) {
-      DumpSLocEntry(ID, LoadedSLocEntryTable[Index], NextStart);
-      NextStart = LoadedSLocEntryTable[Index].getOffset();
+      DumpSLocEntry(ID, LoadedSrcLocTable[Index], NextStart);
+      NextStart = LoadedSrcLocTable[Index].getOffset();
     } else {
       NextStart = None;
     }
@@ -2245,8 +2245,8 @@ SrcMgr::MemoryBufferSizes SrcMgr::getMemoryBufferSizes() const {
 
 size_t SrcMgr::getDataStructureSizes() const {
   size_t size = llvm::capacity_in_bytes(MemBufferInfos)
-    + llvm::capacity_in_bytes(LocalSLocEntryTable)
-    + llvm::capacity_in_bytes(LoadedSLocEntryTable)
+    + llvm::capacity_in_bytes(LocalSrcLocTable)
+    + llvm::capacity_in_bytes(LoadedSrcLocTable)
     + llvm::capacity_in_bytes(SLocEntryLoaded)
     + llvm::capacity_in_bytes(FileInfos);
 

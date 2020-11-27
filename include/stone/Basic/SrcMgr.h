@@ -59,7 +59,7 @@
 
 namespace stone {
 
-class LineTableInfo;
+class SrcLineTable;
 class SrcMgr;
 class Diagnostics;
 /// Public enums and private classes that are part of the
@@ -634,22 +634,22 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   ///
   /// Positive FileIDs are indexes into this table. Entry 0 indicates an invalid
   /// expansion.
-  SmallVector<src::SLocEntry, 0> LocalSLocEntryTable;
+  SmallVector<src::SLocEntry, 0> LocalSrcLocTable;
 
   /// The table of SLocEntries that are loaded from other modules.
   ///
   /// Negative FileIDs are indexes into this table. To get from ID to an index,
   /// use (-ID - 2).
-  mutable SmallVector<src::SLocEntry, 0> LoadedSLocEntryTable;
+  mutable SmallVector<src::SLocEntry, 0> LoadedSrcLocTable;
 
   /// The starting offset of the next local SLocEntry.
   ///
-  /// This is LocalSLocEntryTable.back().Offset + the size of that entry.
+  /// This is LocalSrcLocTable.back().Offset + the size of that entry.
   unsigned NextLocalOffset;
 
   /// The starting offset of the latest batch of loaded SLocEntries.
   ///
-  /// This is LoadedSLocEntryTable.back().Offset, except that that entry might
+  /// This is LoadedSrcLocTable.back().Offset, except that that entry might
   /// not have been loaded, so that value would be unknown.
   unsigned CurrentLoadedOffset;
 
@@ -657,10 +657,10 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   /// starts at 2^31.
   static const unsigned MaxLoadedOffset = 1U << 31U;
 
-  /// A bitmap that indicates whether the entries of LoadedSLocEntryTable
+  /// A bitmap that indicates whether the entries of LoadedSrcLocTable
   /// have already been loaded from the external source.
   ///
-  /// Same indexing as LoadedSLocEntryTable.
+  /// Same indexing as LoadedSrcLocTable.
   llvm::BitVector SLocEntryLoaded;
 
   /// An external source for source location entries.
@@ -674,8 +674,8 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
 
   /// Holds information for \#line directives.
   ///
-  /// This is referenced by indices from SLocEntryTable.
-  std::unique_ptr<LineTableInfo> LineTable;
+  /// This is referenced by indices from SrcLocTable.
+  std::unique_ptr<SrcLineTable> LineTable;
 
   /// These ivars serve as a cache used in the getLineNumber
   /// method which is used to speedup getLineNumber calls to nearby locations.
@@ -1041,7 +1041,7 @@ public:
   ///
   /// This is a very hot method that is used for all SrcMgr queries
   /// that start with a SrcLoc object.  It is responsible for finding
-  /// the entry in SLocEntryTable which contains the specified location.
+  /// the entry in SrcLocTable which contains the specified location.
   ///
   FileID getFileID(SrcLoc SpellingLoc) const {
     unsigned SLocOffset = SpellingLoc.getOffset();
@@ -1510,7 +1510,7 @@ public:
   bool hasLineTable() const { return LineTable != nullptr; }
 
   /// Retrieve the stored line table.
-  LineTableInfo &getLineTable();
+  SrcLineTable &getLineTable();
 
   //===--------------------------------------------------------------------===//
   // Queries for performance analysis.
@@ -1631,24 +1631,24 @@ public:
   void dump() const;
 
   /// Get the number of local SLocEntries we have.
-  unsigned local_sloc_entry_size() const { return LocalSLocEntryTable.size(); }
+  unsigned local_sloc_entry_size() const { return LocalSrcLocTable.size(); }
 
   /// Get a local SLocEntry. This is exposed for indexing.
   const src::SLocEntry &getLocalSLocEntry(unsigned Index,
                                              bool *Invalid = nullptr) const {
-    assert(Index < LocalSLocEntryTable.size() && "Invalid index");
-    return LocalSLocEntryTable[Index];
+    assert(Index < LocalSrcLocTable.size() && "Invalid index");
+    return LocalSrcLocTable[Index];
   }
 
   /// Get the number of loaded SLocEntries we have.
-  unsigned loaded_sloc_entry_size() const { return LoadedSLocEntryTable.size();}
+  unsigned loaded_sloc_entry_size() const { return LoadedSrcLocTable.size();}
 
   /// Get a loaded SLocEntry. This is exposed for indexing.
   const src::SLocEntry &getLoadedSLocEntry(unsigned Index,
                                               bool *Invalid = nullptr) const {
-    assert(Index < LoadedSLocEntryTable.size() && "Invalid index");
+    assert(Index < LoadedSrcLocTable.size() && "Invalid index");
     if (SLocEntryLoaded[Index])
-      return LoadedSLocEntryTable[Index];
+      return LoadedSrcLocTable[Index];
     return loadSLocEntry(Index, Invalid);
   }
 
@@ -1656,7 +1656,7 @@ public:
                                         bool *Invalid = nullptr) const {
     if (FID.ID == 0 || FID.ID == -1) {
       if (Invalid) *Invalid = true;
-      return LocalSLocEntryTable[0];
+      return LocalSrcLocTable[0];
     }
     return getSLocEntryByID(FID.ID, Invalid);
   }
@@ -1664,7 +1664,7 @@ public:
   unsigned getNextLocalOffset() const { return NextLocalOffset; }
 
   void setExternalSLocEntrySource(ExternalSLocEntrySource *Source) {
-    assert(LoadedSLocEntryTable.empty() &&
+    assert(LoadedSrcLocTable.empty() &&
            "Invalidating existing loaded entries");
     ExternalSLocEntries = Source;
   }
@@ -1760,7 +1760,7 @@ private:
       return true;
 
     // If it is the last local entry, then it does if the location is local.
-    if (FID.ID+1 == static_cast<int>(LocalSLocEntryTable.size()))
+    if (FID.ID+1 == static_cast<int>(LocalSrcLocTable.size()))
       return SLocOffset < NextLocalOffset;
 
     // Otherwise, the entry after it has to not include it. This works for both
