@@ -42,39 +42,39 @@ TEST_F(SrcMgrTest, GetColNumber) {
   bool Invalid;
 
   Invalid = false;
-  EXPECT_EQ(1U, sm.getColumnNumber(MainFileID, 0, &Invalid));
+  EXPECT_EQ(1U, sm.GetColNumber(MainFileID, 0, &Invalid));
   EXPECT_TRUE(!Invalid);
 
 	Invalid = false;
-  EXPECT_EQ(5U, sm.getColumnNumber(MainFileID, 4, &Invalid));
+  EXPECT_EQ(5U, sm.GetColNumber(MainFileID, 4, &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  EXPECT_EQ(1U, sm.getColumnNumber(MainFileID, 7, &Invalid));
+  EXPECT_EQ(1U, sm.GetColNumber(MainFileID, 7, &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  EXPECT_EQ(5U, sm.getColumnNumber(MainFileID, 11, &Invalid));
+  EXPECT_EQ(5U, sm.GetColNumber(MainFileID, 11, &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  EXPECT_EQ(7U, sm.getColumnNumber(MainFileID, strlen(Source),
+  EXPECT_EQ(7U, sm.GetColNumber(MainFileID, strlen(Source),
                                          &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  sm.getColumnNumber(MainFileID, strlen(Source)+1, &Invalid);
+  sm.GetColNumber(MainFileID, strlen(Source)+1, &Invalid);
   EXPECT_TRUE(Invalid);
 
   // Test invalid files
   Invalid = false;
-  sm.getColumnNumber(FileID(), 0, &Invalid);
+  sm.GetColNumber(FileID(), 0, &Invalid);
   EXPECT_TRUE(Invalid);
 
   Invalid = false;
-  sm.getColumnNumber(FileID(), 1, &Invalid);
+  sm.GetColNumber(FileID(), 1, &Invalid);
   EXPECT_TRUE(Invalid);
 
   // Test with no invalid flag.
-  EXPECT_EQ(1U, sm.getColumnNumber(MainFileID, 0, nullptr));
+  EXPECT_EQ(1U, sm.GetColNumber(MainFileID, 0, nullptr));
 }

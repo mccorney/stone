@@ -49,6 +49,8 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"
+
+
 #include <cassert>
 #include <cstddef>
 #include <map>
@@ -562,7 +564,7 @@ public:
 /// The stack used when building modules on demand, which is used
 /// to provide a link between the source managers of the different compiler
 /// instances.
-using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSourceLoc>>;
+using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSrcLoc>>;
 
 /// This class handles loading and caching of source files into memory.
 ///
@@ -677,8 +679,8 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   /// This is referenced by indices from SrcLocTable.
   std::unique_ptr<SrcLineTable> LineTable;
 
-  /// These ivars serve as a cache used in the getLineNumber
-  /// method which is used to speedup getLineNumber calls to nearby locations.
+  /// These ivars serve as a cache used in the GetLineNumber
+  /// method which is used to speedup GetLineNumber calls to nearby locations.
   mutable FileID LastLineNoFileIDQuery;
   mutable src::ContentCache *LastLineNoContentCache;
   mutable unsigned LastLineNoFilePos;
@@ -736,7 +738,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   /// There is no way to set this value from the command line. If we ever need
   /// to do so (e.g., if on-demand module construction moves out-of-process),
   /// we can add a cc1-level option to do so.
-  SmallVector<std::pair<std::string, FullSourceLoc>, 2> StoredModuleBuildStack;
+  SmallVector<std::pair<std::string, FullSrcLoc>, 2> StoredModuleBuildStack;
 
 public:
   SrcMgr(Diagnostics &Diag, FileMgr &fileMgr,
@@ -778,7 +780,7 @@ public:
   }
 
   /// Push an entry to the module build stack.
-  void pushModuleBuildStack(StringRef moduleName, FullSourceLoc importLoc) {
+  void pushModuleBuildStack(StringRef moduleName, FullSrcLoc importLoc) {
     StoredModuleBuildStack.push_back(std::make_pair(moduleName.str(),importLoc));
   }
 
@@ -1347,7 +1349,7 @@ public:
   /// returns zero if the column number isn't known.  This may only be called
   /// on a file sloc, so you must choose a spelling or expansion location
   /// before calling this method.
-  unsigned getColumnNumber(FileID FID, unsigned FilePos,
+  unsigned GetColNumber(FileID FID, unsigned FilePos,
                            bool *Invalid = nullptr) const;
   unsigned getSpellingColumnNumber(SrcLoc Loc,
                                    bool *Invalid = nullptr) const;
@@ -1362,7 +1364,7 @@ public:
   /// This requires building and caching a table of line offsets for the
   /// MemoryBuffer, so this is not cheap: use only when about to emit a
   /// diagnostic.
-  unsigned getLineNumber(FileID FID, unsigned FilePos, bool *Invalid = nullptr) const;
+  unsigned GetLineNumber(FileID FID, unsigned FilePos, bool *Invalid = nullptr) const;
   unsigned getSpellingLineNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
   unsigned getExpansionLineNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
   unsigned getPresumedLineNumber(SrcLoc Loc, bool *Invalid = nullptr) const;

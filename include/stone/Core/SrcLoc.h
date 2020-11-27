@@ -326,23 +326,22 @@ class SrcFile;
 /// A SrcLoc and its associated SrcMgr.
 ///
 /// This is useful for argument passing to functions that expect both objects.
-class FullSourceLoc : public SrcLoc {
+class FullSrcLoc : public SrcLoc {
   const SrcMgr *srcMgr = nullptr;
 
 public:
-  /// Creates a FullSourceLoc where isValid() returns \c false.
-  FullSourceLoc() = default;
+  /// Creates a FullSrcLoc where isValid() returns \c false.
+  FullSrcLoc() = default;
 
-  explicit FullSourceLoc(SrcLoc Loc, const SrcMgr &SM)
-      : SrcLoc(Loc), srcMgr(&SM) {}
+  explicit FullSrcLoc(SrcLoc loc, const SrcMgr &sm) : SrcLoc(loc), srcMgr(&sm) {}
 
   bool hasManager() const {
       bool hassrcMgr =  srcMgr != nullptr;
-      assert(hassrcMgr == isValid() && "FullSourceLoc has location but no manager");
+      assert(hassrcMgr == isValid() && "FullSrcLoc has location but no manager");
       return hassrcMgr;
   }
 
-  /// \pre This FullSourceLoc has an associated SrcMgr.
+  /// \pre This FullSrcLoc has an associated SrcMgr.
   const SrcMgr &getManager() const {
     assert(srcMgr && "SrcMgr is NULL.");
     return *srcMgr;
@@ -350,13 +349,13 @@ public:
 
   FileID getFileID() const;
 
-  FullSourceLoc getExpansionLoc() const;
-  FullSourceLoc getSpellingLoc() const;
-  FullSourceLoc getFileLoc() const;
+  FullSrcLoc getExpansionLoc() const;
+  FullSrcLoc getSpellingLoc() const;
+  FullSrcLoc getFileLoc() const;
   PresumedLoc getPresumedLoc(bool UseLineDirectives = true) const;
-  bool isMacroArgExpansion(FullSourceLoc *StartLoc = nullptr) const;
-  FullSourceLoc getImmediateMacroCallerLoc() const;
-  std::pair<FullSourceLoc, StringRef> getModuleImportLoc() const;
+  bool isMacroArgExpansion(FullSrcLoc *StartLoc = nullptr) const;
+  FullSrcLoc getImmediateMacroCallerLoc() const;
+  std::pair<FullSrcLoc, StringRef> getModuleImportLoc() const;
   unsigned getFileOffset() const;
 
   unsigned getExpansionLineNumber(bool *Invalid = nullptr) const;
@@ -367,8 +366,8 @@ public:
 
   const char *getCharacterData(bool *Invalid = nullptr) const;
 
-  unsigned getLineNumber(bool *Invalid = nullptr) const;
-  unsigned getColumnNumber(bool *Invalid = nullptr) const;
+  unsigned GetLineNumber(bool *Invalid = nullptr) const;
+  unsigned GetColNumber(bool *Invalid = nullptr) const;
 
   const SrcFile *getSrcFile() const;
 
@@ -392,32 +391,32 @@ public:
   /// Determines the order of 2 source locations in the translation unit.
   ///
   /// \returns true if this source location comes before 'Loc', false otherwise.
-  bool isBeforeInTranslationUnitThan(FullSourceLoc Loc) const {
+  bool isBeforeInTranslationUnitThan(FullSrcLoc Loc) const {
     assert(Loc.isValid());
     assert(srcMgr == Loc.srcMgr && "Loc comes from another SrcMgr!");
     return isBeforeInTranslationUnitThan((SrcLoc)Loc);
   }
 
-  /// Comparison function class, useful for sorting FullSourceLocs.
+  /// Comparison function class, useful for sorting FullSrcLocs.
   struct BeforeThanCompare {
-    bool operator()(const FullSourceLoc& lhs, const FullSourceLoc& rhs) const {
+    bool operator()(const FullSrcLoc& lhs, const FullSrcLoc& rhs) const {
       return lhs.isBeforeInTranslationUnitThan(rhs);
     }
   };
 
-  /// Prints information about this FullSourceLoc to stderr.
+  /// Prints information about this FullSrcLoc to stderr.
   ///
   /// This is useful for debugging.
   void dump() const;
 
   friend bool
-  operator==(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
+  operator==(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
     return LHS.getRawEncoding() == RHS.getRawEncoding() &&
           LHS.srcMgr == RHS.srcMgr;
   }
 
   friend bool
-  operator!=(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
+  operator!=(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
     return !(LHS == RHS);
   }
 };

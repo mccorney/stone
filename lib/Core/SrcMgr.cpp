@@ -1150,9 +1150,9 @@ const char *SrcMgr::getCharacterData(SrcLoc SL,
   return Buffer->getBufferStart() + (CharDataInvalid? 0 : LocInfo.second);
 }
 
-/// getColumnNumber - Return the column # for the specified file position.
+/// GetColNumber - Return the column # for the specified file position.
 /// this is significantly cheaper to compute than the line number.
-unsigned SrcMgr::getColumnNumber(FileID FID, unsigned FilePos,
+unsigned SrcMgr::GetColNumber(FileID FID, unsigned FilePos,
                                         bool *Invalid) const {
   bool MyInvalid = false;
   const llvm::MemoryBuffer *MemBuf = getBuffer(FID, &MyInvalid);
@@ -1211,14 +1211,14 @@ unsigned SrcMgr::getSpellingColumnNumber(SrcLoc Loc,
                                                 bool *Invalid) const {
   if (isInvalid(Loc, Invalid)) return 0;
   std::pair<FileID, unsigned> LocInfo = getDecomposedSpellingLoc(Loc);
-  return getColumnNumber(LocInfo.first, LocInfo.second, Invalid);
+  return GetColNumber(LocInfo.first, LocInfo.second, Invalid);
 }
 
 unsigned SrcMgr::getExpansionColumnNumber(SrcLoc Loc,
                                                  bool *Invalid) const {
   if (isInvalid(Loc, Invalid)) return 0;
   std::pair<FileID, unsigned> LocInfo = getDecomposedExpansionLoc(Loc);
-  return getColumnNumber(LocInfo.first, LocInfo.second, Invalid);
+  return GetColNumber(LocInfo.first, LocInfo.second, Invalid);
 }
 
 unsigned SrcMgr::getPresumedColumnNumber(SrcLoc Loc,
@@ -1279,11 +1279,11 @@ static void ComputeLineNumbers(Diagnostics &Diag, ContentCache *FI,
   std::copy(LineOffsets.begin(), LineOffsets.end(), FI->SourceLineCache);
 }
 
-/// getLineNumber - Given a SrcLoc, return the spelling line number
+/// GetLineNumber - Given a SrcLoc, return the spelling line number
 /// for the position indicated.  This requires building and caching a table of
 /// line offsets for the MemoryBuffer, so this is not cheap: use only when
 /// about to emit a diagnostic.
-unsigned SrcMgr::getLineNumber(FileID FID, unsigned FilePos,
+unsigned SrcMgr::GetLineNumber(FileID FID, unsigned FilePos,
                                       bool *Invalid) const {
   if (FID.isInvalid()) {
     if (Invalid)
@@ -1381,13 +1381,13 @@ unsigned SrcMgr::getSpellingLineNumber(SrcLoc Loc,
                                               bool *Invalid) const {
   if (isInvalid(Loc, Invalid)) return 0;
   std::pair<FileID, unsigned> LocInfo = getDecomposedSpellingLoc(Loc);
-  return getLineNumber(LocInfo.first, LocInfo.second);
+  return GetLineNumber(LocInfo.first, LocInfo.second);
 }
 unsigned SrcMgr::getExpansionLineNumber(SrcLoc Loc,
                                                bool *Invalid) const {
   if (isInvalid(Loc, Invalid)) return 0;
   std::pair<FileID, unsigned> LocInfo = getDecomposedExpansionLoc(Loc);
-  return getLineNumber(LocInfo.first, LocInfo.second);
+  return GetLineNumber(LocInfo.first, LocInfo.second);
 }
 unsigned SrcMgr::getPresumedLineNumber(SrcLoc Loc,
                                               bool *Invalid) const {
@@ -1474,10 +1474,10 @@ PresumedLoc SrcMgr::getPresumedLoc(SrcLoc Loc,
   else
     Filename = C->getBuffer(Diag, *this)->getBufferIdentifier();
 
-  unsigned LineNo = getLineNumber(LocInfo.first, LocInfo.second, &Invalid);
+  unsigned LineNo = GetLineNumber(LocInfo.first, LocInfo.second, &Invalid);
   if (Invalid)
     return PresumedLoc();
-  unsigned ColNo  = getColumnNumber(LocInfo.first, LocInfo.second, &Invalid);
+  unsigned ColNo  = GetColNumber(LocInfo.first, LocInfo.second, &Invalid);
   if (Invalid)
     return PresumedLoc();
 
@@ -1502,7 +1502,7 @@ PresumedLoc SrcMgr::getPresumedLoc(SrcLoc Loc,
       // be multiple lines down from the line entry.  Add the difference in
       // physical line numbers from the query point and the line marker to the
       // total.
-      unsigned MarkerLineNo = getLineNumber(LocInfo.first, Entry->FileOffset);
+      unsigned MarkerLineNo = GetLineNumber(LocInfo.first, Entry->FileOffset);
       LineNo = Entry->LineNo + (LineNo-MarkerLineNo-1);
 
       // Note that column numbers are not molested by line markers.
