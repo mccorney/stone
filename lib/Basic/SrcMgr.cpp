@@ -350,9 +350,9 @@ LineTableInfo &SourceManager::getLineTable() {
 // Private 'Create' methods.
 //===----------------------------------------------------------------------===//
 
-SourceManager::SourceManager(DiagnosticsEngine &Diag, FileManager &FileMgr,
+SourceManager::SourceManager(DiagnosticsEngine &Diag, FileManager &fileMgr,
                              bool UserFilesAreVolatile)
-  : Diag(Diag), FileMgr(FileMgr), UserFilesAreVolatile(UserFilesAreVolatile) {
+  : Diag(Diag), fileMgr(fileMgr), UserFilesAreVolatile(UserFilesAreVolatile) {
   clearIDTables();
   //TODO: Diag.setSourceManager(this);
 }
@@ -2258,7 +2258,7 @@ size_t SourceManager::getDataStructureSizes() const {
 
 SourceManagerForFile::SourceManagerForFile(StringRef FileName,
                                            StringRef Content) {
-  // This is referenced by `FileMgr` and will be released by `FileMgr` when it
+  // This is referenced by `fileMgr` and will be released by `fileMgr` when it
   // is deleted.
   IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFileSystem(
       new llvm::vfs::InMemoryFileSystem);
@@ -2267,8 +2267,8 @@ SourceManagerForFile::SourceManagerForFile(StringRef FileName,
       llvm::MemoryBuffer::getMemBuffer(Content, FileName,
                                        /*RequiresNullTerminator=*/false));
   // This is passed to `SM` as reference, so the pointer has to be referenced
-  // in `Environment` so that `FileMgr` can out-live this function scope.
-  FileMgr =
+  // in `Environment` so that `fileMgr` can out-live this function scope.
+  fileMgr =
       llvm::make_unique<FileManager>(FileSystemOptions(), InMemoryFileSystem);
 
 /*
@@ -2280,9 +2280,9 @@ SourceManagerForFile::SourceManagerForFile(StringRef FileName,
 */
 
 /*
-  SourceMgr = llvm::make_unique<SourceManager>(*Diagnostics, *FileMgr);
+  SourceMgr = llvm::make_unique<SourceManager>(*Diagnostics, *fileMgr);
 
-  FileID ID = SourceMgr->createFileID(FileMgr->getFile(FileName),
+  FileID ID = SourceMgr->createFileID(fileMgr->getFile(FileName),
                                       SourceLocation(), stone::src::C_User);
   assert(ID.isValid());
   SourceMgr->setMainFileID(ID);

@@ -585,7 +585,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   /// DiagnosticsEngine object.
   DiagnosticsEngine &Diag;
 
-  FileManager &FileMgr;
+  FileManager &fileMgr;
 
   mutable llvm::BumpPtrAllocator ContentCacheAlloc;
 
@@ -744,7 +744,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   SmallVector<std::pair<std::string, FullSourceLoc>, 2> StoredModuleBuildStack;
 
 public:
-  SourceManager(DiagnosticsEngine &Diag, FileManager &FileMgr,
+  SourceManager(DiagnosticsEngine &Diag, FileManager &fileMgr,
                 bool UserFilesAreVolatile = false);
   explicit SourceManager(const SourceManager &) = delete;
   SourceManager &operator=(const SourceManager &) = delete;
@@ -758,7 +758,7 @@ public:
 
   DiagnosticsEngine &getDiagnostics() const { return Diag; }
 
-  FileManager &getFileManager() const { return FileMgr; }
+  FileManager &getFileManager() const { return fileMgr; }
 
   /// Set true if the SourceManager should report the original file name
   /// for contents of files that were overridden by other files. Defaults to
@@ -1867,7 +1867,7 @@ private:
   // The order of these fields are important - they should be in the same order
   // as they are created in `createSourceManagerForFile` so that they can be
   // deleted in the reverse order as they are created.
-  std::unique_ptr<FileManager> FileMgr;
+  std::unique_ptr<FileManager> fileMgr;
   //std::unique_ptr<DiagnosticsEngine> Diagnostics;
   std::unique_ptr<SourceManager> SourceMgr;
 };

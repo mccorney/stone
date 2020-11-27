@@ -63,7 +63,7 @@ void FileManager::clearStatCache() { StatCache.reset(); }
 
 /// Retrieve the directory that the given file name resides in.
 /// Filename can point to either a real file or a virtual file.
-static const DirectoryEntry *getDirectoryFromFile(FileManager &FileMgr,
+static const DirectoryEntry *getDirectoryFromFile(FileManager &fileMgr,
                                                   StringRef Filename,
                                                   bool CacheFailure) {
   if (Filename.empty())
@@ -77,7 +77,7 @@ static const DirectoryEntry *getDirectoryFromFile(FileManager &FileMgr,
   if (DirName.empty())
     DirName = ".";
 
-  return FileMgr.getDirectory(DirName, CacheFailure);
+  return fileMgr.getDirectory(DirName, CacheFailure);
 }
 
 /// Add all ancestors of the given path (pointing to either a file or
