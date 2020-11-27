@@ -63,7 +63,7 @@ void FileMgr::clearStatCache() { StatCache.reset(); }
 
 /// Retrieve the directory that the given file name resides in.
 /// Filename can point to either a real file or a virtual file.
-static const DirectoryEntry *getDirectoryFromFile(FileMgr &fileMgr,
+static const SrcDir *getDirectoryFromFile(FileMgr &fileMgr,
                                                   StringRef Filename,
                                                   bool CacheFailure) {
   if (Filename.empty())
@@ -97,7 +97,7 @@ void FileMgr::addAncestorsAsVirtualDirs(StringRef Path) {
     return;
 
   // Add the virtual directory to the cache.
-  auto UDE = llvm::make_unique<DirectoryEntry>();
+  auto UDE = llvm::make_unique<SrcDir>();
   UDE->Name = NamedDirEnt.first();
   NamedDirEnt.second = UDE.get();
   VirtualDirectoryEntries.push_back(std::move(UDE));
@@ -106,7 +106,7 @@ void FileMgr::addAncestorsAsVirtualDirs(StringRef Path) {
   addAncestorsAsVirtualDirs(DirName);
 }
 
-const DirectoryEntry *FileMgr::getDirectory(StringRef DirName,
+const SrcDir *FileMgr::getDirectory(StringRef DirName,
                                                 bool CacheFailure) {
   // stat doesn't like trailing separators except for root directory.
   // At least, on Win32 MSVCRT, stat() cannot strip trailing '/'.
@@ -156,7 +156,7 @@ const DirectoryEntry *FileMgr::getDirectory(StringRef DirName,
   // same inode (this occurs on Unix-like systems when one dir is
   // symlinked to another, for example) or the same path (on
   // Windows).
-  DirectoryEntry &UDE = UniqueRealDirs[Status.getUniqueID()];
+  SrcDir &UDE = UniqueRealDirs[Status.getUniqueID()];
 
   NamedDirEnt.second = &UDE;
   if (UDE.getName().empty()) {
@@ -191,7 +191,7 @@ const FileEntry *FileMgr::getFile(StringRef Filename, bool openFile,
   // subdirectory.  This will let us avoid having to waste time on known-to-fail
   // searches when we go to find sys/bar.h, because all the search directories
   // without a 'sys' subdir will get a cached failure result.
-  const DirectoryEntry *DirInfo = getDirectoryFromFile(*this, Filename,
+  const SrcDir *DirInfo = getDirectoryFromFile(*this, Filename,
                                                        CacheFailure);
   if (DirInfo == nullptr) { // Directory doesn't exist, file can't exist.
     if (!CacheFailure)
@@ -290,9 +290,9 @@ FileMgr::getVirtualFile(StringRef Filename, off_t Size,
   FileEntry *UFE = nullptr;
 
   // Now that all ancestors of Filename are in the cache, the
-  // following call is guaranteed to find the DirectoryEntry from the
+  // following call is guaranteed to find the SrcDir from the
   // cache.
-  const DirectoryEntry *DirInfo = getDirectoryFromFile(*this, Filename,
+  const SrcDir *DirInfo = getDirectoryFromFile(*this, Filename,
                                                        /*CacheFailure=*/true);
   assert(DirInfo &&
          "The directory of a virtual file should already be in the cache.");
@@ -488,9 +488,9 @@ void FileMgr::modifyFileEntry(FileEntry *File,
   File->ModTime = ModificationTime;
 }
 
-StringRef FileMgr::getCanonicalName(const DirectoryEntry *Dir) {
+StringRef FileMgr::getCanonicalName(const SrcDir *Dir) {
   // FIXME: use llvm::sys::fs::canonical() when it gets implemented
-  llvm::DenseMap<const DirectoryEntry *, llvm::StringRef>::iterator Known
+  llvm::DenseMap<const SrcDir *, llvm::StringRef>::iterator Known
     = CanonicalDirNames.find(Dir);
   if (Known != CanonicalDirNames.end())
     return Known->second;

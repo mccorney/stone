@@ -43,7 +43,7 @@ class FileSystemStatCache;
 
 /// Cached information about one directory (either on disk or in
 /// the virtual file system).
-class DirectoryEntry {
+class SrcDir {
   friend class FileMgr;
 
   StringRef Name; // Name of the directory.
@@ -64,7 +64,7 @@ class FileEntry {
   std::string RealPathName;   // Real path to the file; could be empty.
   off_t Size;                 // File size in bytes.
   time_t ModTime;             // Modification time of file.
-  const DirectoryEntry *Dir;  // Directory file lives in.
+  const SrcDir *Dir;  // Directory file lives in.
   unsigned UID;               // A unique (small) ID for the file.
   llvm::sys::fs::UniqueID UniqueID;
   bool IsNamedPipe;
@@ -90,7 +90,7 @@ public:
   time_t getModificationTime() const { return ModTime; }
 
   /// Return the directory the file lives in.
-  const DirectoryEntry *getDir() const { return Dir; }
+  const SrcDir *getDir() const { return Dir; }
 
   bool operator<(const FileEntry &RHS) const { return UniqueID < RHS.UniqueID; }
 
@@ -119,7 +119,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   FileSystemOptions FileSystemOpts;
 
   /// Cache for existing real directories.
-  std::map<llvm::sys::fs::UniqueID, DirectoryEntry> UniqueRealDirs;
+  std::map<llvm::sys::fs::UniqueID, SrcDir> UniqueRealDirs;
 
   /// Cache for existing real files.
   std::map<llvm::sys::fs::UniqueID, FileEntry> UniqueRealFiles;
@@ -128,7 +128,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   ///
   /// For each virtual file (e.g. foo/bar/baz.cpp), we add all of its parent
   /// directories (foo/ and foo/bar/) here.
-  SmallVector<std::unique_ptr<DirectoryEntry>, 4> VirtualDirectoryEntries;
+  SmallVector<std::unique_ptr<SrcDir>, 4> VirtualDirectoryEntries;
   /// The virtual files that we have allocated.
   SmallVector<std::unique_ptr<FileEntry>, 4> VirtualFileEntries;
 
@@ -140,7 +140,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   /// for virtual directories/files are owned by
   /// VirtualDirectoryEntries/VirtualFileEntries above.
   ///
-  llvm::StringMap<DirectoryEntry*, llvm::BumpPtrAllocator> SeenDirEntries;
+  llvm::StringMap<SrcDir*, llvm::BumpPtrAllocator> SeenDirEntries;
 
   /// A cache that maps paths to file entries (either real or
   /// virtual) we have looked up.
@@ -149,7 +149,7 @@ class FileMgr : public RefCountedBase<FileMgr> {
   llvm::StringMap<FileEntry*, llvm::BumpPtrAllocator> SeenFileEntries;
 
   /// The canonical names of directories.
-  llvm::DenseMap<const DirectoryEntry *, llvm::StringRef> CanonicalDirNames;
+  llvm::DenseMap<const SrcDir *, llvm::StringRef> CanonicalDirNames;
 
   /// Storage for canonical names that we have computed.
   llvm::BumpPtrAllocator CanonicalNameStorage;
@@ -203,7 +203,7 @@ public:
   ///
   /// \param CacheFailure If true and the file does not exist, we'll cache
   /// the failure to find this file.
-  const DirectoryEntry *getDirectory(StringRef DirName,
+  const SrcDir *getDirectory(StringRef DirName,
                                      bool CacheFailure = true);
 
   /// Lookup, cache, and verify the specified file (real or
@@ -276,7 +276,7 @@ public:
   /// This is a very expensive operation, despite its results being cached,
   /// and should only be used when the physical layout of the file system is
   /// required, which is (almost) never.
-  StringRef getCanonicalName(const DirectoryEntry *Dir);
+  StringRef getCanonicalName(const SrcDir *Dir);
 
   void PrintStats() const;
 };
