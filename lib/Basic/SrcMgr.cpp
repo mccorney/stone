@@ -248,7 +248,7 @@ unsigned LineTableInfo::getLineTableFilenameID(StringRef Name) {
 void LineTableInfo::AddLineNote(FileID FID, unsigned Offset, unsigned LineNo,
                                 int FilenameID, unsigned EntryExit,
                                 src::CharacteristicKind FileKind) {
-  std::vector<LineEntry> &Entries = LineEntries[FID];
+  std::vector<SrcLine> &Entries = LineEntries[FID];
 
   // An unspecified FilenameID means use the last filename if available, or the
   // main source file otherwise.
@@ -269,20 +269,20 @@ void LineTableInfo::AddLineNote(FileID FID, unsigned Offset, unsigned LineNo,
 
     // Get the include loc of the last entries' include loc as our include loc.
     IncludeOffset = 0;
-    if (const LineEntry *PrevEntry =
-          FindNearestLineEntry(FID, Entries.back().IncludeOffset))
+    if (const SrcLine *PrevEntry =
+          FindNearestSrcLine(FID, Entries.back().IncludeOffset))
       IncludeOffset = PrevEntry->IncludeOffset;
   }
 
-  Entries.push_back(LineEntry::get(Offset, LineNo, FilenameID, FileKind,
+  Entries.push_back(SrcLine::get(Offset, LineNo, FilenameID, FileKind,
                                    IncludeOffset));
 }
 
-/// FindNearestLineEntry - Find the line entry nearest to FID that is before
+/// FindNearestSrcLine - Find the line entry nearest to FID that is before
 /// it.  If there is no line entry before Offset in FID, return null.
-const LineEntry *LineTableInfo::FindNearestLineEntry(FileID FID,
+const SrcLine *LineTableInfo::FindNearestSrcLine(FileID FID,
                                                      unsigned Offset) {
-  const std::vector<LineEntry> &Entries = LineEntries[FID];
+  const std::vector<SrcLine> &Entries = LineEntries[FID];
   assert(!Entries.empty() && "No #line entries for this FID after all!");
 
   // It is very common for the query to be after the last #line, check this
@@ -291,7 +291,7 @@ const LineEntry *LineTableInfo::FindNearestLineEntry(FileID FID,
     return &Entries.back();
 
   // Do a binary search to find the maximal element that is still before Offset.
-  std::vector<LineEntry>::const_iterator I = llvm::upper_bound(Entries, Offset);
+  std::vector<SrcLine>::const_iterator I = llvm::upper_bound(Entries, Offset);
   if (I == Entries.begin())
     return nullptr;
   return &*--I;
@@ -300,7 +300,7 @@ const LineEntry *LineTableInfo::FindNearestLineEntry(FileID FID,
 /// Add a new line entry that has already been encoded into
 /// the internal representation of the line table.
 void LineTableInfo::AddEntry(FileID FID,
-                             const std::vector<LineEntry> &Entries) {
+                             const std::vector<SrcLine> &Entries) {
   LineEntries[FID] = Entries;
 }
 
@@ -996,7 +996,7 @@ SrcLoc SrcMgr::getImmediateSpellingLoc(SrcLoc Loc) const{
 
 /// getImmediateExpansionRange - Loc is required to be an expansion location.
 /// Return the start/end of the expansion information.
-CharSourceRange
+CharSrcRange
 SrcMgr::getImmediateExpansionRange(SrcLoc Loc) const {
   assert(Loc.isMacroID() && "Not a macro expansion loc!");
   const ExpansionInfo &Expansion = getSLocEntry(getFileID(Loc)).getExpansion();
@@ -1011,18 +1011,18 @@ SrcLoc SrcMgr::getTopMacroCallerLoc(SrcLoc Loc) const {
 
 /// getExpansionRange - Given a SrcLoc object, return the range of
 /// tokens covered by the expansion in the ultimate file.
-CharSourceRange SrcMgr::getExpansionRange(SrcLoc Loc) const {
+CharSrcRange SrcMgr::getExpansionRange(SrcLoc Loc) const {
   if (Loc.isFileID())
-    return CharSourceRange(SourceRange(Loc, Loc), true);
+    return CharSrcRange(SrcRange(Loc, Loc), true);
 
-  CharSourceRange Res = getImmediateExpansionRange(Loc);
+  CharSrcRange Res = getImmediateExpansionRange(Loc);
 
   // Fully resolve the start and end locations to their ultimate expansion
   // points.
   while (!Res.getBegin().isFileID())
     Res.setBegin(getImmediateExpansionRange(Res.getBegin()).getBegin());
   while (!Res.getEnd().isFileID()) {
-    CharSourceRange EndRange = getImmediateExpansionRange(Res.getEnd());
+    CharSrcRange EndRange = getImmediateExpansionRange(Res.getEnd());
     Res.setEnd(EndRange.getEnd());
     Res.setTokenRange(EndRange.isTokenRange());
   }
@@ -1422,8 +1422,8 @@ SrcMgr::getFileCharacteristic(SrcLoc Loc) const {
 
   assert(LineTable && "Can't have linetable entries without a LineTable!");
   // See if there is a #line directive before the location.
-  const LineEntry *Entry =
-    LineTable->FindNearestLineEntry(LocInfo.first, LocInfo.second);
+  const SrcLine *Entry =
+    LineTable->FindNearestSrcLine(LocInfo.first, LocInfo.second);
 
   // If this is before the first line marker, use the file characteristic.
   if (!Entry)
@@ -1488,9 +1488,9 @@ PresumedLoc SrcMgr::getPresumedLoc(SrcLoc Loc,
   if (UseLineDirectives && FI.hasLineDirectives()) {
     assert(LineTable && "Can't have linetable entries without a LineTable!");
     // See if there is a #line directive before this.  If so, get it.
-    if (const LineEntry *Entry =
-          LineTable->FindNearestLineEntry(LocInfo.first, LocInfo.second)) {
-      // If the LineEntry indicates a filename, use it.
+    if (const SrcLine *Entry =
+          LineTable->FindNearestSrcLine(LocInfo.first, LocInfo.second)) {
+      // If the SrcLine indicates a filename, use it.
       if (Entry->FilenameID != -1) {
         Filename = LineTable->getFilename(Entry->FilenameID);
         // The contents of files referenced by #line are not in the
@@ -1498,7 +1498,7 @@ PresumedLoc SrcMgr::getPresumedLoc(SrcLoc Loc,
         FID = FileID::get(0);
       }
 
-      // Use the line number specified by the LineEntry.  This line number may
+      // Use the line number specified by the SrcLine.  This line number may
       // be multiple lines down from the line entry.  Add the difference in
       // physical line numbers from the query point and the line marker to the
       // total.
@@ -1540,8 +1540,8 @@ bool SrcMgr::isInMainFile(SrcLoc Loc) const {
 
   // Check if there is a line directive for this location.
   if (FI.hasLineDirectives())
-    if (const LineEntry *Entry =
-            LineTable->FindNearestLineEntry(LocInfo.first, LocInfo.second))
+    if (const SrcLine *Entry =
+            LineTable->FindNearestSrcLine(LocInfo.first, LocInfo.second))
       if (Entry->IncludeOffset)
         return false;
 

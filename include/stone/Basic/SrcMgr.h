@@ -337,9 +337,9 @@ namespace src {
       return ExpansionIsTokenRange;
     }
 
-    CharSourceRange getExpansionLocRange() const {
-      return CharSourceRange(
-          SourceRange(getExpansionLocStart(), getExpansionLocEnd()),
+    CharSrcRange getExpansionLocRange() const {
+      return CharSrcRange(
+          SrcRange(getExpansionLocStart(), getExpansionLocEnd()),
           isExpansionTokenRange());
     }
 
@@ -1131,25 +1131,25 @@ public:
   /// expansion location.
   ///
   /// \pre \p Loc is required to be an expansion location.
-  CharSourceRange getImmediateExpansionRange(SrcLoc Loc) const;
+  CharSrcRange getImmediateExpansionRange(SrcLoc Loc) const;
 
   /// Given a SrcLoc object, return the range of
   /// tokens covered by the expansion in the ultimate file.
-  CharSourceRange getExpansionRange(SrcLoc Loc) const;
+  CharSrcRange getExpansionRange(SrcLoc Loc) const;
 
-  /// Given a SourceRange object, return the range of
+  /// Given a SrcRange object, return the range of
   /// tokens or characters covered by the expansion in the ultimate file.
-  CharSourceRange getExpansionRange(SourceRange Range) const {
+  CharSrcRange getExpansionRange(SrcRange Range) const {
     SrcLoc Begin = getExpansionRange(Range.getBegin()).getBegin();
-    CharSourceRange End = getExpansionRange(Range.getEnd());
-    return CharSourceRange(SourceRange(Begin, End.getEnd()),
+    CharSrcRange End = getExpansionRange(Range.getEnd());
+    return CharSrcRange(SrcRange(Begin, End.getEnd()),
                            End.isTokenRange());
   }
 
-  /// Given a CharSourceRange object, return the range of
+  /// Given a CharSrcRange object, return the range of
   /// tokens or characters covered by the expansion in the ultimate file.
-  CharSourceRange getExpansionRange(CharSourceRange Range) const {
-    CharSourceRange Expansion = getExpansionRange(Range.getAsRange());
+  CharSrcRange getExpansionRange(CharSrcRange Range) const {
+    CharSrcRange Expansion = getExpansionRange(Range.getAsRange());
     if (Expansion.getEnd() == Range.getEnd())
       Expansion.setTokenRange(Range.isTokenRange());
     return Expansion;
@@ -1834,13 +1834,13 @@ public:
 
 /// Compare two non-overlapping source ranges.
 template<>
-class BeforeThanCompare<SourceRange> {
+class BeforeThanCompare<SrcRange> {
   SrcMgr &SM;
 
 public:
   explicit BeforeThanCompare(SrcMgr &SM) : SM(SM) {}
 
-  bool operator()(SourceRange LHS, SourceRange RHS) const {
+  bool operator()(SrcRange LHS, SrcRange RHS) const {
     return SM.isBeforeInTranslationUnit(LHS.getBegin(), RHS.getBegin());
   }
 };

@@ -56,16 +56,12 @@ public:
   unsigned getHashValue() const { return static_cast<unsigned>(ID); }
 
 private:
-  friend class ASTWriter;
-  friend class ASTReader;
   friend class SrcMgr;
-
   static FileID get(int V) {
     FileID F;
     F.ID = V;
     return F;
   }
-
   int getOpaqueValue() const { return ID; }
 };
 
@@ -194,14 +190,14 @@ inline bool operator<(const SrcLoc &LHS, const SrcLoc &RHS) {
 }
 
 /// A trivial tuple used to represent a source range.
-class SourceRange {
+class SrcRange {
   SrcLoc B;
   SrcLoc E;
 
 public:
-  SourceRange() = default;
-  SourceRange(SrcLoc loc) : B(loc), E(loc) {}
-  SourceRange(SrcLoc begin, SrcLoc end) : B(begin), E(end) {}
+  SrcRange() = default;
+  SrcRange(SrcLoc loc) : B(loc), E(loc) {}
+  SrcRange(SrcLoc begin, SrcLoc end) : B(begin), E(end) {}
 
   SrcLoc getBegin() const { return B; }
   SrcLoc getEnd() const { return E; }
@@ -212,11 +208,11 @@ public:
   bool isValid() const { return B.isValid() && E.isValid(); }
   bool isInvalid() const { return !isValid(); }
 
-  bool operator==(const SourceRange &X) const {
+  bool operator==(const SrcRange &X) const {
     return B == X.B && E == X.E;
   }
 
-  bool operator!=(const SourceRange &X) const {
+  bool operator!=(const SrcRange &X) const {
     return B != X.B || E != X.E;
   }
 
@@ -227,33 +223,33 @@ public:
 
 /// Represents a character-granular source range.
 ///
-/// The underlying SourceRange can either specify the starting/ending character
+/// The underlying SrcRange can either specify the starting/ending character
 /// of the range, or it can specify the start of the range and the start of the
 /// last token of the range (a "token range").  In the token range case, the
 /// size of the last token must be measured to determine the actual end of the
 /// range.
-class CharSourceRange {
-  SourceRange Range;
+class CharSrcRange {
+  SrcRange Range;
   bool IsTokenRange = false;
 
 public:
-  CharSourceRange() = default;
-  CharSourceRange(SourceRange R, bool ITR) : Range(R), IsTokenRange(ITR) {}
+  CharSrcRange() = default;
+  CharSrcRange(SrcRange R, bool ITR) : Range(R), IsTokenRange(ITR) {}
 
-  static CharSourceRange getTokenRange(SourceRange R) {
-    return CharSourceRange(R, true);
+  static CharSrcRange getTokenRange(SrcRange R) {
+    return CharSrcRange(R, true);
   }
 
-  static CharSourceRange getCharRange(SourceRange R) {
-    return CharSourceRange(R, false);
+  static CharSrcRange getCharRange(SrcRange R) {
+    return CharSrcRange(R, false);
   }
 
-  static CharSourceRange getTokenRange(SrcLoc B, SrcLoc E) {
-    return getTokenRange(SourceRange(B, E));
+  static CharSrcRange getTokenRange(SrcLoc B, SrcLoc E) {
+    return getTokenRange(SrcRange(B, E));
   }
 
-  static CharSourceRange getCharRange(SrcLoc B, SrcLoc E) {
-    return getCharRange(SourceRange(B, E));
+  static CharSrcRange getCharRange(SrcLoc B, SrcLoc E) {
+    return getCharRange(SrcRange(B, E));
   }
 
   /// Return true if the end of this range specifies the start of
@@ -264,7 +260,7 @@ public:
 
   SrcLoc getBegin() const { return Range.getBegin(); }
   SrcLoc getEnd() const { return Range.getEnd(); }
-  SourceRange getAsRange() const { return Range; }
+  SrcRange getAsRange() const { return Range; }
 
   void setBegin(SrcLoc b) { Range.setBegin(b); }
   void setEnd(SrcLoc e) { Range.setEnd(e); }

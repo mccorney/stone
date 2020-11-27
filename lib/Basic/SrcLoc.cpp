@@ -84,7 +84,7 @@ LLVM_DUMP_METHOD void SrcLoc::dump(const SrcMgr &SM) const {
   llvm::errs() << '\n';
 }
 
-LLVM_DUMP_METHOD void SourceRange::dump(const SrcMgr &SM) const {
+LLVM_DUMP_METHOD void SrcRange::dump(const SrcMgr &SM) const {
   print(llvm::errs(), SM);
   llvm::errs() << '\n';
 }
@@ -119,7 +119,7 @@ static PresumedLoc PrintDifference(raw_ostream &OS, const SrcMgr &SM,
   return PrintedLoc;
 }
 
-void SourceRange::print(raw_ostream &OS, const SrcMgr &SM) const {
+void SrcRange::print(raw_ostream &OS, const SrcMgr &SM) const {
 
   OS << '<';
   auto PrintedLoc = PrintDifference(OS, SM, B, {});
@@ -131,7 +131,7 @@ void SourceRange::print(raw_ostream &OS, const SrcMgr &SM) const {
 }
 
 LLVM_DUMP_METHOD std::string
-SourceRange::printToString(const SrcMgr &SM) const {
+SrcRange::printToString(const SrcMgr &SM) const {
   std::string S;
   llvm::raw_string_ostream OS(S);
   print(OS, SM);
