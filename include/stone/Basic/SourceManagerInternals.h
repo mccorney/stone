@@ -42,7 +42,7 @@ struct LineEntry {
   int FilenameID;
 
   /// Set the 0 if no flags, 1 if a system header,
-  SrcMgr::CharacteristicKind FileKind;
+  src::CharacteristicKind FileKind;
 
   /// The offset of the virtual include stack location,
   /// which is manipulated by GNU linemarker directives.
@@ -51,7 +51,7 @@ struct LineEntry {
   unsigned IncludeOffset;
 
   static LineEntry get(unsigned Offs, unsigned Line, int Filename,
-                       SrcMgr::CharacteristicKind FileKind,
+                       src::CharacteristicKind FileKind,
                        unsigned IncludeOffset) {
     LineEntry E;
     E.FileOffset = Offs;
@@ -110,7 +110,7 @@ public:
 
   void AddLineNote(FileID FID, unsigned Offset,
                    unsigned LineNo, int FilenameID,
-                   unsigned EntryExit, SrcMgr::CharacteristicKind FileKind);
+                   unsigned EntryExit, src::CharacteristicKind FileKind);
 
 
   /// Find the line entry nearest to FID that is before it.

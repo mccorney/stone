@@ -63,10 +63,9 @@ class ASTWriter;
 class LineTableInfo;
 class SourceManager;
 class DiagnosticsEngine;
-
 /// Public enums and private classes that are part of the
 /// SourceManager implementation.
-namespace SrcMgr {
+namespace src {
 
   /// Indicates whether a file or directory holds normal user code,
   /// system code, or system code which is implicitly 'extern "C"' in C++ mode.
@@ -595,7 +594,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   /// This map allows us to merge ContentCache entries based
   /// on their FileEntry*.  All ContentCache objects will thus have unique,
   /// non-null, FileEntry pointers.
-  llvm::DenseMap<const FileEntry*, SrcMgr::ContentCache*> FileInfos;
+  llvm::DenseMap<const FileEntry*, src::ContentCache*> FileInfos;
 
   /// True if the ContentCache for files that are overridden by other
   /// files, should report the original file name. Defaults to true.
@@ -633,19 +632,19 @@ class SourceManager : public RefCountedBase<SourceManager> {
   ///
   /// All FileEntry* within the stored ContentCache objects are NULL,
   /// as they do not refer to a file.
-  std::vector<SrcMgr::ContentCache*> MemBufferInfos;
+  std::vector<src::ContentCache*> MemBufferInfos;
 
   /// The table of SLocEntries that are local to this module.
   ///
   /// Positive FileIDs are indexes into this table. Entry 0 indicates an invalid
   /// expansion.
-  SmallVector<SrcMgr::SLocEntry, 0> LocalSLocEntryTable;
+  SmallVector<src::SLocEntry, 0> LocalSLocEntryTable;
 
   /// The table of SLocEntries that are loaded from other modules.
   ///
   /// Negative FileIDs are indexes into this table. To get from ID to an index,
   /// use (-ID - 2).
-  mutable SmallVector<SrcMgr::SLocEntry, 0> LoadedSLocEntryTable;
+  mutable SmallVector<src::SLocEntry, 0> LoadedSLocEntryTable;
 
   /// The starting offset of the next local SLocEntry.
   ///
@@ -685,7 +684,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   /// These ivars serve as a cache used in the getLineNumber
   /// method which is used to speedup getLineNumber calls to nearby locations.
   mutable FileID LastLineNoFileIDQuery;
-  mutable SrcMgr::ContentCache *LastLineNoContentCache;
+  mutable src::ContentCache *LastLineNoContentCache;
   mutable unsigned LastLineNoFilePos;
   mutable unsigned LastLineNoResult;
 
@@ -725,7 +724,7 @@ class SourceManager : public RefCountedBase<SourceManager> {
   // Cache for the "fake" buffer used for error-recovery purposes.
   mutable std::unique_ptr<llvm::MemoryBuffer> FakeBufferForRecovery;
 
-  mutable std::unique_ptr<SrcMgr::ContentCache> FakeContentCacheForRecovery;
+  mutable std::unique_ptr<src::ContentCache> FakeContentCacheForRecovery;
 
   /// Lazily computed map of macro argument chunks to their expanded
   /// source location.
@@ -817,9 +816,9 @@ public:
   ///
   /// This translates NULL into standard input.
   FileID createFileID(const FileEntry *SourceFile, SourceLocation IncludePos,
-                      SrcMgr::CharacteristicKind FileCharacter,
+                      src::CharacteristicKind FileCharacter,
                       int LoadedID = 0, unsigned LoadedOffset = 0) {
-    const SrcMgr::ContentCache *IR =
+    const src::ContentCache *IR =
         getOrCreateContentCache(SourceFile, isSystem(FileCharacter));
     assert(IR && "getOrCreateContentCache() cannot return NULL");
     return createFileID(IR, IncludePos, FileCharacter, LoadedID, LoadedOffset);
@@ -830,7 +829,7 @@ public:
   /// This does no caching of the buffer and takes ownership of the
   /// MemoryBuffer, so only pass a MemoryBuffer to this once.
   FileID createFileID(std::unique_ptr<llvm::MemoryBuffer> Buffer,
-                      SrcMgr::CharacteristicKind FileCharacter = SrcMgr::C_User,
+                      src::CharacteristicKind FileCharacter = src::C_User,
                       int LoadedID = 0, unsigned LoadedOffset = 0,
                       SourceLocation IncludeLoc = SourceLocation()) {
     return createFileID(
@@ -845,7 +844,7 @@ public:
   /// This does not take ownership of the MemoryBuffer. The memory buffer must
   /// outlive the SourceManager.
   FileID createFileID(UnownedTag, const llvm::MemoryBuffer *Buffer,
-                      SrcMgr::CharacteristicKind FileCharacter = SrcMgr::C_User,
+                      src::CharacteristicKind FileCharacter = src::C_User,
                       int LoadedID = 0, unsigned LoadedOffset = 0,
                       SourceLocation IncludeLoc = SourceLocation()) {
     return createFileID(createMemBufferContentCache(Buffer, /*DoNotFree*/true),
@@ -855,7 +854,7 @@ public:
   /// Get the FileID for \p SourceFile if it exists. Otherwise, create a
   /// new FileID for the \p SourceFile.
   FileID getOrCreateFileID(const FileEntry *SourceFile,
-                           SrcMgr::CharacteristicKind FileCharacter) {
+                           src::CharacteristicKind FileCharacter) {
     FileID ID = translateFile(SourceFile);
     return ID.isValid() ? ID : createFileID(SourceFile, SourceLocation(),
                                             FileCharacter);
@@ -957,7 +956,7 @@ public:
   const llvm::MemoryBuffer *getBuffer(FileID FID, SourceLocation Loc,
                                       bool *Invalid = nullptr) const {
     bool MyInvalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
     if (MyInvalid || !Entry.isFile()) {
       if (Invalid)
         *Invalid = true;
@@ -972,7 +971,7 @@ public:
   const llvm::MemoryBuffer *getBuffer(FileID FID,
                                       bool *Invalid = nullptr) const {
     bool MyInvalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
     if (MyInvalid || !Entry.isFile()) {
       if (Invalid)
         *Invalid = true;
@@ -988,20 +987,20 @@ public:
   /// Returns the FileEntry record for the provided FileID.
   const FileEntry *getFileEntryForID(FileID FID) const {
     bool MyInvalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
     if (MyInvalid || !Entry.isFile())
       return nullptr;
 
-    const SrcMgr::ContentCache *Content = Entry.getFile().getContentCache();
+    const src::ContentCache *Content = Entry.getFile().getContentCache();
     if (!Content)
       return nullptr;
     return Content->OrigEntry;
   }
 
   /// Returns the FileEntry record for the provided SLocEntry.
-  const FileEntry *getFileEntryForSLocEntry(const SrcMgr::SLocEntry &sloc) const
+  const FileEntry *getFileEntryForSLocEntry(const src::SLocEntry &sloc) const
   {
-    const SrcMgr::ContentCache *Content = sloc.getFile().getContentCache();
+    const src::ContentCache *Content = sloc.getFile().getContentCache();
     if (!Content)
       return nullptr;
     return Content->OrigEntry;
@@ -1018,7 +1017,7 @@ public:
   /// during preprocessing of \p FID, including it.
   unsigned getNumCreatedFIDsForFileID(FileID FID) const {
     bool Invalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
     if (Invalid || !Entry.isFile())
       return 0;
 
@@ -1030,12 +1029,12 @@ public:
   void setNumCreatedFIDsForFileID(FileID FID, unsigned NumFIDs,
                                   bool Force = false) const {
     bool Invalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
     if (Invalid || !Entry.isFile())
       return;
 
     assert((Force || Entry.getFile().NumCreatedFIDs == 0) && "Already set!");
-    const_cast<SrcMgr::FileInfo &>(Entry.getFile()).NumCreatedFIDs = NumFIDs;
+    const_cast<src::FileInfo &>(Entry.getFile()).NumCreatedFIDs = NumFIDs;
   }
 
   //===--------------------------------------------------------------------===//
@@ -1069,7 +1068,7 @@ public:
   /// the specified file.
   SourceLocation getLocForStartOfFile(FileID FID) const {
     bool Invalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
     if (Invalid || !Entry.isFile())
       return SourceLocation();
 
@@ -1081,7 +1080,7 @@ public:
   /// specified file.
   SourceLocation getLocForEndOfFile(FileID FID) const {
     bool Invalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
     if (Invalid || !Entry.isFile())
       return SourceLocation();
 
@@ -1093,7 +1092,7 @@ public:
   /// otherwise it returns an invalid location.
   SourceLocation getIncludeLoc(FileID FID) const {
     bool Invalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
     if (Invalid || !Entry.isFile())
       return SourceLocation();
 
@@ -1183,7 +1182,7 @@ public:
   /// Form a SourceLocation from a FileID and Offset pair.
   SourceLocation getComposedLoc(FileID FID, unsigned Offset) const {
     bool Invalid = false;
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
+    const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
     if (Invalid)
       return SourceLocation();
 
@@ -1199,7 +1198,7 @@ public:
   std::pair<FileID, unsigned> getDecomposedLoc(SourceLocation Loc) const {
     FileID FID = getFileID(Loc);
     bool Invalid = false;
-    const SrcMgr::SLocEntry &E = getSLocEntry(FID, &Invalid);
+    const src::SLocEntry &E = getSLocEntry(FID, &Invalid);
     if (Invalid)
       return std::make_pair(FileID(), 0);
     return std::make_pair(FID, Loc.getOffset()-E.getOffset());
@@ -1213,7 +1212,7 @@ public:
   getDecomposedExpansionLoc(SourceLocation Loc) const {
     FileID FID = getFileID(Loc);
     bool Invalid = false;
-    const SrcMgr::SLocEntry *E = &getSLocEntry(FID, &Invalid);
+    const src::SLocEntry *E = &getSLocEntry(FID, &Invalid);
     if (Invalid)
       return std::make_pair(FileID(), 0);
 
@@ -1232,7 +1231,7 @@ public:
   getDecomposedSpellingLoc(SourceLocation Loc) const {
     FileID FID = getFileID(Loc);
     bool Invalid = false;
-    const SrcMgr::SLocEntry *E = &getSLocEntry(FID, &Invalid);
+    const src::SLocEntry *E = &getSLocEntry(FID, &Invalid);
     if (Invalid)
       return std::make_pair(FileID(), 0);
 
@@ -1389,7 +1388,7 @@ public:
   /// \endcode
   /// which changes all source locations in the current file after that to be
   /// considered to be from a system header.
-  SrcMgr::CharacteristicKind getFileCharacteristic(SourceLocation Loc) const;
+  src::CharacteristicKind getFileCharacteristic(SourceLocation Loc) const;
 
   /// Returns the "presumed" location of a SourceLocation specifies.
   ///
@@ -1457,7 +1456,7 @@ public:
 
   /// Returns if a SourceLocation is in an "extern C" system header.
   bool isInExternCSystemHeader(SourceLocation Loc) const {
-    return getFileCharacteristic(Loc) == SrcMgr::C_ExternCSystem;
+    return getFileCharacteristic(Loc) == src::C_ExternCSystem;
   }
 
   /// Returns whether \p Loc is expanded from a macro in a system header.
@@ -1509,7 +1508,7 @@ public:
   /// If FilenameID is -1, it is considered to be unspecified.
   void AddLineNote(SourceLocation Loc, unsigned LineNo, int FilenameID,
                    bool IsFileEntry, bool IsFileExit,
-                   SrcMgr::CharacteristicKind FileKind);
+                   src::CharacteristicKind FileKind);
 
   /// Determine if the source manager has a line table.
   bool hasLineTable() const { return LineTable != nullptr; }
@@ -1622,7 +1621,7 @@ public:
 
   // Iterators over FileInfos.
   using fileinfo_iterator =
-      llvm::DenseMap<const FileEntry*, SrcMgr::ContentCache*>::const_iterator;
+      llvm::DenseMap<const FileEntry*, src::ContentCache*>::const_iterator;
 
   fileinfo_iterator fileinfo_begin() const { return FileInfos.begin(); }
   fileinfo_iterator fileinfo_end() const { return FileInfos.end(); }
@@ -1639,7 +1638,7 @@ public:
   unsigned local_sloc_entry_size() const { return LocalSLocEntryTable.size(); }
 
   /// Get a local SLocEntry. This is exposed for indexing.
-  const SrcMgr::SLocEntry &getLocalSLocEntry(unsigned Index,
+  const src::SLocEntry &getLocalSLocEntry(unsigned Index,
                                              bool *Invalid = nullptr) const {
     assert(Index < LocalSLocEntryTable.size() && "Invalid index");
     return LocalSLocEntryTable[Index];
@@ -1649,7 +1648,7 @@ public:
   unsigned loaded_sloc_entry_size() const { return LoadedSLocEntryTable.size();}
 
   /// Get a loaded SLocEntry. This is exposed for indexing.
-  const SrcMgr::SLocEntry &getLoadedSLocEntry(unsigned Index,
+  const src::SLocEntry &getLoadedSLocEntry(unsigned Index,
                                               bool *Invalid = nullptr) const {
     assert(Index < LoadedSLocEntryTable.size() && "Invalid index");
     if (SLocEntryLoaded[Index])
@@ -1657,7 +1656,7 @@ public:
     return loadSLocEntry(Index, Invalid);
   }
 
-  const SrcMgr::SLocEntry &getSLocEntry(FileID FID,
+  const src::SLocEntry &getSLocEntry(FileID FID,
                                         bool *Invalid = nullptr) const {
     if (FID.ID == 0 || FID.ID == -1) {
       if (Invalid) *Invalid = true;
@@ -1728,12 +1727,12 @@ private:
   friend class ASTWriter;
 
   llvm::MemoryBuffer *getFakeBufferForRecovery() const;
-  const SrcMgr::ContentCache *getFakeContentCacheForRecovery() const;
+  const src::ContentCache *getFakeContentCacheForRecovery() const;
 
-  const SrcMgr::SLocEntry &loadSLocEntry(unsigned Index, bool *Invalid) const;
+  const src::SLocEntry &loadSLocEntry(unsigned Index, bool *Invalid) const;
 
   /// Get the entry with the given unwrapped FileID.
-  const SrcMgr::SLocEntry &getSLocEntryByID(int ID,
+  const src::SLocEntry &getSLocEntryByID(int ID,
                                             bool *Invalid = nullptr) const {
     assert(ID != -1 && "Using FileID sentinel value");
     if (ID < 0)
@@ -1741,14 +1740,14 @@ private:
     return getLocalSLocEntry(static_cast<unsigned>(ID), Invalid);
   }
 
-  const SrcMgr::SLocEntry &
+  const src::SLocEntry &
   getLoadedSLocEntryByID(int ID, bool *Invalid = nullptr) const {
     return getLoadedSLocEntry(static_cast<unsigned>(-ID - 2), Invalid);
   }
 
   /// Implements the common elements of storing an expansion info struct into
   /// the SLocEntry table and producing a source location that refers to it.
-  SourceLocation createExpansionLocImpl(const SrcMgr::ExpansionInfo &Expansion,
+  SourceLocation createExpansionLocImpl(const src::ExpansionInfo &Expansion,
                                         unsigned TokLength,
                                         int LoadedID = 0,
                                         unsigned LoadedOffset = 0);
@@ -1756,7 +1755,7 @@ private:
   /// Return true if the specified FileID contains the
   /// specified SourceLocation offset.  This is a very hot method.
   inline bool isOffsetInFileID(FileID FID, unsigned SLocOffset) const {
-    const SrcMgr::SLocEntry &Entry = getSLocEntry(FID);
+    const src::SLocEntry &Entry = getSLocEntry(FID);
     // If the entry is after the offset, it can't contain it.
     if (SLocOffset < Entry.getOffset()) return false;
 
@@ -1786,17 +1785,17 @@ private:
   ///
   /// This works regardless of whether the ContentCache corresponds to a
   /// file or some other input source.
-  FileID createFileID(const SrcMgr::ContentCache* File,
+  FileID createFileID(const src::ContentCache* File,
                       SourceLocation IncludePos,
-                      SrcMgr::CharacteristicKind DirCharacter,
+                      src::CharacteristicKind DirCharacter,
                       int LoadedID, unsigned LoadedOffset);
 
-  const SrcMgr::ContentCache *
+  const src::ContentCache *
     getOrCreateContentCache(const FileEntry *SourceFile,
                             bool isSystemFile = false);
 
   /// Create a new ContentCache for the specified  memory buffer.
-  const SrcMgr::ContentCache *
+  const src::ContentCache *
   createMemBufferContentCache(const llvm::MemoryBuffer *Buf, bool DoNotFree);
 
   FileID getFileIDSlow(unsigned SLocOffset) const;
@@ -1808,9 +1807,9 @@ private:
   SourceLocation getFileLocSlowCase(SourceLocation Loc) const;
 
   std::pair<FileID, unsigned>
-  getDecomposedExpansionLocSlowCase(const SrcMgr::SLocEntry *E) const;
+  getDecomposedExpansionLocSlowCase(const src::SLocEntry *E) const;
   std::pair<FileID, unsigned>
-  getDecomposedSpellingLocSlowCase(const SrcMgr::SLocEntry *E,
+  getDecomposedSpellingLocSlowCase(const src::SLocEntry *E,
                                    unsigned Offset) const;
   void computeMacroArgsCache(MacroArgsMap &MacroArgsCache, FileID FID) const;
   void associateFileChunkWithMacroArgExp(MacroArgsMap &MacroArgsCache,
