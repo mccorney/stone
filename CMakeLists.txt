@@ -6,6 +6,7 @@ project(Stone)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include(CMakeParseArguments)
+
 include(StoneProperties)
 include(StoneCore)
 include(StoneTblGen)
@@ -19,31 +20,13 @@ include_directories(BEFORE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-set_stone_build_properties(STONE)
+set_stone_properties(STONE)
 
-message(STATUS "Stone version: 0.0.1")
+set_stone_version()
+message(STATUS "stone compiler version: ${STONE_VERSION}")
 
-if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
-  install(DIRECTORY include/stone 
-    DESTINATION include
-    FILES_MATCHING
-    PATTERN "*.def"
-    PATTERN "*.h"
-    PATTERN "config.h" EXCLUDE
-	)
+install_stone()
 
-  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/stone
-    DESTINATION include
-    FILES_MATCHING
-    PATTERN "CMakeFiles" EXCLUDE
-    PATTERN "*.inc"
-    PATTERN "*.h"
-    )
-
-  install(PROGRAMS utils/bash-autocomplete.sh
-    DESTINATION share/stone
-    )
-endif()
 
 add_definitions( -D_GNU_SOURCE )
 

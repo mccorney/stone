@@ -2,7 +2,7 @@ file(GLOB_RECURSE
 	ALL_CXX_SOURCE_FILES
 	*.[chi]pp *.[chi]xx *.cpp *.cc *.h *.hh *.[CHI]
 )
-macro(set_stone_build_properties product)
+macro(set_stone_properties product)
 
 	#LLVM
   set(PATH_TO_LLVM_SOURCE "${CMAKE_SOURCE_DIR}")

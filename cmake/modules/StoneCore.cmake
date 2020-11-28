@@ -121,3 +121,45 @@ macro(add_stone_symlink name dest)
   # Always generate install targets
   llvm_install_symlink(${name} ${dest} ALWAYS_GENERATE)
 endmacro()
+
+macro(install_stone)
+
+	if (NOT LLVM_INSTALL_TOOLCHAIN_ONLY)
+  install(DIRECTORY include/stone 
+    DESTINATION include
+    FILES_MATCHING
+    PATTERN "*.def"
+    PATTERN "*.h"
+    PATTERN "config.h" EXCLUDE
+	)
+
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/stone
+    DESTINATION include
+    FILES_MATCHING
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "*.inc"
+    PATTERN "*.h"
+    )
+
+  install(PROGRAMS utils/bash-autocomplete.sh
+    DESTINATION share/stone
+    )
+endif()
+
+
+endmacro()
+macro(set_stone_version)
+  # If STONE_VERSION_* is specified, use it, if not use LLVM_VERSION_*.
+if(NOT DEFINED STONE_VERSION_MAJOR)
+  set(STONE_VERSION_MAJOR 0)
+endif()
+if(NOT DEFINED STONE_VERSION_MINOR)
+  set(STONE_VERSION_MINOR 1)
+endif()
+if(NOT DEFINED STONE_VERSION_PATCHLEVEL)
+  set(STONE_VERSION_PATCHLEVEL 0)
+endif()
+
+set(STONE_VERSION "${STONE_VERSION_MAJOR}.${STONE_VERSION_MINOR}.${STONE_VERSION_PATCHLEVEL}")
+
+endmacro()
