@@ -1,13 +1,10 @@
 #include "stone/Core/SrcMgr.h"
 #include "gtest/gtest.h"
 
-using namespace stone; 
+using namespace stone;
 
 class ParserTest : public ::testing::Test {
 public:
-
 };
 
-TEST_F(ParserTest, ParseFile) {
-
-}
+TEST_F(ParserTest, ParseFile) {}

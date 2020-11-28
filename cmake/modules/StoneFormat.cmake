@@ -6,14 +6,16 @@ set(stone_include_files
 )
 set(stone_lib_files
 	${STONE_SOURCE_DIR}/lib/Core/*.cpp
+	${STONE_SOURCE_DIR}/lib/Core/test/*.cpp
 	${STONE_SOURCE_DIR}/lib/Analyze/*.cpp
+	${STONE_SOURCE_DIR}/lib/Analyze/test/*.cpp
 	${STONE_SOURCE_DIR}/lib/System/*.cpp
+	${STONE_SOURCE_DIR}/lib/System/test/*.cpp
 	${STONE_SOURCE_DIR}/lib/Gen/*.cpp
+	${STONE_SOURCE_DIR}/lib/Gen/test/*.cpp
 )
 find_program(CLANG_FORMAT clang-format)
-
 if(CLANG_FORMAT)
-
 	add_custom_target(
 		stone-fmt
 		clang-format
@@ -22,5 +24,4 @@ if(CLANG_FORMAT)
 		${stone_lib_files}
 		${stone_include_files}
 		)
-
 endif()
