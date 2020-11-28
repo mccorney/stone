@@ -34,10 +34,15 @@ class DiagnosticListener {};
 
 class Diagnostic {
   // bool isActive;
-  unsigned diagnosticID;
+protected:
+  unsigned diagnosticID = 0;
+  unsigned startPos = 0;
+  unsigned endPos = 0;
 
 public:
-  virtual unsigned GetID();
+  const unsigned GetID() { return diagnosticID; }
+  const unsigned GetStartPos() { return startPos; }
+  const unsigned GetEndPos() { return endPos; }
 
 public:
 };
