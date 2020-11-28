@@ -4,7 +4,9 @@
 using namespace stone;
 
 Compiler::Compiler() {}
+
 void Compiler::Init(llvm::ArrayRef<const char *> args) {}
+
 int Compiler::Run(Pipeline *pipeline) {
 
   return stone::Analyze(GetAnalysis(), pipeline);

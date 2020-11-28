@@ -8,7 +8,8 @@ struct GenOptions;
 class Module;
 
 // May want to pass Module instead
-int Gen(Module &M, const GenOptions &GenOpts, Pipeline *P = nullptr);
+int Gen(stone::Module &langModule, const GenOptions &genOpts,
+        Pipeline *pipeline = nullptr);
 
 } // namespace stone
 

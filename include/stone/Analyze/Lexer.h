@@ -1,7 +1,7 @@
 #ifndef STONE_ANALYZE_LEXER_H
 #define STONE_ANALYZE_LEXER_H
 
-#include "stone/Core/Diagnostics.h"
+#include "stone/Analyze/LexerDiagnostic.h"
 #include "stone/Core/SrcLoc.h"
 
 namespace stone {
@@ -12,19 +12,6 @@ class Token;
 class LangOptions;
 class Token;
 class Diag;
-
-/*
-class LexerDiagClient final : public DiagClient {
-                public:
-                unsigned int GetID() {
-                        if(ID == 0) {
-                                // Load
-                        }
-                        return ID;
-                }
-};
-
-*/
 
 class Lexer final {
   FileID srcID;

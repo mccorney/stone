@@ -3,6 +3,7 @@
 
 #include "stone/Analyze/Analysis.h"
 #include "stone/Analyze/AnalyzeOptions.h"
+#include "stone/Analyze/ParserDiagnostic.h"
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 
@@ -12,10 +13,10 @@ namespace stone {
 class Pipeline;
 
 class Parser final {
-  Analysis &AS;
+  Analysis &analysis;
 
 public:
-  Parser(Analysis &AS, Pipeline *P = nullptr);
+  Parser(Analysis &analysis, Pipeline *pipeline = nullptr);
 
 public:
   // Decl

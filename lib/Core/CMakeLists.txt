@@ -23,6 +23,7 @@ set(stone_core_sources
 	SrcMgr.cpp
 	Stats.cpp
 	Stmt.cpp
+	TextDiagnosticListener.cpp
 	Visitor.cpp
 	Walker.cpp
 

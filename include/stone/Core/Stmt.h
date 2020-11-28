@@ -22,6 +22,7 @@
 #include <utility>
 
 namespace stone {
+
 class Stmt : public ASTNode {
 public:
   enum Kind {};
