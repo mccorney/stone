@@ -19,11 +19,9 @@
 #include "stone/Core/FileMgr.h"
 #include "stone/Core/FileSystemStatCache.h"
 
-
-
+#include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Config/llvm-config.h"
-#include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
@@ -43,7 +41,7 @@ using namespace stone;
 //===----------------------------------------------------------------------===//
 
 FileMgr::FileMgr(const FileSystemOptions &FSO,
-                         IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS)
+                 IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS)
     : FS(std::move(FS)), FileSystemOpts(FSO), SeenDirEntries(64),
       SeenFileEntries(64), NextFileUID(0) {
   NumDirLookups = NumFileLookups = 0;
@@ -66,9 +64,8 @@ void FileMgr::clearStatCache() { StatCache.reset(); }
 
 /// Retrieve the directory that the given file name resides in.
 /// Filename can point to either a real file or a virtual file.
-static const SrcDir *getDirectoryFromFile(FileMgr &fileMgr,
-                                                  StringRef Filename,
-                                                  bool CacheFailure) {
+static const SrcDir *getDirectoryFromFile(FileMgr &fileMgr, StringRef Filename,
+                                          bool CacheFailure) {
   if (Filename.empty())
     return nullptr;
 
@@ -109,15 +106,13 @@ void FileMgr::addAncestorsAsVirtualDirs(StringRef Path) {
   addAncestorsAsVirtualDirs(DirName);
 }
 
-const SrcDir *FileMgr::getDirectory(StringRef DirName,
-                                                bool CacheFailure) {
+const SrcDir *FileMgr::getDirectory(StringRef DirName, bool CacheFailure) {
   // stat doesn't like trailing separators except for root directory.
   // At least, on Win32 MSVCRT, stat() cannot strip trailing '/'.
   // (though it can strip '\\')
-  if (DirName.size() > 1 &&
-      DirName != llvm::sys::path::root_path(DirName) &&
+  if (DirName.size() > 1 && DirName != llvm::sys::path::root_path(DirName) &&
       llvm::sys::path::is_separator(DirName.back()))
-    DirName = DirName.substr(0, DirName.size()-1);
+    DirName = DirName.substr(0, DirName.size() - 1);
 #ifdef _WIN32
   // Fixing a problem with "stone C:test.c" on Windows.
   // Stat("C:") does not recognize "C:" as a valid directory
@@ -148,7 +143,8 @@ const SrcDir *FileMgr::getDirectory(StringRef DirName,
 
   // Check to see if the directory exists.
   llvm::vfs::Status Status;
-  if (getStatValue(InterndDirName, Status, false, nullptr /*directory lookup*/)) {
+  if (getStatValue(InterndDirName, Status, false,
+                   nullptr /*directory lookup*/)) {
     // There's no real directory at the given path.
     if (!CacheFailure)
       SeenDirEntries.erase(DirName);
@@ -165,14 +161,14 @@ const SrcDir *FileMgr::getDirectory(StringRef DirName,
   if (UDE.getName().empty()) {
     // We don't have this directory yet, add it.  We use the string
     // key from the SeenDirEntries map as the string.
-    UDE.Name  = InterndDirName;
+    UDE.Name = InterndDirName;
   }
 
   return &UDE;
 }
 
 const SrcFile *FileMgr::getFile(StringRef Filename, bool openFile,
-                                      bool CacheFailure) {
+                                bool CacheFailure) {
   ++NumFileLookups;
 
   // See if there is already an entry in the map.
@@ -194,8 +190,7 @@ const SrcFile *FileMgr::getFile(StringRef Filename, bool openFile,
   // subdirectory.  This will let us avoid having to waste time on known-to-fail
   // searches when we go to find sys/bar.h, because all the search directories
   // without a 'sys' subdir will get a cached failure result.
-  const SrcDir *DirInfo = getDirectoryFromFile(*this, Filename,
-                                                       CacheFailure);
+  const SrcDir *DirInfo = getDirectoryFromFile(*this, Filename, CacheFailure);
   if (DirInfo == nullptr) { // Directory doesn't exist, file can't exist.
     if (!CacheFailure)
       SeenFileEntries.erase(Filename);
@@ -229,7 +224,7 @@ const SrcFile *FileMgr::getFile(StringRef Filename, bool openFile,
   // the name.
   if (Status.getName() != Filename) {
     auto &NamedFileEnt =
-      *SeenFileEntries.insert({Status.getName(), &UFE}).first;
+        *SeenFileEntries.insert({Status.getName(), &UFE}).first;
     assert(NamedFileEnt.second == &UFE &&
            "filename from getStatValue() refers to wrong file");
     InterndFileName = NamedFileEnt.first().data();
@@ -257,11 +252,11 @@ const SrcFile *FileMgr::getFile(StringRef Filename, bool openFile,
   }
 
   // Otherwise, we don't have this file yet, add it.
-  UFE.Name    = InterndFileName;
-  UFE.Size    = Status.getSize();
+  UFE.Name = InterndFileName;
+  UFE.Size = Status.getSize();
   UFE.ModTime = llvm::sys::toTimeT(Status.getLastModificationTime());
-  UFE.Dir     = DirInfo;
-  UFE.UID     = NextFileUID++;
+  UFE.Dir = DirInfo;
+  UFE.UID = NextFileUID++;
   UFE.UniqueID = Status.getUniqueID();
   UFE.IsNamedPipe = Status.getType() == llvm::sys::fs::file_type::fifo_file;
   UFE.File = std::move(F);
@@ -277,9 +272,8 @@ const SrcFile *FileMgr::getFile(StringRef Filename, bool openFile,
   return &UFE;
 }
 
-const SrcFile *
-FileMgr::getVirtualFile(StringRef Filename, off_t Size,
-                            time_t ModificationTime) {
+const SrcFile *FileMgr::getVirtualFile(StringRef Filename, off_t Size,
+                                       time_t ModificationTime) {
   ++NumFileLookups;
 
   // See if there is already an entry in the map for an existing file.
@@ -296,7 +290,7 @@ FileMgr::getVirtualFile(StringRef Filename, off_t Size,
   // following call is guaranteed to find the SrcDir from the
   // cache.
   const SrcDir *DirInfo = getDirectoryFromFile(*this, Filename,
-                                                       /*CacheFailure=*/true);
+                                               /*CacheFailure=*/true);
   assert(DirInfo &&
          "The directory of a virtual file should already be in the cache.");
 
@@ -305,11 +299,10 @@ FileMgr::getVirtualFile(StringRef Filename, off_t Size,
   const char *InterndFileName = NamedFileEnt.first().data();
   if (getStatValue(InterndFileName, Status, true, nullptr) == 0) {
     UFE = &UniqueRealFiles[Status.getUniqueID()];
-    Status = llvm::vfs::Status(
-      Status.getName(), Status.getUniqueID(),
-      llvm::sys::toTimePoint(ModificationTime),
-      Status.getUser(), Status.getGroup(), Size,
-      Status.getType(), Status.getPermissions());
+    Status = llvm::vfs::Status(Status.getName(), Status.getUniqueID(),
+                               llvm::sys::toTimePoint(ModificationTime),
+                               Status.getUser(), Status.getGroup(), Size,
+                               Status.getType(), Status.getPermissions());
 
     NamedFileEnt.second = UFE;
 
@@ -332,11 +325,11 @@ FileMgr::getVirtualFile(StringRef Filename, off_t Size,
     NamedFileEnt.second = UFE;
   }
 
-  UFE->Name    = InterndFileName;
-  UFE->Size    = Size;
+  UFE->Name = InterndFileName;
+  UFE->Size = Size;
   UFE->ModTime = ModificationTime;
-  UFE->Dir     = DirInfo;
-  UFE->UID     = NextFileUID++;
+  UFE->Dir = DirInfo;
+  UFE->UID = NextFileUID++;
   UFE->IsValid = true;
   UFE->File.reset();
   return UFE;
@@ -345,8 +338,8 @@ FileMgr::getVirtualFile(StringRef Filename, off_t Size,
 bool FileMgr::FixupRelativePath(SmallVectorImpl<char> &path) const {
   StringRef pathRef(path.data(), path.size());
 
-  if (FileSystemOpts.WorkingDir.empty()
-      || llvm::sys::path::is_absolute(pathRef))
+  if (FileSystemOpts.WorkingDir.empty() ||
+      llvm::sys::path::is_absolute(pathRef))
     return false;
 
   SmallString<128> NewPath(FileSystemOpts.WorkingDir);
@@ -379,7 +372,7 @@ void FileMgr::fillRealPathName(SrcFile *UFE, llvm::StringRef FileName) {
 
 llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>>
 FileMgr::getBufferForFile(const SrcFile *Entry, bool isVolatile,
-                              bool ShouldCloseOpenFile) {
+                          bool ShouldCloseOpenFile) {
   uint64_t FileSize = Entry->getSize();
   // If there's a high enough chance that the file have changed since we
   // got its size, force a stat before opening it.
@@ -427,8 +420,7 @@ FileMgr::getBufferForFile(StringRef Filename, bool isVolatile) {
 /// false if it's an existent real file.  If FileDescriptor is NULL,
 /// do directory look-up instead of file look-up.
 bool FileMgr::getStatValue(StringRef Path, llvm::vfs::Status &Status,
-                               bool isFile,
-                               std::unique_ptr<llvm::vfs::File> *F) {
+                           bool isFile, std::unique_ptr<llvm::vfs::File> *F) {
   // FIXME: FileSystemOpts shouldn't be passed in here, all paths should be
   // absolute!
   if (FileSystemOpts.WorkingDir.empty())
@@ -442,8 +434,7 @@ bool FileMgr::getStatValue(StringRef Path, llvm::vfs::Status &Status,
                                        StatCache.get(), *FS));
 }
 
-bool FileMgr::getNoncachedStatValue(StringRef Path,
-                                        llvm::vfs::Status &Result) {
+bool FileMgr::getNoncachedStatValue(StringRef Path, llvm::vfs::Status &Result) {
   SmallString<128> FilePath(Path);
   FixupRelativePath(FilePath);
 
@@ -469,13 +460,14 @@ void FileMgr::invalidateCache(const SrcFile *Entry) {
 }
 
 void FileMgr::GetUniqueIDMapping(
-                   SmallVectorImpl<const SrcFile *> &UIDToFiles) const {
+    SmallVectorImpl<const SrcFile *> &UIDToFiles) const {
   UIDToFiles.clear();
   UIDToFiles.resize(NextFileUID);
 
   // Map file entries
-  for (llvm::StringMap<SrcFile*, llvm::BumpPtrAllocator>::const_iterator
-         FE = SeenFileEntries.begin(), FEEnd = SeenFileEntries.end();
+  for (llvm::StringMap<SrcFile *, llvm::BumpPtrAllocator>::const_iterator
+           FE = SeenFileEntries.begin(),
+           FEEnd = SeenFileEntries.end();
        FE != FEEnd; ++FE)
     if (FE->getValue())
       UIDToFiles[FE->getValue()->getUID()] = FE->getValue();
@@ -485,16 +477,16 @@ void FileMgr::GetUniqueIDMapping(
     UIDToFiles[VFE->getUID()] = VFE.get();
 }
 
-void FileMgr::modifySrcFile(SrcFile *File,
-                                  off_t Size, time_t ModificationTime) {
+void FileMgr::modifySrcFile(SrcFile *File, off_t Size,
+                            time_t ModificationTime) {
   File->Size = Size;
   File->ModTime = ModificationTime;
 }
 
 StringRef FileMgr::getCanonicalName(const SrcDir *Dir) {
   // FIXME: use llvm::sys::fs::canonical() when it gets implemented
-  llvm::DenseMap<const SrcDir *, llvm::StringRef>::iterator Known
-    = CanonicalDirNames.find(Dir);
+  llvm::DenseMap<const SrcDir *, llvm::StringRef>::iterator Known =
+      CanonicalDirNames.find(Dir);
   if (Known != CanonicalDirNames.end())
     return Known->second;
 
@@ -514,10 +506,10 @@ void FileMgr::PrintStats() const {
                << UniqueRealDirs.size() << " real dirs found.\n";
   llvm::errs() << VirtualFileEntries.size() << " virtual files found, "
                << VirtualDirectoryEntries.size() << " virtual dirs found.\n";
-  llvm::errs() << NumDirLookups << " dir lookups, "
-               << NumDirCacheMisses << " dir cache misses.\n";
-  llvm::errs() << NumFileLookups << " file lookups, "
-               << NumFileCacheMisses << " file cache misses.\n";
+  llvm::errs() << NumDirLookups << " dir lookups, " << NumDirCacheMisses
+               << " dir cache misses.\n";
+  llvm::errs() << NumFileLookups << " file lookups, " << NumFileCacheMisses
+               << " file cache misses.\n";
 
-  //llvm::errs() << PagesMapped << BytesOfPagesMapped << FSLookups;
+  // llvm::errs() << PagesMapped << BytesOfPagesMapped << FSLookups;
 }

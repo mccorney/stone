@@ -1,5 +1,5 @@
 
 
 class CompileProcess : final Process {
-	public: 
+public:
 };

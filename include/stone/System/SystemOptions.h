@@ -4,10 +4,8 @@
 #include "stone/System/BuildOptions.h"
 
 namespace stone {
-struct SystemOptions final : public BuildOptions {
-	
-};
+struct SystemOptions final : public BuildOptions {};
 
-}
+} // namespace stone
 
 #endif

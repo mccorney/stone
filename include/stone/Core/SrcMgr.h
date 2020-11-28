@@ -50,7 +50,6 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"
 
-
 #include <cassert>
 #include <cstddef>
 #include <map>
@@ -68,405 +67,396 @@ class Diagnostics;
 /// SrcMgr implementation.
 namespace src {
 
-  /// Indicates whether a file or directory holds normal user code,
-  /// system code, or system code which is implicitly 'extern "C"' in C++ mode.
-  ///
-  /// Entire directories can be tagged with this (this is maintained by
-  /// DirectoryLookup and friends) as can specific FileInfos when a \#pragma
-  /// system_header is seen or in various other cases.
-  ///
-  enum CharacteristicKind {
-    C_User, C_System, C_ExternCSystem, C_User_ModuleMap, C_System_ModuleMap
+/// Indicates whether a file or directory holds normal user code,
+/// system code, or system code which is implicitly 'extern "C"' in C++ mode.
+///
+/// Entire directories can be tagged with this (this is maintained by
+/// DirectoryLookup and friends) as can specific FileInfos when a \#pragma
+/// system_header is seen or in various other cases.
+///
+enum CharacteristicKind {
+  C_User,
+  C_System,
+  C_ExternCSystem,
+  C_User_ModuleMap,
+  C_System_ModuleMap
+};
+
+/// Determine whether a file / directory characteristic is for system code.
+inline bool isSystem(CharacteristicKind CK) {
+  return CK != C_User && CK != C_User_ModuleMap;
+}
+
+/// Determine whether a file characteristic is for a module map.
+inline bool isModuleMap(CharacteristicKind CK) {
+  return CK == C_User_ModuleMap || CK == C_System_ModuleMap;
+}
+
+/// One instance of this struct is kept for every file loaded or used.
+///
+/// This object owns the MemoryBuffer object.
+class alignas(8) ContentCache {
+  enum CCFlags {
+    /// Whether the buffer is invalid.
+    InvalidFlag = 0x01,
+
+    /// Whether the buffer should not be freed on destruction.
+    DoNotFreeFlag = 0x02
   };
 
-  /// Determine whether a file / directory characteristic is for system code.
-  inline bool isSystem(CharacteristicKind CK) {
-    return CK != C_User && CK != C_User_ModuleMap;
-  }
-
-  /// Determine whether a file characteristic is for a module map.
-  inline bool isModuleMap(CharacteristicKind CK) {
-    return CK == C_User_ModuleMap || CK == C_System_ModuleMap;
-  }
-
-  /// One instance of this struct is kept for every file loaded or used.
+  /// The actual buffer containing the characters from the input
+  /// file.
   ///
-  /// This object owns the MemoryBuffer object.
-  class alignas(8) ContentCache {
-    enum CCFlags {
-      /// Whether the buffer is invalid.
-      InvalidFlag = 0x01,
+  /// This is owned by the ContentCache object.  The bits indicate
+  /// whether the buffer is invalid.
+  mutable llvm::PointerIntPair<const llvm::MemoryBuffer *, 2> Buffer;
 
-      /// Whether the buffer should not be freed on destruction.
-      DoNotFreeFlag = 0x02
-    };
+public:
+  /// Reference to the file entry representing this ContentCache.
+  ///
+  /// This reference does not own the SrcFile object.
+  ///
+  /// It is possible for this to be NULL if the ContentCache encapsulates
+  /// an imaginary text buffer.
+  const SrcFile *OrigEntry;
 
-    /// The actual buffer containing the characters from the input
-    /// file.
-    ///
-    /// This is owned by the ContentCache object.  The bits indicate
-    /// whether the buffer is invalid.
-    mutable llvm::PointerIntPair<const llvm::MemoryBuffer *, 2> Buffer;
+  /// References the file which the contents were actually loaded from.
+  ///
+  /// Can be different from 'Entry' if we overridden the contents of one file
+  /// with the contents of another file.
+  const SrcFile *ContentsEntry;
 
-  public:
-    /// Reference to the file entry representing this ContentCache.
-    ///
-    /// This reference does not own the SrcFile object.
-    ///
-    /// It is possible for this to be NULL if the ContentCache encapsulates
-    /// an imaginary text buffer.
-    const SrcFile *OrigEntry;
+  /// A bump pointer allocated array of offsets for each source line.
+  ///
+  /// This is lazily computed.  This is owned by the SrcMgr
+  /// BumpPointerAllocator object.
+  unsigned *SourceLineCache = nullptr;
 
-    /// References the file which the contents were actually loaded from.
-    ///
-    /// Can be different from 'Entry' if we overridden the contents of one file
-    /// with the contents of another file.
-    const SrcFile *ContentsEntry;
+  /// The number of lines in this ContentCache.
+  ///
+  /// This is only valid if SourceLineCache is non-null.
+  unsigned NumLines = 0;
 
-    /// A bump pointer allocated array of offsets for each source line.
-    ///
-    /// This is lazily computed.  This is owned by the SrcMgr
-    /// BumpPointerAllocator object.
-    unsigned *SourceLineCache = nullptr;
+  /// Indicates whether the buffer itself was provided to override
+  /// the actual file contents.
+  ///
+  /// When true, the original entry may be a virtual file that does not
+  /// exist.
+  unsigned BufferOverridden : 1;
 
-    /// The number of lines in this ContentCache.
-    ///
-    /// This is only valid if SourceLineCache is non-null.
-    unsigned NumLines = 0;
+  /// True if this content cache was initially created for a source
+  /// file considered as a system one.
+  unsigned IsSystemFile : 1;
 
-    /// Indicates whether the buffer itself was provided to override
-    /// the actual file contents.
-    ///
-    /// When true, the original entry may be a virtual file that does not
-    /// exist.
-    unsigned BufferOverridden : 1;
+  /// True if this file may be transient, that is, if it might not
+  /// exist at some later point in time when this content entry is used,
+  /// after serialization and deserialization.
+  unsigned IsTransient : 1;
 
-    /// True if this content cache was initially created for a source
-    /// file considered as a system one.
-    unsigned IsSystemFile : 1;
+  ContentCache(const SrcFile *Ent = nullptr) : ContentCache(Ent, Ent) {}
 
-    /// True if this file may be transient, that is, if it might not
-    /// exist at some later point in time when this content entry is used,
-    /// after serialization and deserialization.
-    unsigned IsTransient : 1;
-
-    ContentCache(const SrcFile *Ent = nullptr) : ContentCache(Ent, Ent) {}
-
-    ContentCache(const SrcFile *Ent, const SrcFile *contentEnt)
+  ContentCache(const SrcFile *Ent, const SrcFile *contentEnt)
       : Buffer(nullptr, false), OrigEntry(Ent), ContentsEntry(contentEnt),
         BufferOverridden(false), IsSystemFile(false), IsTransient(false) {}
 
-    /// The copy ctor does not allow copies where source object has either
-    /// a non-NULL Buffer or SourceLineCache.  Ownership of allocated memory
-    /// is not transferred, so this is a logical error.
-    ContentCache(const ContentCache &RHS)
+  /// The copy ctor does not allow copies where source object has either
+  /// a non-NULL Buffer or SourceLineCache.  Ownership of allocated memory
+  /// is not transferred, so this is a logical error.
+  ContentCache(const ContentCache &RHS)
       : Buffer(nullptr, false), BufferOverridden(false), IsSystemFile(false),
         IsTransient(false) {
-      OrigEntry = RHS.OrigEntry;
-      ContentsEntry = RHS.ContentsEntry;
+    OrigEntry = RHS.OrigEntry;
+    ContentsEntry = RHS.ContentsEntry;
 
-      assert(RHS.Buffer.getPointer() == nullptr &&
-             RHS.SourceLineCache == nullptr &&
-             "Passed ContentCache object cannot own a buffer.");
+    assert(RHS.Buffer.getPointer() == nullptr &&
+           RHS.SourceLineCache == nullptr &&
+           "Passed ContentCache object cannot own a buffer.");
 
-      NumLines = RHS.NumLines;
-    }
+    NumLines = RHS.NumLines;
+  }
 
-    ContentCache &operator=(const ContentCache& RHS) = delete;
+  ContentCache &operator=(const ContentCache &RHS) = delete;
 
-    ~ContentCache();
+  ~ContentCache();
 
-    /// Returns the memory buffer for the associated content.
-    ///
-    /// \param Diag Object through which diagnostics will be emitted if the
-    ///   buffer cannot be retrieved.
-    ///
-    /// \param Loc If specified, is the location that invalid file diagnostics
-    ///   will be emitted at.
-    ///
-    /// \param Invalid If non-NULL, will be set \c true if an error occurred.
-    const llvm::MemoryBuffer *getBuffer(Diagnostics &Diag,
-                                        const SrcMgr &SM,
-                                        SrcLoc Loc = SrcLoc(),
-                                        bool *Invalid = nullptr) const;
+  /// Returns the memory buffer for the associated content.
+  ///
+  /// \param Diag Object through which diagnostics will be emitted if the
+  ///   buffer cannot be retrieved.
+  ///
+  /// \param Loc If specified, is the location that invalid file diagnostics
+  ///   will be emitted at.
+  ///
+  /// \param Invalid If non-NULL, will be set \c true if an error occurred.
+  const llvm::MemoryBuffer *getBuffer(Diagnostics &Diag, const SrcMgr &SM,
+                                      SrcLoc Loc = SrcLoc(),
+                                      bool *Invalid = nullptr) const;
 
-    /// Returns the size of the content encapsulated by this
-    /// ContentCache.
-    ///
-    /// This can be the size of the source file or the size of an
-    /// arbitrary scratch buffer.  If the ContentCache encapsulates a source
-    /// file this size is retrieved from the file's SrcFile.
-    unsigned getSize() const;
+  /// Returns the size of the content encapsulated by this
+  /// ContentCache.
+  ///
+  /// This can be the size of the source file or the size of an
+  /// arbitrary scratch buffer.  If the ContentCache encapsulates a source
+  /// file this size is retrieved from the file's SrcFile.
+  unsigned getSize() const;
 
-    /// Returns the number of bytes actually mapped for this
-    /// ContentCache.
-    ///
-    /// This can be 0 if the MemBuffer was not actually expanded.
-    unsigned getSizeBytesMapped() const;
+  /// Returns the number of bytes actually mapped for this
+  /// ContentCache.
+  ///
+  /// This can be 0 if the MemBuffer was not actually expanded.
+  unsigned getSizeBytesMapped() const;
 
-    /// Returns the kind of memory used to back the memory buffer for
-    /// this content cache.  This is used for performance analysis.
-    llvm::MemoryBuffer::BufferKind getMemoryBufferKind() const;
+  /// Returns the kind of memory used to back the memory buffer for
+  /// this content cache.  This is used for performance analysis.
+  llvm::MemoryBuffer::BufferKind getMemoryBufferKind() const;
 
-    /// Get the underlying buffer, returning NULL if the buffer is not
-    /// yet available.
-    const llvm::MemoryBuffer *getRawBuffer() const {
-      return Buffer.getPointer();
-    }
+  /// Get the underlying buffer, returning NULL if the buffer is not
+  /// yet available.
+  const llvm::MemoryBuffer *getRawBuffer() const { return Buffer.getPointer(); }
 
-    /// Replace the existing buffer (which will be deleted)
-    /// with the given buffer.
-    void replaceBuffer(const llvm::MemoryBuffer *B, bool DoNotFree = false);
+  /// Replace the existing buffer (which will be deleted)
+  /// with the given buffer.
+  void replaceBuffer(const llvm::MemoryBuffer *B, bool DoNotFree = false);
 
-    /// Determine whether the buffer itself is invalid.
-    bool isBufferInvalid() const {
-      return Buffer.getInt() & InvalidFlag;
-    }
+  /// Determine whether the buffer itself is invalid.
+  bool isBufferInvalid() const { return Buffer.getInt() & InvalidFlag; }
 
-    /// Determine whether the buffer should be freed.
-    bool shouldFreeBuffer() const {
-      return (Buffer.getInt() & DoNotFreeFlag) == 0;
-    }
+  /// Determine whether the buffer should be freed.
+  bool shouldFreeBuffer() const {
+    return (Buffer.getInt() & DoNotFreeFlag) == 0;
+  }
+};
+
+// Assert that the \c ContentCache objects will always be 8-byte aligned so
+// that we can pack 3 bits of integer into pointers to such objects.
+static_assert(alignof(ContentCache) >= 8,
+              "ContentCache must be 8-byte aligned.");
+
+/// Information about a FileID, basically just the logical file
+/// that it represents and include stack information.
+///
+/// Each FileInfo has include stack information, indicating where it came
+/// from. This information encodes the \#include chain that a token was
+/// expanded from. The main include file has an invalid IncludeLoc.
+///
+/// FileInfos contain a "ContentCache *", with the contents of the file.
+///
+class FileInfo {
+  friend class stone::SrcMgr;
+  /// The location of the \#include that brought in this file.
+  ///
+  /// This is an invalid SLOC for the main file (top of the \#include chain).
+  unsigned IncludeLoc; // Really a SrcLoc
+
+  /// Number of FileIDs (files and macros) that were created during
+  /// preprocessing of this \#include, including this SLocEntry.
+  ///
+  /// Zero means the preprocessor didn't provide such info for this SLocEntry.
+  unsigned NumCreatedFIDs : 31;
+
+  /// Whether this FileInfo has any \#line directives.
+  unsigned HasLineDirectives : 1;
+
+  /// The content cache and the characteristic of the file.
+  llvm::PointerIntPair<const ContentCache *, 3, CharacteristicKind>
+      ContentAndKind;
+
+public:
+  /// Return a FileInfo object.
+  static FileInfo get(SrcLoc IL, const ContentCache *Con,
+                      CharacteristicKind FileCharacter) {
+    FileInfo X;
+    X.IncludeLoc = IL.getRawEncoding();
+    X.NumCreatedFIDs = 0;
+    X.HasLineDirectives = false;
+    X.ContentAndKind.setPointer(Con);
+    X.ContentAndKind.setInt(FileCharacter);
+    return X;
+  }
+
+  SrcLoc getIncludeLoc() const {
+    return SrcLoc::getFromRawEncoding(IncludeLoc);
+  }
+
+  const ContentCache *getContentCache() const {
+    return ContentAndKind.getPointer();
+  }
+
+  /// Return whether this is a system header or not.
+  CharacteristicKind getFileCharacteristic() const {
+    return ContentAndKind.getInt();
+  }
+
+  /// Return true if this FileID has \#line directives in it.
+  bool hasLineDirectives() const { return HasLineDirectives; }
+
+  /// Set the flag that indicates that this FileID has
+  /// line table entries associated with it.
+  void setHasLineDirectives() { HasLineDirectives = true; }
+};
+
+/// Each ExpansionInfo encodes the expansion location - where
+/// the token was ultimately expanded, and the SpellingLoc - where the actual
+/// character data for the token came from.
+class ExpansionInfo {
+  // Really these are all SrcLocs.
+
+  /// Where the spelling for the token can be found.
+  unsigned SpellingLoc;
+
+  /// In a macro expansion, ExpansionLocStart and ExpansionLocEnd
+  /// indicate the start and end of the expansion. In object-like macros,
+  /// they will be the same. In a function-like macro expansion, the start
+  /// will be the identifier and the end will be the ')'. Finally, in
+  /// macro-argument instantiations, the end will be 'SrcLoc()', an
+  /// invalid location.
+  unsigned ExpansionLocStart, ExpansionLocEnd;
+
+  /// Whether the expansion range is a token range.
+  bool ExpansionIsTokenRange;
+
+public:
+  SrcLoc getSpellingLoc() const {
+    SrcLoc SpellLoc = SrcLoc::getFromRawEncoding(SpellingLoc);
+    return SpellLoc.isInvalid() ? getExpansionLocStart() : SpellLoc;
+  }
+
+  SrcLoc getExpansionLocStart() const {
+    return SrcLoc::getFromRawEncoding(ExpansionLocStart);
+  }
+
+  SrcLoc getExpansionLocEnd() const {
+    SrcLoc EndLoc = SrcLoc::getFromRawEncoding(ExpansionLocEnd);
+    return EndLoc.isInvalid() ? getExpansionLocStart() : EndLoc;
+  }
+
+  bool isExpansionTokenRange() const { return ExpansionIsTokenRange; }
+
+  CharSrcRange getExpansionLocRange() const {
+    return CharSrcRange(SrcRange(getExpansionLocStart(), getExpansionLocEnd()),
+                        isExpansionTokenRange());
+  }
+
+  bool isMacroArgExpansion() const {
+    // Note that this needs to return false for default constructed objects.
+    return getExpansionLocStart().isValid() &&
+           SrcLoc::getFromRawEncoding(ExpansionLocEnd).isInvalid();
+  }
+
+  bool isMacroBodyExpansion() const {
+    return getExpansionLocStart().isValid() &&
+           SrcLoc::getFromRawEncoding(ExpansionLocEnd).isValid();
+  }
+
+  bool isFunctionMacroExpansion() const {
+    return getExpansionLocStart().isValid() &&
+           getExpansionLocStart() != getExpansionLocEnd();
+  }
+
+  /// Return a ExpansionInfo for an expansion.
+  ///
+  /// Start and End specify the expansion range (where the macro is
+  /// expanded), and SpellingLoc specifies the spelling location (where
+  /// the characters from the token come from). All three can refer to
+  /// normal File SLocs or expansion locations.
+  static ExpansionInfo create(SrcLoc SpellingLoc, SrcLoc Start, SrcLoc End,
+                              bool ExpansionIsTokenRange = true) {
+    ExpansionInfo X;
+    X.SpellingLoc = SpellingLoc.getRawEncoding();
+    X.ExpansionLocStart = Start.getRawEncoding();
+    X.ExpansionLocEnd = End.getRawEncoding();
+    X.ExpansionIsTokenRange = ExpansionIsTokenRange;
+    return X;
+  }
+
+  /// Return a special ExpansionInfo for the expansion of
+  /// a macro argument into a function-like macro's body.
+  ///
+  /// ExpansionLoc specifies the expansion location (where the macro is
+  /// expanded). This doesn't need to be a range because a macro is always
+  /// expanded at a macro parameter reference, and macro parameters are
+  /// always exactly one token. SpellingLoc specifies the spelling location
+  /// (where the characters from the token come from). ExpansionLoc and
+  /// SpellingLoc can both refer to normal File SLocs or expansion locations.
+  ///
+  /// Given the code:
+  /// \code
+  ///   #define F(x) f(x)
+  ///   F(42);
+  /// \endcode
+  ///
+  /// When expanding '\c F(42)', the '\c x' would call this with an
+  /// SpellingLoc pointing at '\c 42' and an ExpansionLoc pointing at its
+  /// location in the definition of '\c F'.
+  static ExpansionInfo createForMacroArg(SrcLoc SpellingLoc,
+                                         SrcLoc ExpansionLoc) {
+    // We store an intentionally invalid source location for the end of the
+    // expansion range to mark that this is a macro argument location rather
+    // than a normal one.
+    return create(SpellingLoc, ExpansionLoc, SrcLoc());
+  }
+
+  /// Return a special ExpansionInfo representing a token that ends
+  /// prematurely. This is used to model a '>>' token that has been split
+  /// into '>' tokens and similar cases. Unlike for the other forms of
+  /// expansion, the expansion range in this case is a character range, not
+  /// a token range.
+  static ExpansionInfo createForTokenSplit(SrcLoc SpellingLoc, SrcLoc Start,
+                                           SrcLoc End) {
+    return create(SpellingLoc, Start, End, false);
+  }
+};
+
+/// This is a discriminated union of FileInfo and ExpansionInfo.
+///
+/// SrcMgr keeps an array of these objects, and they are uniquely
+/// identified by the FileID datatype.
+class SLocEntry {
+  unsigned Offset : 31;
+  unsigned IsExpansion : 1;
+  union {
+    FileInfo File;
+    ExpansionInfo Expansion;
   };
 
-  // Assert that the \c ContentCache objects will always be 8-byte aligned so
-  // that we can pack 3 bits of integer into pointers to such objects.
-  static_assert(alignof(ContentCache) >= 8,
-                "ContentCache must be 8-byte aligned.");
+public:
+  SLocEntry() : Offset(), IsExpansion(), File() {}
 
-  /// Information about a FileID, basically just the logical file
-  /// that it represents and include stack information.
-  ///
-  /// Each FileInfo has include stack information, indicating where it came
-  /// from. This information encodes the \#include chain that a token was
-  /// expanded from. The main include file has an invalid IncludeLoc.
-  ///
-  /// FileInfos contain a "ContentCache *", with the contents of the file.
-  ///
-  class FileInfo {
-    friend class stone::SrcMgr;
-    /// The location of the \#include that brought in this file.
-    ///
-    /// This is an invalid SLOC for the main file (top of the \#include chain).
-    unsigned IncludeLoc;  // Really a SrcLoc
+  unsigned getOffset() const { return Offset; }
 
-    /// Number of FileIDs (files and macros) that were created during
-    /// preprocessing of this \#include, including this SLocEntry.
-    ///
-    /// Zero means the preprocessor didn't provide such info for this SLocEntry.
-    unsigned NumCreatedFIDs : 31;
+  bool isExpansion() const { return IsExpansion; }
+  bool isFile() const { return !isExpansion(); }
 
-    /// Whether this FileInfo has any \#line directives.
-    unsigned HasLineDirectives : 1;
+  const FileInfo &getFile() const {
+    assert(isFile() && "Not a file SLocEntry!");
+    return File;
+  }
 
-    /// The content cache and the characteristic of the file.
-    llvm::PointerIntPair<const ContentCache*, 3, CharacteristicKind>
-        ContentAndKind;
+  const ExpansionInfo &getExpansion() const {
+    assert(isExpansion() && "Not a macro expansion SLocEntry!");
+    return Expansion;
+  }
 
-  public:
-    /// Return a FileInfo object.
-    static FileInfo get(SrcLoc IL, const ContentCache *Con,
-                        CharacteristicKind FileCharacter) {
-      FileInfo X;
-      X.IncludeLoc = IL.getRawEncoding();
-      X.NumCreatedFIDs = 0;
-      X.HasLineDirectives = false;
-      X.ContentAndKind.setPointer(Con);
-      X.ContentAndKind.setInt(FileCharacter);
-      return X;
-    }
+  static SLocEntry get(unsigned Offset, const FileInfo &FI) {
+    assert(!(Offset & (1u << 31)) && "Offset is too large");
+    SLocEntry E;
+    E.Offset = Offset;
+    E.IsExpansion = false;
+    E.File = FI;
+    return E;
+  }
 
-    SrcLoc getIncludeLoc() const {
-      return SrcLoc::getFromRawEncoding(IncludeLoc);
-    }
+  static SLocEntry get(unsigned Offset, const ExpansionInfo &Expansion) {
+    assert(!(Offset & (1u << 31)) && "Offset is too large");
+    SLocEntry E;
+    E.Offset = Offset;
+    E.IsExpansion = true;
+    E.Expansion = Expansion;
+    return E;
+  }
+};
 
-    const ContentCache *getContentCache() const {
-      return ContentAndKind.getPointer();
-    }
-
-    /// Return whether this is a system header or not.
-    CharacteristicKind getFileCharacteristic() const {
-      return ContentAndKind.getInt();
-    }
-
-    /// Return true if this FileID has \#line directives in it.
-    bool hasLineDirectives() const { return HasLineDirectives; }
-
-    /// Set the flag that indicates that this FileID has
-    /// line table entries associated with it.
-    void setHasLineDirectives() {
-      HasLineDirectives = true;
-    }
-  };
-
-  /// Each ExpansionInfo encodes the expansion location - where
-  /// the token was ultimately expanded, and the SpellingLoc - where the actual
-  /// character data for the token came from.
-  class ExpansionInfo {
-    // Really these are all SrcLocs.
-
-    /// Where the spelling for the token can be found.
-    unsigned SpellingLoc;
-
-    /// In a macro expansion, ExpansionLocStart and ExpansionLocEnd
-    /// indicate the start and end of the expansion. In object-like macros,
-    /// they will be the same. In a function-like macro expansion, the start
-    /// will be the identifier and the end will be the ')'. Finally, in
-    /// macro-argument instantiations, the end will be 'SrcLoc()', an
-    /// invalid location.
-    unsigned ExpansionLocStart, ExpansionLocEnd;
-
-    /// Whether the expansion range is a token range.
-    bool ExpansionIsTokenRange;
-
-  public:
-    SrcLoc getSpellingLoc() const {
-      SrcLoc SpellLoc = SrcLoc::getFromRawEncoding(SpellingLoc);
-      return SpellLoc.isInvalid() ? getExpansionLocStart() : SpellLoc;
-    }
-
-    SrcLoc getExpansionLocStart() const {
-      return SrcLoc::getFromRawEncoding(ExpansionLocStart);
-    }
-
-    SrcLoc getExpansionLocEnd() const {
-      SrcLoc EndLoc =
-        SrcLoc::getFromRawEncoding(ExpansionLocEnd);
-      return EndLoc.isInvalid() ? getExpansionLocStart() : EndLoc;
-    }
-
-    bool isExpansionTokenRange() const {
-      return ExpansionIsTokenRange;
-    }
-
-    CharSrcRange getExpansionLocRange() const {
-      return CharSrcRange(
-          SrcRange(getExpansionLocStart(), getExpansionLocEnd()),
-          isExpansionTokenRange());
-    }
-
-    bool isMacroArgExpansion() const {
-      // Note that this needs to return false for default constructed objects.
-      return getExpansionLocStart().isValid() &&
-        SrcLoc::getFromRawEncoding(ExpansionLocEnd).isInvalid();
-    }
-
-    bool isMacroBodyExpansion() const {
-      return getExpansionLocStart().isValid() &&
-        SrcLoc::getFromRawEncoding(ExpansionLocEnd).isValid();
-    }
-
-    bool isFunctionMacroExpansion() const {
-      return getExpansionLocStart().isValid() &&
-          getExpansionLocStart() != getExpansionLocEnd();
-    }
-
-    /// Return a ExpansionInfo for an expansion.
-    ///
-    /// Start and End specify the expansion range (where the macro is
-    /// expanded), and SpellingLoc specifies the spelling location (where
-    /// the characters from the token come from). All three can refer to
-    /// normal File SLocs or expansion locations.
-    static ExpansionInfo create(SrcLoc SpellingLoc,
-                                SrcLoc Start, SrcLoc End,
-                                bool ExpansionIsTokenRange = true) {
-      ExpansionInfo X;
-      X.SpellingLoc = SpellingLoc.getRawEncoding();
-      X.ExpansionLocStart = Start.getRawEncoding();
-      X.ExpansionLocEnd = End.getRawEncoding();
-      X.ExpansionIsTokenRange = ExpansionIsTokenRange;
-      return X;
-    }
-
-    /// Return a special ExpansionInfo for the expansion of
-    /// a macro argument into a function-like macro's body.
-    ///
-    /// ExpansionLoc specifies the expansion location (where the macro is
-    /// expanded). This doesn't need to be a range because a macro is always
-    /// expanded at a macro parameter reference, and macro parameters are
-    /// always exactly one token. SpellingLoc specifies the spelling location
-    /// (where the characters from the token come from). ExpansionLoc and
-    /// SpellingLoc can both refer to normal File SLocs or expansion locations.
-    ///
-    /// Given the code:
-    /// \code
-    ///   #define F(x) f(x)
-    ///   F(42);
-    /// \endcode
-    ///
-    /// When expanding '\c F(42)', the '\c x' would call this with an
-    /// SpellingLoc pointing at '\c 42' and an ExpansionLoc pointing at its
-    /// location in the definition of '\c F'.
-    static ExpansionInfo createForMacroArg(SrcLoc SpellingLoc,
-                                           SrcLoc ExpansionLoc) {
-      // We store an intentionally invalid source location for the end of the
-      // expansion range to mark that this is a macro argument location rather
-      // than a normal one.
-      return create(SpellingLoc, ExpansionLoc, SrcLoc());
-    }
-
-    /// Return a special ExpansionInfo representing a token that ends
-    /// prematurely. This is used to model a '>>' token that has been split
-    /// into '>' tokens and similar cases. Unlike for the other forms of
-    /// expansion, the expansion range in this case is a character range, not
-    /// a token range.
-    static ExpansionInfo createForTokenSplit(SrcLoc SpellingLoc,
-                                             SrcLoc Start,
-                                             SrcLoc End) {
-      return create(SpellingLoc, Start, End, false);
-    }
-  };
-
-  /// This is a discriminated union of FileInfo and ExpansionInfo.
-  ///
-  /// SrcMgr keeps an array of these objects, and they are uniquely
-  /// identified by the FileID datatype.
-  class SLocEntry {
-    unsigned Offset : 31;
-    unsigned IsExpansion : 1;
-    union {
-      FileInfo File;
-      ExpansionInfo Expansion;
-    };
-
-  public:
-    SLocEntry() : Offset(), IsExpansion(), File() {}
-
-    unsigned getOffset() const { return Offset; }
-
-    bool isExpansion() const { return IsExpansion; }
-    bool isFile() const { return !isExpansion(); }
-
-    const FileInfo &getFile() const {
-      assert(isFile() && "Not a file SLocEntry!");
-      return File;
-    }
-
-    const ExpansionInfo &getExpansion() const {
-      assert(isExpansion() && "Not a macro expansion SLocEntry!");
-      return Expansion;
-    }
-
-    static SLocEntry get(unsigned Offset, const FileInfo &FI) {
-      assert(!(Offset & (1u << 31)) && "Offset is too large");
-      SLocEntry E;
-      E.Offset = Offset;
-      E.IsExpansion = false;
-      E.File = FI;
-      return E;
-    }
-
-    static SLocEntry get(unsigned Offset, const ExpansionInfo &Expansion) {
-      assert(!(Offset & (1u << 31)) && "Offset is too large");
-      SLocEntry E;
-      E.Offset = Offset;
-      E.IsExpansion = true;
-      E.Expansion = Expansion;
-      return E;
-    }
-  };
-
-} // namespace srcMgr
+} // namespace src
 
 /// External source of source location entries.
 class ExternalSLocEntrySource {
@@ -526,8 +516,10 @@ public:
   bool getCachedResult(unsigned LOffset, unsigned ROffset) const {
     // If one of the query files is the common file, use the offset.  Otherwise,
     // use the #include loc in the common file.
-    if (LQueryFID != CommonFID) LOffset = LCommonOffset;
-    if (RQueryFID != CommonFID) ROffset = RCommonOffset;
+    if (LQueryFID != CommonFID)
+      LOffset = LCommonOffset;
+    if (RQueryFID != CommonFID)
+      ROffset = RCommonOffset;
 
     // It is common for multiple macro expansions to be "included" from the same
     // location (expansion location), in which case use the order of the FileIDs
@@ -592,7 +584,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   /// This map allows us to merge ContentCache entries based
   /// on their SrcFile*.  All ContentCache objects will thus have unique,
   /// non-null, SrcFile pointers.
-  llvm::DenseMap<const SrcFile*, src::ContentCache*> FileInfos;
+  llvm::DenseMap<const SrcFile *, src::ContentCache *> FileInfos;
 
   /// True if the ContentCache for files that are overridden by other
   /// files, should report the original file name. Defaults to true.
@@ -630,7 +622,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   ///
   /// All SrcFile* within the stored ContentCache objects are NULL,
   /// as they do not refer to a file.
-  std::vector<src::ContentCache*> MemBufferInfos;
+  std::vector<src::ContentCache *> MemBufferInfos;
 
   /// The table of SLocEntries that are local to this module.
   ///
@@ -742,7 +734,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
 
 public:
   SrcMgr(Diagnostics &Diag, FileMgr &fileMgr,
-                bool UserFilesAreVolatile = false);
+         bool UserFilesAreVolatile = false);
   explicit SrcMgr(const SrcMgr &) = delete;
   SrcMgr &operator=(const SrcMgr &) = delete;
   ~SrcMgr();
@@ -781,7 +773,8 @@ public:
 
   /// Push an entry to the module build stack.
   void pushModuleBuildStack(StringRef moduleName, FullSrcLoc importLoc) {
-    StoredModuleBuildStack.push_back(std::make_pair(moduleName.str(),importLoc));
+    StoredModuleBuildStack.push_back(
+        std::make_pair(moduleName.str(), importLoc));
   }
 
   //===--------------------------------------------------------------------===//
@@ -792,9 +785,7 @@ public:
   FileID getMainFileID() const { return MainFileID; }
 
   /// Set the file ID for the main source file.
-  void setMainFileID(FileID FID) {
-    MainFileID = FID;
-  }
+  void setMainFileID(FileID FID) { MainFileID = FID; }
 
   /// Set the file ID for the precompiled preamble.
   void setPreambleFileID(FileID Preamble) {
@@ -814,8 +805,8 @@ public:
   ///
   /// This translates NULL into standard input.
   FileID createFileID(const SrcFile *SourceFile, SrcLoc IncludePos,
-                      src::CharacteristicKind FileCharacter,
-                      int LoadedID = 0, unsigned LoadedOffset = 0) {
+                      src::CharacteristicKind FileCharacter, int LoadedID = 0,
+                      unsigned LoadedOffset = 0) {
     const src::ContentCache *IR =
         getOrCreateContentCache(SourceFile, isSystem(FileCharacter));
     assert(IR && "getOrCreateContentCache() cannot return NULL");
@@ -845,7 +836,7 @@ public:
                       src::CharacteristicKind FileCharacter = src::C_User,
                       int LoadedID = 0, unsigned LoadedOffset = 0,
                       SrcLoc IncludeLoc = SrcLoc()) {
-    return createFileID(createMemBufferContentCache(Buffer, /*DoNotFree*/true),
+    return createFileID(createMemBufferContentCache(Buffer, /*DoNotFree*/ true),
                         IncludeLoc, FileCharacter, LoadedID, LoadedOffset);
   }
 
@@ -854,34 +845,29 @@ public:
   FileID getOrCreateFileID(const SrcFile *SourceFile,
                            src::CharacteristicKind FileCharacter) {
     FileID ID = translateFile(SourceFile);
-    return ID.isValid() ? ID : createFileID(SourceFile, SrcLoc(),
-                                            FileCharacter);
+    return ID.isValid() ? ID
+                        : createFileID(SourceFile, SrcLoc(), FileCharacter);
   }
 
   /// Return a new SrcLoc that encodes the
   /// fact that a token from SpellingLoc should actually be referenced from
   /// ExpansionLoc, and that it represents the expansion of a macro argument
   /// into the function-like macro body.
-  SrcLoc createMacroArgExpansionLoc(SrcLoc Loc,
-                                            SrcLoc ExpansionLoc,
-                                            unsigned TokLength);
+  SrcLoc createMacroArgExpansionLoc(SrcLoc Loc, SrcLoc ExpansionLoc,
+                                    unsigned TokLength);
 
   /// Return a new SrcLoc that encodes the fact
   /// that a token from SpellingLoc should actually be referenced from
   /// ExpansionLoc.
-  SrcLoc createExpansionLoc(SrcLoc Loc,
-                                    SrcLoc ExpansionLocStart,
-                                    SrcLoc ExpansionLocEnd,
-                                    unsigned TokLength,
-                                    bool ExpansionIsTokenRange = true,
-                                    int LoadedID = 0,
-                                    unsigned LoadedOffset = 0);
+  SrcLoc createExpansionLoc(SrcLoc Loc, SrcLoc ExpansionLocStart,
+                            SrcLoc ExpansionLocEnd, unsigned TokLength,
+                            bool ExpansionIsTokenRange = true, int LoadedID = 0,
+                            unsigned LoadedOffset = 0);
 
   /// Return a new SrcLoc that encodes that the token starting
   /// at \p TokenStart ends prematurely at \p TokenEnd.
-  SrcLoc createTokenSplitLoc(SrcLoc SpellingLoc,
-                                     SrcLoc TokenStart,
-                                     SrcLoc TokenEnd);
+  SrcLoc createTokenSplitLoc(SrcLoc SpellingLoc, SrcLoc TokenStart,
+                             SrcLoc TokenEnd);
 
   /// Retrieve the memory buffer associated with the given file.
   ///
@@ -913,8 +899,7 @@ public:
   ///
   /// \param NewFile the file whose contents will be used as the
   /// data instead of the contents of the given source file.
-  void overrideFileContents(const SrcFile *SourceFile,
-                            const SrcFile *NewFile);
+  void overrideFileContents(const SrcFile *SourceFile, const SrcFile *NewFile);
 
   /// Returns true if the file contents have been overridden.
   bool isFileOverridden(const SrcFile *File) const {
@@ -977,8 +962,7 @@ public:
       return getFakeBufferForRecovery();
     }
 
-    return Entry.getFile().getContentCache()->getBuffer(Diag, *this,
-                                                        SrcLoc(),
+    return Entry.getFile().getContentCache()->getBuffer(Diag, *this, SrcLoc(),
                                                         Invalid);
   }
 
@@ -996,8 +980,7 @@ public:
   }
 
   /// Returns the SrcFile record for the provided SLocEntry.
-  const SrcFile *getSrcFileForSLocEntry(const src::SLocEntry &sloc) const
-  {
+  const SrcFile *getSrcFileForSLocEntry(const src::SLocEntry &sloc) const {
     const src::ContentCache *Content = sloc.getFile().getContentCache();
     if (!Content)
       return nullptr;
@@ -1100,8 +1083,7 @@ public:
   // Returns the import location if the given source location is
   // located within a module, or an invalid location if the source location
   // is within the current translation unit.
-  std::pair<SrcLoc, StringRef>
-  getModuleImportLoc(SrcLoc Loc) const {
+  std::pair<SrcLoc, StringRef> getModuleImportLoc(SrcLoc Loc) const {
     FileID FID = getFileID(Loc);
 
     // Positive file IDs are in the current translation unit, and -1 is a
@@ -1117,7 +1099,8 @@ public:
   SrcLoc getExpansionLoc(SrcLoc Loc) const {
     // Handle the non-mapped case inline, defer to out of line code to handle
     // expansions.
-    if (Loc.isFileID()) return Loc;
+    if (Loc.isFileID())
+      return Loc;
     return getExpansionLocSlowCase(Loc);
   }
 
@@ -1125,7 +1108,8 @@ public:
   /// location or the spelling location, depending on if it comes from a
   /// macro argument or not.
   SrcLoc getFileLoc(SrcLoc Loc) const {
-    if (Loc.isFileID()) return Loc;
+    if (Loc.isFileID())
+      return Loc;
     return getFileLocSlowCase(Loc);
   }
 
@@ -1144,8 +1128,7 @@ public:
   CharSrcRange getExpansionRange(SrcRange Range) const {
     SrcLoc Begin = getExpansionRange(Range.getBegin()).getBegin();
     CharSrcRange End = getExpansionRange(Range.getEnd());
-    return CharSrcRange(SrcRange(Begin, End.getEnd()),
-                           End.isTokenRange());
+    return CharSrcRange(SrcRange(Begin, End.getEnd()), End.isTokenRange());
   }
 
   /// Given a CharSrcRange object, return the range of
@@ -1165,7 +1148,8 @@ public:
   SrcLoc getSpellingLoc(SrcLoc Loc) const {
     // Handle the non-mapped case inline, defer to out of line code to handle
     // expansions.
-    if (Loc.isFileID()) return Loc;
+    if (Loc.isFileID())
+      return Loc;
     return getSpellingLocSlowCase(Loc);
   }
 
@@ -1199,22 +1183,21 @@ public:
     const src::SLocEntry &E = getSLocEntry(FID, &Invalid);
     if (Invalid)
       return std::make_pair(FileID(), 0);
-    return std::make_pair(FID, Loc.getOffset()-E.getOffset());
+    return std::make_pair(FID, Loc.getOffset() - E.getOffset());
   }
 
   /// Decompose the specified location into a raw FileID + Offset pair.
   ///
   /// If the location is an expansion record, walk through it until we find
   /// the final location expanded.
-  std::pair<FileID, unsigned>
-  getDecomposedExpansionLoc(SrcLoc Loc) const {
+  std::pair<FileID, unsigned> getDecomposedExpansionLoc(SrcLoc Loc) const {
     FileID FID = getFileID(Loc);
     bool Invalid = false;
     const src::SLocEntry *E = &getSLocEntry(FID, &Invalid);
     if (Invalid)
       return std::make_pair(FileID(), 0);
 
-    unsigned Offset = Loc.getOffset()-E->getOffset();
+    unsigned Offset = Loc.getOffset() - E->getOffset();
     if (Loc.isFileID())
       return std::make_pair(FID, Offset);
 
@@ -1225,15 +1208,14 @@ public:
   ///
   /// If the location is an expansion record, walk through it until we find
   /// its spelling record.
-  std::pair<FileID, unsigned>
-  getDecomposedSpellingLoc(SrcLoc Loc) const {
+  std::pair<FileID, unsigned> getDecomposedSpellingLoc(SrcLoc Loc) const {
     FileID FID = getFileID(Loc);
     bool Invalid = false;
     const src::SLocEntry *E = &getSLocEntry(FID, &Invalid);
     if (Invalid)
       return std::make_pair(FileID(), 0);
 
-    unsigned Offset = Loc.getOffset()-E->getOffset();
+    unsigned Offset = Loc.getOffset() - E->getOffset();
     if (Loc.isFileID())
       return std::make_pair(FID, Offset);
     return getDecomposedSpellingLocSlowCase(E, Offset);
@@ -1260,8 +1242,7 @@ public:
   /// Such source locations only appear inside of the expansion
   /// locations representing where a particular function-like macro was
   /// expanded.
-  bool isMacroArgExpansion(SrcLoc Loc,
-                           SrcLoc *StartLoc = nullptr) const;
+  bool isMacroArgExpansion(SrcLoc Loc, SrcLoc *StartLoc = nullptr) const;
 
   /// Tests whether the given source location represents the expansion of
   /// a macro body.
@@ -1276,29 +1257,27 @@ public:
   /// \param MacroBegin If non-null and function returns true, it is set to the
   /// begin location of the immediate macro expansion.
   bool isAtStartOfImmediateMacroExpansion(SrcLoc Loc,
-                                    SrcLoc *MacroBegin = nullptr) const;
+                                          SrcLoc *MacroBegin = nullptr) const;
 
   /// Returns true if the given MacroID location points at the character
   /// end of the immediate macro expansion.
   ///
   /// \param MacroEnd If non-null and function returns true, it is set to the
   /// character end location of the immediate macro expansion.
-  bool
-  isAtEndOfImmediateMacroExpansion(SrcLoc Loc,
-                                   SrcLoc *MacroEnd = nullptr) const;
+  bool isAtEndOfImmediateMacroExpansion(SrcLoc Loc,
+                                        SrcLoc *MacroEnd = nullptr) const;
 
   /// Returns true if \p Loc is inside the [\p Start, +\p Length)
   /// chunk of the source location address space.
   ///
   /// If it's true and \p RelativeOffset is non-null, it will be set to the
   /// relative offset of \p Loc inside the chunk.
-  bool isInSLocAddrSpace(SrcLoc Loc,
-                         SrcLoc Start, unsigned Length,
+  bool isInSLocAddrSpace(SrcLoc Loc, SrcLoc Start, unsigned Length,
                          unsigned *RelativeOffset = nullptr) const {
     assert(((Start.getOffset() < NextLocalOffset &&
-               Start.getOffset()+Length <= NextLocalOffset) ||
+             Start.getOffset() + Length <= NextLocalOffset) ||
             (Start.getOffset() >= CurrentLoadedOffset &&
-                Start.getOffset()+Length < MaxLoadedOffset)) &&
+             Start.getOffset() + Length < MaxLoadedOffset)) &&
            "Chunk is not valid SLoc address space");
     unsigned LocOffs = Loc.getOffset();
     unsigned BeginOffs = Start.getOffset();
@@ -1340,8 +1319,7 @@ public:
   /// in the appropriate spelling MemoryBuffer.
   ///
   /// \param Invalid If non-NULL, will be set \c true if an error occurs.
-  const char *getCharacterData(SrcLoc SL,
-                               bool *Invalid = nullptr) const;
+  const char *getCharacterData(SrcLoc SL, bool *Invalid = nullptr) const;
 
   /// Return the column # for the specified file position.
   ///
@@ -1350,13 +1328,10 @@ public:
   /// on a file sloc, so you must choose a spelling or expansion location
   /// before calling this method.
   unsigned GetColNumber(FileID FID, unsigned FilePos,
-                           bool *Invalid = nullptr) const;
-  unsigned getSpellingColumnNumber(SrcLoc Loc,
-                                   bool *Invalid = nullptr) const;
-  unsigned getExpansionColumnNumber(SrcLoc Loc,
-                                    bool *Invalid = nullptr) const;
-  unsigned getPresumedColumnNumber(SrcLoc Loc,
-                                   bool *Invalid = nullptr) const;
+                        bool *Invalid = nullptr) const;
+  unsigned getSpellingColumnNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
+  unsigned getExpansionColumnNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
+  unsigned getPresumedColumnNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
 
   /// Given a SrcLoc, return the spelling line number
   /// for the position indicated.
@@ -1364,7 +1339,8 @@ public:
   /// This requires building and caching a table of line offsets for the
   /// MemoryBuffer, so this is not cheap: use only when about to emit a
   /// diagnostic.
-  unsigned GetLineNumber(FileID FID, unsigned FilePos, bool *Invalid = nullptr) const;
+  unsigned GetLineNumber(FileID FID, unsigned FilePos,
+                         bool *Invalid = nullptr) const;
   unsigned getSpellingLineNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
   unsigned getExpansionLineNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
   unsigned getPresumedLineNumber(SrcLoc Loc, bool *Invalid = nullptr) const;
@@ -1401,8 +1377,7 @@ public:
   /// presumed location cannot be calculated (e.g., because \p Loc is invalid
   /// or the file containing \p Loc has changed on disk), returns an invalid
   /// presumed location.
-  PresumedLoc getPresumedLoc(SrcLoc Loc,
-                             bool UseLineDirectives = true) const;
+  PresumedLoc getPresumedLoc(SrcLoc Loc, bool UseLineDirectives = true) const;
 
   /// Returns whether the PresumedLoc for a given SrcLoc is
   /// in the main file.
@@ -1504,9 +1479,8 @@ public:
   /// specified by Loc.
   ///
   /// If FilenameID is -1, it is considered to be unspecified.
-  void AddLineNote(SrcLoc Loc, unsigned LineNo, int FilenameID,
-                   bool IsSrcFile, bool IsFileExit,
-                   src::CharacteristicKind FileKind);
+  void AddLineNote(SrcLoc Loc, unsigned LineNo, int FilenameID, bool IsSrcFile,
+                   bool IsFileExit, src::CharacteristicKind FileKind);
 
   /// Determine if the source manager has a line table.
   bool hasLineTable() const { return LineTable != nullptr; }
@@ -1529,7 +1503,7 @@ public:
     const size_t mmap_bytes;
 
     MemoryBufferSizes(size_t malloc_bytes, size_t mmap_bytes)
-      : malloc_bytes(malloc_bytes), mmap_bytes(mmap_bytes) {}
+        : malloc_bytes(malloc_bytes), mmap_bytes(mmap_bytes) {}
   };
 
   /// Return the amount of memory used by memory buffers, breaking down
@@ -1548,8 +1522,8 @@ public:
   ///
   /// If the source file is included multiple times, the source location will
   /// be based upon the first inclusion.
-  SrcLoc translateFileLineCol(const SrcFile *SourceFile,
-                                      unsigned Line, unsigned Col) const;
+  SrcLoc translateFileLineCol(const SrcFile *SourceFile, unsigned Line,
+                              unsigned Col) const;
 
   /// Get the FileID for the given file.
   ///
@@ -1559,8 +1533,7 @@ public:
 
   /// Get the source location in \p FID for the given line:col.
   /// Returns null location if \p FID is not a file SLocEntry.
-  SrcLoc translateLineCol(FileID FID,
-                                  unsigned Line, unsigned Col) const;
+  SrcLoc translateLineCol(FileID FID, unsigned Line, unsigned Col) const;
 
   /// If \p Loc points inside a function macro argument, the returned
   /// location will be the macro location in which the argument was expanded.
@@ -1610,8 +1583,7 @@ public:
   }
 
   /// Return true if the Point is within Start and End.
-  bool isPointWithin(SrcLoc Location, SrcLoc Start,
-                     SrcLoc End) const {
+  bool isPointWithin(SrcLoc Location, SrcLoc Start, SrcLoc End) const {
     return Location == Start || Location == End ||
            (isBeforeInTranslationUnit(Start, Location) &&
             isBeforeInTranslationUnit(Location, End));
@@ -1619,7 +1591,7 @@ public:
 
   // Iterators over FileInfos.
   using fileinfo_iterator =
-      llvm::DenseMap<const SrcFile*, src::ContentCache*>::const_iterator;
+      llvm::DenseMap<const SrcFile *, src::ContentCache *>::const_iterator;
 
   fileinfo_iterator fileinfo_begin() const { return FileInfos.begin(); }
   fileinfo_iterator fileinfo_end() const { return FileInfos.end(); }
@@ -1637,17 +1609,17 @@ public:
 
   /// Get a local SLocEntry. This is exposed for indexing.
   const src::SLocEntry &getLocalSLocEntry(unsigned Index,
-                                             bool *Invalid = nullptr) const {
+                                          bool *Invalid = nullptr) const {
     assert(Index < LocalSrcLocTable.size() && "Invalid index");
     return LocalSrcLocTable[Index];
   }
 
   /// Get the number of loaded SLocEntries we have.
-  unsigned loaded_sloc_entry_size() const { return LoadedSrcLocTable.size();}
+  unsigned loaded_sloc_entry_size() const { return LoadedSrcLocTable.size(); }
 
   /// Get a loaded SLocEntry. This is exposed for indexing.
   const src::SLocEntry &getLoadedSLocEntry(unsigned Index,
-                                              bool *Invalid = nullptr) const {
+                                           bool *Invalid = nullptr) const {
     assert(Index < LoadedSrcLocTable.size() && "Invalid index");
     if (SLocEntryLoaded[Index])
       return LoadedSrcLocTable[Index];
@@ -1655,9 +1627,10 @@ public:
   }
 
   const src::SLocEntry &getSLocEntry(FileID FID,
-                                        bool *Invalid = nullptr) const {
+                                     bool *Invalid = nullptr) const {
     if (FID.ID == 0 || FID.ID == -1) {
-      if (Invalid) *Invalid = true;
+      if (Invalid)
+        *Invalid = true;
       return LocalSrcLocTable[0];
     }
     return getSLocEntryByID(FID.ID, Invalid);
@@ -1666,8 +1639,7 @@ public:
   unsigned getNextLocalOffset() const { return NextLocalOffset; }
 
   void setExternalSLocEntrySource(ExternalSLocEntrySource *Source) {
-    assert(LoadedSrcLocTable.empty() &&
-           "Invalidating existing loaded entries");
+    assert(LoadedSrcLocTable.empty() && "Invalidating existing loaded entries");
     ExternalSLocEntries = Source;
   }
 
@@ -1677,8 +1649,8 @@ public:
   /// NumSLocEntries will be allocated, which occupy a total of TotalSize space
   /// in the global source view. The lowest ID and the base offset of the
   /// entries will be returned.
-  std::pair<int, unsigned>
-  AllocateLoadedSLocEntries(unsigned NumSLocEntries, unsigned TotalSize);
+  std::pair<int, unsigned> AllocateLoadedSLocEntries(unsigned NumSLocEntries,
+                                                     unsigned TotalSize);
 
   /// Returns true if \p Loc came from a PCH/Module.
   bool isLoadedSrcLoc(SrcLoc Loc) const {
@@ -1697,14 +1669,13 @@ public:
   }
 
   /// Returns true if \p FID did not come from a PCH/Module.
-  bool isLocalFileID(FileID FID) const {
-    return !isLoadedFileID(FID);
-  }
+  bool isLocalFileID(FileID FID) const { return !isLoadedFileID(FID); }
 
   /// Gets the location of the immediate macro caller, one level up the stack
   /// toward the initial macro typed into the source.
   SrcLoc getImmediateMacroCallerLoc(SrcLoc Loc) const {
-    if (!Loc.isMacroID()) return Loc;
+    if (!Loc.isMacroID())
+      return Loc;
 
     // When we have the location of (part of) an expanded parameter, its
     // spelling location points to the argument as expanded in the macro call,
@@ -1731,43 +1702,43 @@ private:
 
   /// Get the entry with the given unwrapped FileID.
   const src::SLocEntry &getSLocEntryByID(int ID,
-                                            bool *Invalid = nullptr) const {
+                                         bool *Invalid = nullptr) const {
     assert(ID != -1 && "Using FileID sentinel value");
     if (ID < 0)
       return getLoadedSLocEntryByID(ID, Invalid);
     return getLocalSLocEntry(static_cast<unsigned>(ID), Invalid);
   }
 
-  const src::SLocEntry &
-  getLoadedSLocEntryByID(int ID, bool *Invalid = nullptr) const {
+  const src::SLocEntry &getLoadedSLocEntryByID(int ID,
+                                               bool *Invalid = nullptr) const {
     return getLoadedSLocEntry(static_cast<unsigned>(-ID - 2), Invalid);
   }
 
   /// Implements the common elements of storing an expansion info struct into
   /// the SLocEntry table and producing a source location that refers to it.
   SrcLoc createExpansionLocImpl(const src::ExpansionInfo &Expansion,
-                                        unsigned TokLength,
-                                        int LoadedID = 0,
-                                        unsigned LoadedOffset = 0);
+                                unsigned TokLength, int LoadedID = 0,
+                                unsigned LoadedOffset = 0);
 
   /// Return true if the specified FileID contains the
   /// specified SrcLoc offset.  This is a very hot method.
   inline bool isOffsetInFileID(FileID FID, unsigned SLocOffset) const {
     const src::SLocEntry &Entry = getSLocEntry(FID);
     // If the entry is after the offset, it can't contain it.
-    if (SLocOffset < Entry.getOffset()) return false;
+    if (SLocOffset < Entry.getOffset())
+      return false;
 
     // If this is the very last entry then it does.
     if (FID.ID == -2)
       return true;
 
     // If it is the last local entry, then it does if the location is local.
-    if (FID.ID+1 == static_cast<int>(LocalSrcLocTable.size()))
+    if (FID.ID + 1 == static_cast<int>(LocalSrcLocTable.size()))
       return SLocOffset < NextLocalOffset;
 
     // Otherwise, the entry after it has to not include it. This works for both
     // local and loaded entries.
-    return SLocOffset < getSLocEntryByID(FID.ID+1).getOffset();
+    return SLocOffset < getSLocEntryByID(FID.ID + 1).getOffset();
   }
 
   /// Returns the previous in-order FileID or an invalid FileID if there
@@ -1783,14 +1754,12 @@ private:
   ///
   /// This works regardless of whether the ContentCache corresponds to a
   /// file or some other input source.
-  FileID createFileID(const src::ContentCache* File,
-                      SrcLoc IncludePos,
-                      src::CharacteristicKind DirCharacter,
-                      int LoadedID, unsigned LoadedOffset);
+  FileID createFileID(const src::ContentCache *File, SrcLoc IncludePos,
+                      src::CharacteristicKind DirCharacter, int LoadedID,
+                      unsigned LoadedOffset);
 
-  const src::ContentCache *
-    getOrCreateContentCache(const SrcFile *SourceFile,
-                            bool isSystemFile = false);
+  const src::ContentCache *getOrCreateContentCache(const SrcFile *SourceFile,
+                                                   bool isSystemFile = false);
 
   /// Create a new ContentCache for the specified  memory buffer.
   const src::ContentCache *
@@ -1811,19 +1780,16 @@ private:
                                    unsigned Offset) const;
   void computeMacroArgsCache(MacroArgsMap &MacroArgsCache, FileID FID) const;
   void associateFileChunkWithMacroArgExp(MacroArgsMap &MacroArgsCache,
-                                         FileID FID,
-                                         SrcLoc SpellLoc,
+                                         FileID FID, SrcLoc SpellLoc,
                                          SrcLoc ExpansionLoc,
                                          unsigned ExpansionLength) const;
 };
 
 /// Comparison function object.
-template<typename T>
-class BeforeThanCompare;
+template <typename T> class BeforeThanCompare;
 
 /// Compare two source locations.
-template<>
-class BeforeThanCompare<SrcLoc> {
+template <> class BeforeThanCompare<SrcLoc> {
   SrcMgr &SM;
 
 public:
@@ -1835,8 +1801,7 @@ public:
 };
 
 /// Compare two non-overlapping source ranges.
-template<>
-class BeforeThanCompare<SrcRange> {
+template <> class BeforeThanCompare<SrcRange> {
   SrcMgr &SM;
 
 public:
@@ -1865,7 +1830,7 @@ private:
   // as they are created in `createSrcMgrForFile` so that they can be
   // deleted in the reverse order as they are created.
   std::unique_ptr<FileMgr> fileMgr;
-  //std::unique_ptr<Diagnostics> Diagnostics;
+  // std::unique_ptr<Diagnostics> Diagnostics;
   std::unique_ptr<SrcMgr> SourceMgr;
 };
 

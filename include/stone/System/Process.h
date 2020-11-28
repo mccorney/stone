@@ -1,21 +1,17 @@
 namespace stone {
 
-class Process; 
-class ProcessQueue; 
+class Process;
+class ProcessQueue;
 
-
-enum class ProcessKind {
-	Compile,
-	Link
-};
+enum class ProcessKind { Compile, Link };
 class Process final {
-	Action *Trigger; 
-	System *S; 
-	public:
-		llvm::SmallVector<Process*> Deps; 
+  Action *Trigger;
+  System *S;
+
+public:
+  llvm::SmallVector<Process *> Deps;
 };
 
-class ProcessQueue {
-};
+class ProcessQueue {};
 
-}
+} // namespace stone

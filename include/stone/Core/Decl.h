@@ -21,19 +21,17 @@
 #include <type_traits>
 #include <utility>
 
-
-namespace stone{
+namespace stone {
 class alignas(8) Decl : public ASTNode {
 public:
-  enum Kind {
-  };
+  enum Kind {};
+
 public:
   Decl() = delete;
-  Decl(const Decl&) = delete;
+  Decl(const Decl &) = delete;
   Decl(Decl &&) = delete;
-  Decl &operator=(const Decl&) = delete;
-  Decl &operator=(Decl&&) = delete;
-
+  Decl &operator=(const Decl &) = delete;
+  Decl &operator=(Decl &&) = delete;
 };
-}
-#endif 
+} // namespace stone
+#endif

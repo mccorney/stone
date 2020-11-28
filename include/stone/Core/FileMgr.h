@@ -32,7 +32,7 @@ class FileSystemStatCache;
 /// the virtual file system).
 class SrcDir {
   friend class FileMgr;
-	llvm::StringRef Name; // Name of the directory.
+  llvm::StringRef Name; // Name of the directory.
 
 public:
   StringRef getName() const { return Name; }
@@ -46,23 +46,21 @@ public:
 class SrcFile {
   friend class FileMgr;
 
-  StringRef Name;             // Name of the file.
-  std::string RealPathName;   // Real path to the file; could be empty.
-  off_t Size;                 // File size in bytes.
-  time_t ModTime;             // Modification time of file.
-  const SrcDir *Dir;  // Directory file lives in.
-  unsigned UID;               // A unique (small) ID for the file.
+  StringRef Name;           // Name of the file.
+  std::string RealPathName; // Real path to the file; could be empty.
+  off_t Size;               // File size in bytes.
+  time_t ModTime;           // Modification time of file.
+  const SrcDir *Dir;        // Directory file lives in.
+  unsigned UID;             // A unique (small) ID for the file.
   llvm::sys::fs::UniqueID UniqueID;
   bool IsNamedPipe;
-  bool IsValid;               // Is this \c SrcFile initialized and valid?
+  bool IsValid; // Is this \c SrcFile initialized and valid?
 
   /// The open file, if it is owned by the \p SrcFile.
   mutable std::unique_ptr<llvm::vfs::File> File;
 
 public:
-  SrcFile()
-      : UniqueID(0, 0), IsNamedPipe(false), IsValid(false)
-  {}
+  SrcFile() : UniqueID(0, 0), IsNamedPipe(false), IsValid(false) {}
 
   SrcFile(const SrcFile &) = delete;
   SrcFile &operator=(const SrcFile &) = delete;
@@ -126,13 +124,13 @@ class FileMgr : public RefCountedBase<FileMgr> {
   /// for virtual directories/files are owned by
   /// VirtualDirectoryEntries/VirtualFileEntries above.
   ///
-  llvm::StringMap<SrcDir*, llvm::BumpPtrAllocator> SeenDirEntries;
+  llvm::StringMap<SrcDir *, llvm::BumpPtrAllocator> SeenDirEntries;
 
   /// A cache that maps paths to file entries (either real or
   /// virtual) we have looked up.
   ///
   /// \see SeenDirEntries
-  llvm::StringMap<SrcFile*, llvm::BumpPtrAllocator> SeenFileEntries;
+  llvm::StringMap<SrcFile *, llvm::BumpPtrAllocator> SeenFileEntries;
 
   /// The canonical names of directories.
   llvm::DenseMap<const SrcDir *, llvm::StringRef> CanonicalDirNames;
@@ -167,7 +165,7 @@ public:
   /// \param FS if non-null, the VFS to use.  Otherwise uses
   /// llvm::vfs::getRealFileSystem().
   FileMgr(const FileSystemOptions &FileSystemOpts,
-              IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS = nullptr);
+          IntrusiveRefCntPtr<llvm::vfs::FileSystem> FS = nullptr);
   ~FileMgr();
 
   /// Installs the provided FileSystemStatCache object within
@@ -189,8 +187,7 @@ public:
   ///
   /// \param CacheFailure If true and the file does not exist, we'll cache
   /// the failure to find this file.
-  const SrcDir *getDirectory(StringRef DirName,
-                                     bool CacheFailure = true);
+  const SrcDir *getDirectory(StringRef DirName, bool CacheFailure = true);
 
   /// Lookup, cache, and verify the specified file (real or
   /// virtual).
@@ -202,7 +199,7 @@ public:
   /// \param CacheFailure If true and the file does not exist, we'll cache
   /// the failure to find this file.
   const SrcFile *getFile(StringRef Filename, bool OpenFile = false,
-                           bool CacheFailure = true);
+                         bool CacheFailure = true);
 
   /// Returns the current file system options
   FileSystemOptions &getFileSystemOpts() { return FileSystemOpts; }
@@ -215,7 +212,7 @@ public:
   ///
   /// The file itself is not accessed.
   const SrcFile *getVirtualFile(StringRef Filename, off_t Size,
-                                  time_t ModificationTime);
+                                time_t ModificationTime);
 
   /// Open the specified file as a MemoryBuffer, returning a new
   /// MemoryBuffer if successful, otherwise returning null.
@@ -249,13 +246,11 @@ public:
 
   /// Produce an array mapping from the unique IDs assigned to each
   /// file to the corresponding SrcFile pointer.
-  void GetUniqueIDMapping(
-                    SmallVectorImpl<const SrcFile *> &UIDToFiles) const;
+  void GetUniqueIDMapping(SmallVectorImpl<const SrcFile *> &UIDToFiles) const;
 
   /// Modifies the size and modification time of a previously created
   /// SrcFile. Use with caution.
-  static void modifySrcFile(SrcFile *File, off_t Size,
-                              time_t ModificationTime);
+  static void modifySrcFile(SrcFile *File, off_t Size, time_t ModificationTime);
 
   /// Retrieve the canonical name for a given directory.
   ///

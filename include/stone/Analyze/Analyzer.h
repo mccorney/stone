@@ -7,15 +7,18 @@ namespace stone {
 class Pipeline;
 
 class Analyzer final {
-	Analysis& analysis; 
-	public:
-		Analyzer(Analysis& analysis); 
-	public:
-		int Analyze(Pipeline* pipeline = nullptr);
-	private:
-		int Parse();
-		int Check(); 
+  Analysis &analysis;
+
+public:
+  Analyzer(Analysis &analysis);
+
+public:
+  int Analyze(Pipeline *pipeline = nullptr);
+
+private:
+  int Parse();
+  int Check();
 };
 
-}
-#endif 
+} // namespace stone
+#endif

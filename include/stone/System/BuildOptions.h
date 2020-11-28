@@ -3,7 +3,7 @@
 
 namespace stone {
 struct BuildOptions {
-	//ActionKind Action;  
+  // ActionKind Action;
 };
-}
-#endif 
+} // namespace stone
+#endif

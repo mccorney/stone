@@ -1,5 +1,5 @@
 
 
 class LinkProcess : final Process {
-	public: 
+public:
 };

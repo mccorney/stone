@@ -5,19 +5,16 @@
 
 namespace stone {
 
-
-namespace tk{
-	enum Kind {
-	};
+namespace tk {
+enum Kind {};
 }
 
 class Token final {
 public:
-
-	//void SetKind(tk::Kind K);
+  // void SetKind(tk::Kind K);
 public:
-	//static llvm::StringRef GetText(tk::Kind K);
+  // static llvm::StringRef GetText(tk::Kind K);
 };
-}
+} // namespace stone
 
-#endif 
+#endif

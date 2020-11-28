@@ -1,32 +1,21 @@
 #include "stone/Analyze/Parser.h"
 #include "stone/Core/Ret.h"
 
+using namespace stone;
 
-using namespace stone; 
- 
 //===----------------------------------------------------------------------===//
-// Decl 
+// Decl
 //===----------------------------------------------------------------------===//
-int Parser::ParseTopDecl() {
+int Parser::ParseTopDecl() { return ret::ok; }
 
-	return ret::ok; 
-}
-
-void Parser::ParseDecl() {
- 
-}
+void Parser::ParseDecl() {}
 //===----------------------------------------------------------------------===//
 // Stmt
 //===----------------------------------------------------------------------===//
 
-
-void Parser::ParseStmt() {
- 
-}
+void Parser::ParseStmt() {}
 
 //===----------------------------------------------------------------------===//
 // Expr
 //===----------------------------------------------------------------------===//
-void Parser::ParseExpr() {
- 
-}
+void Parser::ParseExpr() {}

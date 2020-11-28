@@ -5,8 +5,8 @@
 
 namespace stone {
 
-class Pipeline; 
-int Compile(llvm::ArrayRef<const char *> args, const char *arg0, 
-		void *mainAddr, Pipeline *pipeline = nullptr);
-}
-#endif 
+class Pipeline;
+int Compile(llvm::ArrayRef<const char *> args, const char *arg0, void *mainAddr,
+            Pipeline *pipeline = nullptr);
+} // namespace stone
+#endif

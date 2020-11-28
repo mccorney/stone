@@ -74,12 +74,10 @@ class SrcLoc {
 
   unsigned ID = 0;
 
-  enum : unsigned {
-    MacroIDBit = 1U << 31
-  };
+  enum : unsigned { MacroIDBit = 1U << 31 };
 
 public:
-  bool isFileID() const  { return (ID & MacroIDBit) == 0; }
+  bool isFileID() const { return (ID & MacroIDBit) == 0; }
   bool isMacroID() const { return (ID & MacroIDBit) != 0; }
 
   /// Return true if this is a valid SrcLoc object.
@@ -92,9 +90,7 @@ public:
 
 private:
   /// Return the offset into the manager's global input view.
-  unsigned getOffset() const {
-    return ID & ~MacroIDBit;
-  }
+  unsigned getOffset() const { return ID & ~MacroIDBit; }
 
   static SrcLoc getFileLoc(unsigned ID) {
     assert((ID & MacroIDBit) == 0 && "Ran out of source locations!");
@@ -114,9 +110,9 @@ public:
   /// Return a source location with the specified offset from this
   /// SrcLoc.
   SrcLoc getLocWithOffset(int Offset) const {
-    assert(((getOffset()+Offset) & MacroIDBit) == 0 && "offset overflow");
+    assert(((getOffset() + Offset) & MacroIDBit) == 0 && "offset overflow");
     SrcLoc L;
-    L.ID = ID+Offset;
+    L.ID = ID + Offset;
     return L;
   }
 
@@ -142,10 +138,10 @@ public:
   ///
   /// This should only be passed to SrcLoc::getFromPtrEncoding, it
   /// should not be inspected directly.
-  void* getPtrEncoding() const {
+  void *getPtrEncoding() const {
     // Double cast to avoid a warning "cast to pointer from integer of different
     // size".
-    return (void*)(uintptr_t)getRawEncoding();
+    return (void *)(uintptr_t)getRawEncoding();
   }
 
   /// Turn a pointer encoding of a SrcLoc object back
@@ -195,13 +191,9 @@ public:
   bool isValid() const { return B.isValid() && E.isValid(); }
   bool isInvalid() const { return !isValid(); }
 
-  bool operator==(const SrcRange &X) const {
-    return B == X.B && E == X.E;
-  }
+  bool operator==(const SrcRange &X) const { return B == X.B && E == X.E; }
 
-  bool operator!=(const SrcRange &X) const {
-    return B != X.B || E != X.E;
-  }
+  bool operator!=(const SrcRange &X) const { return B != X.B || E != X.E; }
 
   void print(raw_ostream &OS, const SrcMgr &SM) const;
   std::string printToString(const SrcMgr &SM) const;
@@ -272,8 +264,7 @@ class PresumedLoc {
 
 public:
   PresumedLoc() = default;
-  PresumedLoc(const char *FN, FileID FID, unsigned Ln, unsigned Co,
-              SrcLoc IL)
+  PresumedLoc(const char *FN, FileID FID, unsigned Ln, unsigned Co, SrcLoc IL)
       : Filename(FN), ID(FID), Line(Ln), Col(Co), IncludeLoc(IL) {}
 
   /// Return true if this object is invalid or uninitialized.
@@ -333,12 +324,13 @@ public:
   /// Creates a FullSrcLoc where isValid() returns \c false.
   FullSrcLoc() = default;
 
-  explicit FullSrcLoc(SrcLoc loc, const SrcMgr &sm) : SrcLoc(loc), srcMgr(&sm) {}
+  explicit FullSrcLoc(SrcLoc loc, const SrcMgr &sm)
+      : SrcLoc(loc), srcMgr(&sm) {}
 
   bool hasManager() const {
-      bool hassrcMgr =  srcMgr != nullptr;
-      assert(hassrcMgr == isValid() && "FullSrcLoc has location but no manager");
-      return hassrcMgr;
+    bool hassrcMgr = srcMgr != nullptr;
+    assert(hassrcMgr == isValid() && "FullSrcLoc has location but no manager");
+    return hassrcMgr;
   }
 
   /// \pre This FullSrcLoc has an associated SrcMgr.
@@ -399,7 +391,7 @@ public:
 
   /// Comparison function class, useful for sorting FullSrcLocs.
   struct BeforeThanCompare {
-    bool operator()(const FullSrcLoc& lhs, const FullSrcLoc& rhs) const {
+    bool operator()(const FullSrcLoc &lhs, const FullSrcLoc &rhs) const {
       return lhs.isBeforeInTranslationUnitThan(rhs);
     }
   };
@@ -409,14 +401,12 @@ public:
   /// This is useful for debugging.
   void dump() const;
 
-  friend bool
-  operator==(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
+  friend bool operator==(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
     return LHS.getRawEncoding() == RHS.getRawEncoding() &&
-          LHS.srcMgr == RHS.srcMgr;
+           LHS.srcMgr == RHS.srcMgr;
   }
 
-  friend bool
-  operator!=(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
+  friend bool operator!=(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
     return !(LHS == RHS);
   }
 };
@@ -425,40 +415,32 @@ public:
 
 namespace llvm {
 
-  /// Define DenseMapInfo so that FileID's can be used as keys in DenseMap and
-  /// DenseSets.
-  template <>
-  struct DenseMapInfo<stone::FileID> {
-    static stone::FileID getEmptyKey() {
-      return {};
-    }
+/// Define DenseMapInfo so that FileID's can be used as keys in DenseMap and
+/// DenseSets.
+template <> struct DenseMapInfo<stone::FileID> {
+  static stone::FileID getEmptyKey() { return {}; }
 
-    static stone::FileID getTombstoneKey() {
-      return stone::FileID::getSentinel();
-    }
+  static stone::FileID getTombstoneKey() {
+    return stone::FileID::getSentinel();
+  }
 
-    static unsigned getHashValue(stone::FileID S) {
-      return S.getHashValue();
-    }
+  static unsigned getHashValue(stone::FileID S) { return S.getHashValue(); }
 
-    static bool isEqual(stone::FileID LHS, stone::FileID RHS) {
-      return LHS == RHS;
-    }
-  };
+  static bool isEqual(stone::FileID LHS, stone::FileID RHS) {
+    return LHS == RHS;
+  }
+};
 
-  // Teach SmallPtrSet how to handle SrcLoc.
-  template<>
-  struct PointerLikeTypeTraits<stone::SrcLoc> {
-    enum { NumLowBitsAvailable = 0 };
+// Teach SmallPtrSet how to handle SrcLoc.
+template <> struct PointerLikeTypeTraits<stone::SrcLoc> {
+  enum { NumLowBitsAvailable = 0 };
 
-    static void *getAsVoidPointer(stone::SrcLoc L) {
-      return L.getPtrEncoding();
-    }
+  static void *getAsVoidPointer(stone::SrcLoc L) { return L.getPtrEncoding(); }
 
-    static stone::SrcLoc getFromVoidPointer(void *P) {
-      return stone::SrcLoc::getFromRawEncoding((unsigned)(uintptr_t)P);
-    }
-  };
+  static stone::SrcLoc getFromVoidPointer(void *P) {
+    return stone::SrcLoc::getFromRawEncoding((unsigned)(uintptr_t)P);
+  }
+};
 
 } // namespace llvm
 

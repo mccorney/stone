@@ -2,9 +2,9 @@
 #define STONE_ANALYZE_PARSE_H
 
 namespace stone {
-	class Pipeline; 
-	class Analysis;
+class Pipeline;
+class Analysis;
 
-	int Parse(Analysis& AS, Pipeline *P = nullptr);
-}
-#endif 
+int Parse(Analysis &AS, Pipeline *P = nullptr);
+} // namespace stone
+#endif

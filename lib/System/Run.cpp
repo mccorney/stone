@@ -1,10 +1,10 @@
-#include "stone/System/System.h"
-#include "stone/System/Compile.h"
 #include "stone/System/Run.h"
-#include "stone/System/Help.h"
+#include "stone/Core/Fmt.h"
 #include "stone/Core/LLVM.h"
 #include "stone/Core/Ret.h"
-#include "stone/Core/Fmt.h"
+#include "stone/System/Compile.h"
+#include "stone/System/Help.h"
+#include "stone/System/System.h"
 
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
@@ -41,51 +41,47 @@ std::string GetExecutablePath(const char *arg0) {
 
 namespace stone {
 
-int Run(llvm::ArrayRef<const char*> args) {	
-	if(args.size()  == 0) {
-		return ret::err; 
-	}
-	if(args.size()  == 1) {
-		return stone::Help(HelpMode::System);
-	}
-	if (llvm::sys::Process::FixupStandardFileDescriptors())
-    return  ret::err;
+int Run(llvm::ArrayRef<const char *> args) {
+  if (args.size() == 0) {
+    return ret::err;
+  }
+  if (args.size() == 1) {
+    return stone::Help(HelpMode::System);
+  }
+  if (llvm::sys::Process::FixupStandardFileDescriptors())
+    return ret::err;
 
   llvm::InitializeAllTargets();
-  //auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
-	// -compile ?
-  auto arg0 = args[1]; 
-	if(arg0 == "-compile") { 
-		//return stone::Compile(llvm::makeArrayRef(Args.data() +2,
-                                                //Args.data() + Args.size()), Arg0) 
-	}
+  // auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
+  // -compile ?
+  auto arg0 = args[1];
+  if (arg0 == "-compile") {
+    // return stone::Compile(llvm::makeArrayRef(Args.data() +2,
+    // Args.data() + Args.size()), Arg0)
+  }
 
-	System system;
-	system.Init(args);
-	//system.Build(); 
-	return system.Run();
+  System system;
+  system.Init(args);
+  // system.Build();
+  return system.Run();
 }
 
-}
-int stone::Run(int argc, const char** args) {
+} // namespace stone
+int stone::Run(int argc, const char **args) {
 
-	llvm::InitLLVM initLLVM(argc, args);
+  llvm::InitLLVM initLLVM(argc, args);
 
-	llvm::SmallVector<const char *, 256> argsToExpand(args, args + argc);
-	llvm::BumpPtrAllocator ptrAlloc;
+  llvm::SmallVector<const char *, 256> argsToExpand(args, args + argc);
+  llvm::BumpPtrAllocator ptrAlloc;
   llvm::StringSaver strSaver(ptrAlloc);
 
-	llvm::cl::ExpandResponseFiles(
+  llvm::cl::ExpandResponseFiles(
       strSaver,
       llvm::Triple(llvm::sys::getProcessTriple()).isOSWindows()
           ? llvm::cl::TokenizeWindowsCommandLine
-          : llvm::cl::TokenizeGNUCommandLine, argsToExpand);
+          : llvm::cl::TokenizeGNUCommandLine,
+      argsToExpand);
 
-	llvm::ArrayRef<const char *> argsToProcess(argsToExpand);
-	return stone::Run(argsToProcess); 
+  llvm::ArrayRef<const char *> argsToProcess(argsToExpand);
+  return stone::Run(argsToProcess);
 }
-
-
-
-
-

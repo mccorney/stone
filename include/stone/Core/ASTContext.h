@@ -1,10 +1,9 @@
 #ifndef STONE_CORE_ASTCONTEXT_H
 #define STONE_CORE_ASTCONTEXT_H
 
-namespace stone{
+namespace stone {
 
-class ASTContext final {
-};
-}
+class ASTContext final {};
+} // namespace stone
 
-#endif 
+#endif

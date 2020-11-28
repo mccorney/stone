@@ -1,15 +1,15 @@
 #ifndef STONE_GEN_GEN_H
 #define STONE_GEN_GEN_H
 
-namespace stone{
+namespace stone {
 class ASTContext;
 class Pipeline;
 struct GenOptions;
-class Module; 
+class Module;
 
-	// May want to pass Module instead
-int Gen(Module& M, const GenOptions& GenOpts, Pipeline* P = nullptr);
+// May want to pass Module instead
+int Gen(Module &M, const GenOptions &GenOpts, Pipeline *P = nullptr);
 
-}
+} // namespace stone
 
-#endif 
+#endif

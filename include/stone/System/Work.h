@@ -1,5 +1,3 @@
 
 
-class Work : public  Process {
-
-}
+class Work : public Process {}

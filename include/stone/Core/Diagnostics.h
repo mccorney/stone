@@ -32,10 +32,7 @@ namespace stone {
 /// SrcMgr.
 class Diagnostics final : public llvm::RefCountedBase<Diagnostics> {
 public:
-
-
 };
 
-}
-#endif 
-
+} // namespace stone
+#endif

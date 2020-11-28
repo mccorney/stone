@@ -1,11 +1,9 @@
 #ifndef STONE_CORE_STATS_H
 #define STONE_CORE_STATS_H
 
-namespace stone{
+namespace stone {
 
-class Stats {
+class Stats {};
+} // namespace stone
 
-};
-}
-
-#endif 
+#endif

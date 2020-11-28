@@ -3,9 +3,7 @@
 
 namespace stone {
 
-struct AnalyzeOptions final {
+struct AnalyzeOptions final {};
 
-};
-
-}
-#endif 
+} // namespace stone
+#endif

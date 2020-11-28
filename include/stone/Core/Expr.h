@@ -3,7 +3,6 @@
 
 #include "stone/Core/ASTNode.h"
 
-
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -22,20 +21,18 @@
 #include <type_traits>
 #include <utility>
 
+namespace stone {
 
-namespace stone{
-
-class Expr  : public ASTNode {
+class Expr : public ASTNode {
 public:
-  enum Kind {
-  };
+  enum Kind {};
+
 public:
   Expr() = delete;
-  Expr(const Expr&) = delete;
+  Expr(const Expr &) = delete;
   Expr(Expr &&) = delete;
-  Expr &operator=(const Expr&) = delete;
-  Expr &operator=(Expr&&) = delete;
-
+  Expr &operator=(const Expr &) = delete;
+  Expr &operator=(Expr &&) = delete;
 };
-}
-#endif 
+} // namespace stone
+#endif

@@ -7,16 +7,13 @@
 
 using namespace stone;
 
-Analyzer::Analyzer(Analysis& analysis) : analysis(analysis) {
+Analyzer::Analyzer(Analysis &analysis) : analysis(analysis) {}
 
-}
+int Analyzer::Analyze(Pipeline *P) {
 
-int Analyzer::Analyze(Pipeline* P) {
-	
-	//stone::Parse(AS, P); 
+  // stone::Parse(AS, P);
 
-	//stone::Check(AS, P); 
+  // stone::Check(AS, P);
 
-
-	return ret::ok; 
+  return ret::ok;
 }

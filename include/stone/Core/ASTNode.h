@@ -3,12 +3,9 @@
 
 #include "stone/Core/SrcLoc.h"
 
+namespace stone {
 
-namespace stone{
+class ASTNode {};
+} // namespace stone
 
-class ASTNode {
-
-};
-}
-
-#endif 
+#endif

@@ -3,11 +3,8 @@
 
 namespace stone {
 
-	enum class HelpMode { 
-		Compile,
-		System
-	};
-	int Help(HelpMode Mode);
-}
+enum class HelpMode { Compile, System };
+int Help(HelpMode Mode);
+} // namespace stone
 
-#endif 
+#endif

@@ -15,8 +15,6 @@
 //#include "stone/Core/PrettyStackTrace.h"
 #include "stone/Core/SrcMgr.h"
 
-
-
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"
@@ -31,7 +29,6 @@ using namespace stone;
 // PrettyStackTraceLoc
 //===----------------------------------------------------------------------===//
 
-
 /*
 void PrettyStackTraceLoc::print(raw_ostream &OS) const {
   if (Loc.isValid()) {
@@ -45,7 +42,7 @@ void PrettyStackTraceLoc::print(raw_ostream &OS) const {
 // SrcLoc
 //===----------------------------------------------------------------------===//
 
-void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM)const{
+void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM) const {
   if (!isValid()) {
     OS << "<invalid loc>";
     return;
@@ -59,8 +56,8 @@ void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM)const{
       return;
     }
     // The macro expansion and spelling pos is identical for file locs.
-    OS << PLoc.getFilename() << ':' << PLoc.getLine()
-       << ':' << PLoc.getColumn();
+    OS << PLoc.getFilename() << ':' << PLoc.getLine() << ':'
+       << PLoc.getColumn();
     return;
   }
 
@@ -71,8 +68,7 @@ void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM)const{
   OS << '>';
 }
 
-LLVM_DUMP_METHOD std::string
-SrcLoc::printToString(const SrcMgr &SM) const {
+LLVM_DUMP_METHOD std::string SrcLoc::printToString(const SrcMgr &SM) const {
   std::string S;
   llvm::raw_string_ostream OS(S);
   print(OS, SM);
@@ -130,8 +126,7 @@ void SrcRange::print(raw_ostream &OS, const SrcMgr &SM) const {
   OS << '>';
 }
 
-LLVM_DUMP_METHOD std::string
-SrcRange::printToString(const SrcMgr &SM) const {
+LLVM_DUMP_METHOD std::string SrcRange::printToString(const SrcMgr &SM) const {
   std::string S;
   llvm::raw_string_ostream OS(S);
   print(OS, SM);
@@ -183,10 +178,8 @@ std::pair<FullSrcLoc, StringRef> FullSrcLoc::getModuleImportLoc() const {
   if (!isValid())
     return std::make_pair(FullSrcLoc(), StringRef());
 
-  std::pair<SrcLoc, StringRef> ImportLoc =
-      srcMgr->getModuleImportLoc(*this);
-  return std::make_pair(FullSrcLoc(ImportLoc.first, *srcMgr),
-                        ImportLoc.second);
+  std::pair<SrcLoc, StringRef> ImportLoc = srcMgr->getModuleImportLoc(*this);
+  return std::make_pair(FullSrcLoc(ImportLoc.first, *srcMgr), ImportLoc.second);
 }
 
 unsigned FullSrcLoc::getFileOffset() const {
@@ -239,9 +232,7 @@ bool FullSrcLoc::isBeforeInTranslationUnitThan(SrcLoc Loc) const {
   return srcMgr->isBeforeInTranslationUnit(*this, Loc);
 }
 
-LLVM_DUMP_METHOD void FullSrcLoc::dump() const {
-  SrcLoc::dump(*srcMgr);
-}
+LLVM_DUMP_METHOD void FullSrcLoc::dump() const { SrcLoc::dump(*srcMgr); }
 
 const char *FullSrcLoc::getCharacterData(bool *Invalid) const {
   assert(isValid());

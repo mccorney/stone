@@ -12,7 +12,6 @@
 
 #include "stone/Core/FileSystemStatCache.h"
 
-
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/ErrorOr.h"
 #include "llvm/Support/Path.h"
@@ -32,11 +31,11 @@ void FileSystemStatCache::anchor() {}
 /// success for directories (not files).  On a successful file lookup, the
 /// implementation can optionally fill in FileDescriptor with a valid
 /// descriptor and the client guarantees that it will close it.
-std::error_code
-FileSystemStatCache::get(StringRef Path, llvm::vfs::Status &Status,
-                         bool isFile, std::unique_ptr<llvm::vfs::File> *F,
-                         FileSystemStatCache *Cache,
-                         llvm::vfs::FileSystem &FS) {
+std::error_code FileSystemStatCache::get(StringRef Path,
+                                         llvm::vfs::Status &Status, bool isFile,
+                                         std::unique_ptr<llvm::vfs::File> *F,
+                                         FileSystemStatCache *Cache,
+                                         llvm::vfs::FileSystem &FS) {
   bool isForDir = !isFile;
   std::error_code RetCode;
 
@@ -92,19 +91,19 @@ FileSystemStatCache::get(StringRef Path, llvm::vfs::Status &Status,
     // If not, close the file if opened.
     if (F)
       *F = nullptr;
-    return std::make_error_code(
-        Status.isDirectory() ?
-            std::errc::is_a_directory : std::errc::not_a_directory);
+    return std::make_error_code(Status.isDirectory()
+                                    ? std::errc::is_a_directory
+                                    : std::errc::not_a_directory);
   }
 
   return std::error_code();
 }
 
-std::error_code
-MemorizeStatCalls::getStat(StringRef Path, llvm::vfs::Status &Status,
-                           bool isFile,
-                           std::unique_ptr<llvm::vfs::File> *F,
-                           llvm::vfs::FileSystem &FS) {
+std::error_code MemorizeStatCalls::getStat(StringRef Path,
+                                           llvm::vfs::Status &Status,
+                                           bool isFile,
+                                           std::unique_ptr<llvm::vfs::File> *F,
+                                           llvm::vfs::FileSystem &FS) {
   auto err = get(Path, Status, isFile, F, nullptr, FS);
   if (err) {
     // Do not cache failed stats, it is easy to construct common inconsistent
