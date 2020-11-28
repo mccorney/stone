@@ -25,6 +25,7 @@
 #include <vector>
 
 namespace stone {
+class Diagnostics;
 class DiagnosticBuilder;
 
 class FixIt final {};
@@ -33,6 +34,7 @@ class DiagnosticPrinter {};
 class DiagnosticListener {};
 
 class Diagnostic {
+  friend Diagnostics;
   // bool isActive;
 protected:
   unsigned diagnosticID = 0;
@@ -41,6 +43,9 @@ protected:
 
 public:
   const unsigned GetID() { return diagnosticID; }
+
+protected:
+  // Only for Diagnostics
   const unsigned GetStartPos() { return startPos; }
   const unsigned GetEndPos() { return endPos; }
 

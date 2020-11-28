@@ -16,8 +16,7 @@ class Diag;
 class Lexer final {
   FileID srcID;
   Diagnostics *dg = nullptr;
-	//LexerDiagnostic lexDiag;
-
+  // LexerDiagnostic lexDiag;
 
   const char *bufferStart;
   const char *curPtr;
