@@ -25,7 +25,8 @@
 #include <vector>
 
 namespace stone {
-class Diagnostics;
+
+class DiagnosticEngine;
 class DiagnosticBuilder;
 
 class FixIt final {};
@@ -34,7 +35,7 @@ class DiagnosticPrinter {};
 class DiagnosticListener {};
 
 class Diagnostic {
-  friend Diagnostics;
+  friend DiagnosticEngine;
   // bool isActive;
 protected:
   unsigned int diagnosticID = 0;

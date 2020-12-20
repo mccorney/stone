@@ -188,7 +188,7 @@ public:
   ///   will be emitted at.
   ///
   /// \param Invalid If non-NULL, will be set \c true if an error occurred.
-  const llvm::MemoryBuffer *getBuffer(Diagnostics &Diag, const SrcMgr &SM,
+  const llvm::MemoryBuffer *getBuffer(DiagnosticEngine &de, const SrcMgr &SM,
                                       SrcLoc Loc = SrcLoc(),
                                       bool *Invalid = nullptr) const;
 
@@ -571,8 +571,8 @@ using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSrcLoc>>;
 /// where the expanded token came from and the expansion location specifies
 /// where it was expanded.
 class SrcMgr : public RefCountedBase<SrcMgr> {
-  /// Diagnostics object.
-  Diagnostics &Diag;
+  /// DiagnosticEngine object.
+  DiagnosticEngine &de;
 
   FileMgr &fileMgr;
 
@@ -733,7 +733,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   SmallVector<std::pair<std::string, FullSrcLoc>, 2> StoredModuleBuildStack;
 
 public:
-  SrcMgr(Diagnostics &Diag, FileMgr &fileMgr,
+  SrcMgr(DiagnosticEngine &de, FileMgr &fileMgr,
          bool UserFilesAreVolatile = false);
   explicit SrcMgr(const SrcMgr &) = delete;
   SrcMgr &operator=(const SrcMgr &) = delete;
@@ -745,7 +745,7 @@ public:
   /// described by \p Old. Requires that \p Old outlive \p *this.
   void initializeForReplay(const SrcMgr &Old);
 
-  Diagnostics &getDiagnostics() const { return Diag; }
+  DiagnosticEngine &getDiagnosticEngine() const { return de; }
 
   FileMgr &getFileMgr() const { return fileMgr; }
 
@@ -947,7 +947,7 @@ public:
       return getFakeBufferForRecovery();
     }
 
-    return Entry.getFile().getContentCache()->getBuffer(Diag, *this, Loc,
+    return Entry.getFile().getContentCache()->getBuffer(de, *this, Loc,
                                                         Invalid);
   }
 
@@ -962,7 +962,7 @@ public:
       return getFakeBufferForRecovery();
     }
 
-    return Entry.getFile().getContentCache()->getBuffer(Diag, *this, SrcLoc(),
+    return Entry.getFile().getContentCache()->getBuffer(de, *this, SrcLoc(),
                                                         Invalid);
   }
 
@@ -1830,7 +1830,7 @@ private:
   // as they are created in `createSrcMgrForFile` so that they can be
   // deleted in the reverse order as they are created.
   std::unique_ptr<FileMgr> fileMgr;
-  // std::unique_ptr<Diagnostics> Diagnostics;
+  // std::unique_ptr<DiagnosticEngine> de;
   std::unique_ptr<SrcMgr> SourceMgr;
 };
 

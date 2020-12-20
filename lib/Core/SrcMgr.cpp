@@ -11,7 +11,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "stone/Core/SrcMgr.h"
-#include "stone/Core/Diagnostics.h"
 #include "stone/Core/FileMgr.h"
 #include "stone/Core/LLVM.h"
 #include "stone/Core/SrcLoc.h"
@@ -96,7 +95,7 @@ void ContentCache::replaceBuffer(const llvm::MemoryBuffer *B, bool DoNotFree) {
   Buffer.setInt((B && DoNotFree) ? DoNotFreeFlag : 0);
 }
 
-const llvm::MemoryBuffer *ContentCache::getBuffer(Diagnostics &Diag,
+const llvm::MemoryBuffer *ContentCache::getBuffer(DiagnosticEngine &de,
                                                   const SrcMgr &SM, SrcLoc Loc,
                                                   bool *Invalid) const {
   // Lazily create the Buffer for ContentCaches that wrap files.  If we already
@@ -124,11 +123,11 @@ const llvm::MemoryBuffer *ContentCache::getBuffer(Diagnostics &Diag,
             .release());
 
     /*
-if (Diag.isDiagnosticInFlight())
+if (de.isDiagnosticInFlight())
 Diag.SetDelayedDiagnostic(diag::err_file_too_large,
                     ContentsEntry->getName());
 else
-Diag.Report(Loc, diag::err_file_too_large)
+de.Report(Loc, diag::err_file_too_large)
 << ContentsEntry->getName();
     */
 
@@ -162,12 +161,12 @@ Diag.Report(Loc, diag::err_file_too_large)
     Buffer.setPointer(BackupBuffer.release());
 
     /*
-if (Diag.isDiagnosticInFlight())
-Diag.SetDelayedDiagnostic(diag::err_cannot_open_file,
+if (de.isDiagnosticInFlight())
+de.SetDelayedDiagnostic(diag::err_cannot_open_file,
                     ContentsEntry->getName(),
                     BufferOrError.getError().message());
 else
-Diag.Report(Loc, diag::err_cannot_open_file)
+de.Report(Loc, diag::err_cannot_open_file)
 << ContentsEntry->getName() << BufferOrError.getError().message();
     */
 
@@ -185,11 +184,11 @@ Diag.Report(Loc, diag::err_cannot_open_file)
   if (getRawBuffer()->getBufferSize() != (size_t)ContentsEntry->getSize()) {
 
     /*
-if (Diag.isDiagnosticInFlight())
-Diag.SetDelayedDiagnostic(diag::err_file_modified,
+if (de.isDiagnosticInFlight())
+de.SetDelayedDiagnostic(diag::err_file_modified,
                     ContentsEntry->getName());
 else
-Diag.Report(Loc, diag::err_file_modified)
+de.Report(Loc, diag::err_file_modified)
 << ContentsEntry->getName();
     */
 
@@ -221,7 +220,7 @@ Diag.Report(Loc, diag::err_file_modified)
 
   if (InvalidBOM) {
     /*
-        Diag.Report(Loc, diag::err_unsupported_bom)
+        de.Report(Loc, diag::err_unsupported_bom)
           << InvalidBOM << ContentsEntry->getName();
 
     */
@@ -350,10 +349,10 @@ SrcLineTable &SrcMgr::getLineTable() {
 // Private 'Create' methods.
 //===----------------------------------------------------------------------===//
 
-SrcMgr::SrcMgr(Diagnostics &Diag, FileMgr &fileMgr, bool UserFilesAreVolatile)
-    : Diag(Diag), fileMgr(fileMgr), UserFilesAreVolatile(UserFilesAreVolatile) {
+SrcMgr::SrcMgr(DiagnosticEngine &de, FileMgr &fileMgr, bool UserFilesAreVolatile)
+    : de(de), fileMgr(fileMgr), UserFilesAreVolatile(UserFilesAreVolatile) {
   clearIDTables();
-  // TODO: Diag.setSrcMgr(this);
+  // TODO: de.setSrcMgr(this);
 }
 
 SrcMgr::~SrcMgr() {
@@ -647,7 +646,7 @@ const llvm::MemoryBuffer *SrcMgr::getMemoryBufferForFile(const SrcFile *File,
                                                          bool *Invalid) {
   const src::ContentCache *IR = getOrCreateContentCache(File);
   assert(IR && "getOrCreateContentCache() cannot return NULL");
-  return IR->getBuffer(Diag, *this, SrcLoc(), Invalid);
+  return IR->getBuffer(de, *this, SrcLoc(), Invalid);
 }
 
 void SrcMgr::overrideFileContents(const SrcFile *SourceFile,
@@ -700,7 +699,7 @@ StringRef SrcMgr::getBufferData(FileID FID, bool *Invalid) const {
   }
 
   const llvm::MemoryBuffer *Buf = SLoc.getFile().getContentCache()->getBuffer(
-      Diag, *this, SrcLoc(), &MyInvalid);
+      de, *this, SrcLoc(), &MyInvalid);
   if (Invalid)
     *Invalid = MyInvalid;
 
@@ -1128,7 +1127,7 @@ const char *SrcMgr::getCharacterData(SrcLoc SL, bool *Invalid) const {
     return "<<<<INVALID BUFFER>>>>";
   }
   const llvm::MemoryBuffer *Buffer =
-      Entry.getFile().getContentCache()->getBuffer(Diag, *this, SrcLoc(),
+      Entry.getFile().getContentCache()->getBuffer(de, *this, SrcLoc(),
                                                    &CharDataInvalid);
   if (Invalid)
     *Invalid = CharDataInvalid;
@@ -1217,14 +1216,14 @@ unsigned SrcMgr::getPresumedColumnNumber(SrcLoc Loc, bool *Invalid) const {
 #endif
 
 static LLVM_ATTRIBUTE_NOINLINE void
-ComputeLineNumbers(Diagnostics &Diag, ContentCache *FI,
+ComputeLineNumbers(DiagnosticEngine &de, ContentCache *FI,
                    llvm::BumpPtrAllocator &Alloc, const SrcMgr &SM,
                    bool &Invalid);
-static void ComputeLineNumbers(Diagnostics &Diag, ContentCache *FI,
+static void ComputeLineNumbers(DiagnosticEngine &de, ContentCache *FI,
                                llvm::BumpPtrAllocator &Alloc, const SrcMgr &SM,
                                bool &Invalid) {
   // Note that calling 'getBuffer()' may lazily page in the file.
-  const MemoryBuffer *Buffer = FI->getBuffer(Diag, SM, SrcLoc(), &Invalid);
+  const MemoryBuffer *Buffer = FI->getBuffer(de, SM, SrcLoc(), &Invalid);
   if (Invalid)
     return;
 
@@ -1294,7 +1293,7 @@ unsigned SrcMgr::GetLineNumber(FileID FID, unsigned FilePos,
   /// SourceLineCache for it on demand.
   if (!Content->SourceLineCache) {
     bool MyInvalid = false;
-    ComputeLineNumbers(Diag, Content, ContentCacheAlloc, *this, MyInvalid);
+    ComputeLineNumbers(de, Content, ContentCacheAlloc, *this, MyInvalid);
     if (Invalid)
       *Invalid = MyInvalid;
     if (MyInvalid)
@@ -1455,7 +1454,7 @@ PresumedLoc SrcMgr::getPresumedLoc(SrcLoc Loc, bool UseLineDirectives) const {
   if (C->OrigEntry)
     Filename = C->OrigEntry->getName();
   else
-    Filename = C->getBuffer(Diag, *this)->getBufferIdentifier();
+    Filename = C->getBuffer(de, *this)->getBufferIdentifier();
 
   unsigned LineNo = GetLineNumber(LocInfo.first, LocInfo.second, &Invalid);
   if (Invalid)
@@ -1729,19 +1728,19 @@ SrcLoc SrcMgr::translateLineCol(FileID FID, unsigned Line, unsigned Col) const {
   // SourceLineCache for it on demand.
   if (!Content->SourceLineCache) {
     bool MyInvalid = false;
-    ComputeLineNumbers(Diag, Content, ContentCacheAlloc, *this, MyInvalid);
+    ComputeLineNumbers(de, Content, ContentCacheAlloc, *this, MyInvalid);
     if (MyInvalid)
       return SrcLoc();
   }
 
   if (Line > Content->NumLines) {
-    unsigned Size = Content->getBuffer(Diag, *this)->getBufferSize();
+    unsigned Size = Content->getBuffer(de, *this)->getBufferSize();
     if (Size > 0)
       --Size;
     return FileLoc.getLocWithOffset(Size);
   }
 
-  const llvm::MemoryBuffer *Buffer = Content->getBuffer(Diag, *this);
+  const llvm::MemoryBuffer *Buffer = Content->getBuffer(de, *this);
   unsigned FilePos = Content->SourceLineCache[Line - 1];
   const char *Buf = Buffer->getBufferStart() + FilePos;
   unsigned BufLength = Buffer->getBufferSize() - FilePos;
@@ -2246,7 +2245,7 @@ SrcMgrForFile::SrcMgrForFile(StringRef FileName, StringRef Content) {
   /*
     // This is passed to `SM` as reference, so the pointer has to be referenced
     // by `Environment` due to the same reason above.
-    Diagnostics = llvm::make_unique<Diagnostics>(
+    DiagnosticEngine = llvm::make_unique<DiagnosticEngine>(
         IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs),
         new DiagnosticOptions);
   */
