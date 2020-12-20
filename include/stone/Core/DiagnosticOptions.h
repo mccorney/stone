@@ -9,12 +9,16 @@ namespace stone {
 struct DiagnosticOptions final {
 public:
   /// Indicates whether textual diagnostics should use color.
-  bool UseColor = false;
+  bool useColor = false;
+
+  // TODO: remove this note: (d1Start = 1, d1End = d1Start + max)
+  // (d2Start = d1End + 1  , d2End = d1End + max)
+  unsigned int maxMessagesPerDiagnostic = 100;
 
   enum FormattingStyle { LLVM, Stone };
   // If set to true, use the more descriptive experimental formatting style for
   // diagnostics.
-  FormattingStyle TextFormattingStyle = FormattingStyle::LLVM;
+  FormattingStyle textFormattingStyle = FormattingStyle::LLVM;
 };
 
 } // namespace stone

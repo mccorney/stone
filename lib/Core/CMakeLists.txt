@@ -25,6 +25,7 @@ set(stone_core_sources
 	Stmt.cpp
 	TextDiagnosticListener.cpp
 	Visitor.cpp
+	Version.cpp
 	Walker.cpp
 
 )

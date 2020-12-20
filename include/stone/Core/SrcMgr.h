@@ -62,7 +62,7 @@ namespace stone {
 
 class SrcLineTable;
 class SrcMgr;
-class Diagnostics;
+class DiagnosticEngine;
 /// Public enums and private classes that are part of the
 /// SrcMgr implementation.
 namespace src {

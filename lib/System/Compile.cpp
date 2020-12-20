@@ -8,6 +8,14 @@
 
 using namespace stone;
 
+namespace stone {
+int Analyze(Compiler &compiler) {
+
+  // stond::Analyze(compiler.GetAnalysis());
+}
+int Gen(Compiler &compiler) {}
+
+} // namespace stone
 int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
                    void *MainAddr, Pipeline *P) {
 
@@ -16,14 +24,16 @@ int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
     return ret::ok;
   }
 
-  Compiler C;
-  C.Init(Args);
-
-  if (C.Run(P) == ret::err) {
+  Compiler compiler;
+  compiler.Init(Args);
+  // stone::Analyze(compiler.GetAnalysis());
+  // This is not needed.
+  if (compiler.Run(P) == ret::err) {
     return ret::err;
   }
+  // Transformer transformer;
 
-  stone::Gen(C.GetAnalysis().GetModule(), C.compilerOpts.genOpts, P);
+  // stone::Gen(C.GetAnalysis().GetModule(), C.compilerOpts.genOpts, P);
 
   return ret::ok;
 }

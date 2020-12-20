@@ -37,17 +37,19 @@ class Diagnostic {
   friend Diagnostics;
   // bool isActive;
 protected:
-  unsigned diagnosticID = 0;
-  unsigned startPos = 0;
-  unsigned endPos = 0;
+  unsigned int diagnosticID = 0;
+  unsigned int maxMessages = 0;
+  unsigned int startMessageID = 0;
+  unsigned int endMessageID = 0;
 
 public:
-  const unsigned GetID() { return diagnosticID; }
+  unsigned int GetID() const { return diagnosticID; }
 
 protected:
   // Only for Diagnostics
-  const unsigned GetStartPos() { return startPos; }
-  const unsigned GetEndPos() { return endPos; }
+  void Init();
+  unsigned int GetStartMsgID() const { return startMessageID; }
+  unsigned int GetEndMsgID() const { return endMessageID; }
 
 public:
 };
@@ -62,47 +64,67 @@ enum class DiagnosticLevel {
   Fatal
 };
 
-enum class DiagnositicArgument {
+enum class DiagnositicArgumentKind {
   /// std::string
-  STDString,
+  STDStr,
 
   /// const char *
-  CString,
+  CStr,
 
   /// int
   SInt,
 
   /// unsigned
   UInt,
+
+  /// custom argument
+  Custom,
 };
+
+class CustomDiagnosticArgument {};
 /// Concrete class used by the front-end to report problems and issues.
 ///
 /// This massages the diagnostics (e.g. handling things like "report warnings
 /// as errors" and passes them off to the DiagnosticConsumer for reporting to
 /// the user. Diagnostics is tied to one translation unit and one
 /// SrcMgr.
-class Diagnostics final {
-public:
-  Diagnostics(const DiagnosticOptions &diagOpts,
-              DiagnosticListener *listener = nullptr, bool ownsListener = true);
+class DiagnosticEngine final {
 
-  Diagnostics(const Diagnostics &) = delete;
-  Diagnostics &operator=(const Diagnostics &) = delete;
-  ~Diagnostics();
+  /// The
+  unsigned int diagnosticSeen = 0;
+
+  /// The maximum diagnostic messages per diagnostic
+  // unsigned int maxDiagnosticMessages = 1000;
+  llvm::DenseMap<unsigned int, std::unique_ptr<Diagnostic>> diagnostics;
+
+public:
+  DiagnosticEngine(const DiagnosticOptions &diagOpts,
+                   DiagnosticListener *listener = nullptr,
+                   bool ownsListener = true);
+
+  DiagnosticEngine(const DiagnosticEngine &) = delete;
+  DiagnosticEngine &operator=(const DiagnosticEngine &) = delete;
+  ~DiagnosticEngine();
 
 public:
   /// Owns the Diagnostic
-  // void AddDiagnostic(std::unique_ptr<Diagnostic> diagnostic);
+  // NOTE: when you add, check for existing, calculate id, start, and end and
+  // then load message; diagnostic.messageID = diagnostics.size() +1;
+  ////TODO: remove this note: (d1Start = 1, d1End = d1Start + max)
+  // (d2Start = d1End + 1  , d2End = d1End + max)
+  // update: use maxMessages from Diagnostic to calculate startMsgID, and
+  // endMsgID
+  void AddDiagnostic(std::unique_ptr<Diagnostic> diagnostic);
 
   // void AddDiagnosticListener(std::unique_ptr<DiagnosticListener> diagnostic);
 };
 
 class DiagnosticBuilder final {
 
-  friend class Diagnostics;
+  friend class DiagnosticEngine;
   // friend class PartialDiagnostic;
 
-  mutable Diagnostics *diagnostics = nullptr;
+  mutable DiagnosticEngine *de = nullptr;
   mutable unsigned numArgs = 0;
 
   /// Status variable indicating if this diagnostic is still active.
@@ -118,11 +140,9 @@ class DiagnosticBuilder final {
 
   DiagnosticBuilder() = default;
 
-  explicit DiagnosticBuilder(Diagnostics *diagnostics)
-      : diagnostics(diagnostics), isActive(true) {
+  explicit DiagnosticBuilder(DiagnosticEngine *de) : de(de), isActive(true) {
 
-    assert(diagnostics &&
-           "DiagnosticBuilder requires a valid DiagnosticsEngine!");
+    assert(de && "DiagnosticBuilder requires a valid DiagnosticsEngine!");
 
     // diagnostics->diagnosticRanges.clear();
     // diagnostics->diagnosticFixIts.clear();
@@ -137,7 +157,8 @@ public:
   /// \param DiagID A member of the @c diag::kind enum.
   /// \param Loc Represents the source location associated with the diagnostic,
   /// which can be an invalid location if no position information is available.
-  inline DiagnosticBuilder Diagnose(SrcLoc loc, const unsigned diagnosticID,
+  inline DiagnosticBuilder Diagnose(const SrcLoc loc,
+                                    const unsigned diagnosticID,
                                     const unsigned messageID);
 
   inline DiagnosticBuilder Diagnose(const unsigned diagnosticID,

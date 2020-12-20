@@ -5,6 +5,6 @@ namespace stone {
 class Pipeline;
 class Analysis;
 
-int Parse(Analysis &AS, Pipeline *P = nullptr);
+int Parse(Analysis &analysis, Pipeline *pipeline = nullptr);
 } // namespace stone
 #endif

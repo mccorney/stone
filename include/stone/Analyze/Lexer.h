@@ -15,7 +15,7 @@ class Diag;
 
 class Lexer final {
   FileID srcID;
-  Diagnostics *dg = nullptr;
+  DiagnosticEngine *de = nullptr;
   // LexerDiagnostic lexDiag;
 
   const char *bufferStart;
@@ -27,7 +27,7 @@ private:
 
 public:
   Lexer(const FileID srcID, const SrcMgr &srcMgr, const LangOptions &langOpts,
-        Diagnostics *dg = nullptr);
+        DiagnosticEngine *de = nullptr);
 
 public:
   void Lex(Token &token);
