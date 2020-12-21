@@ -84,7 +84,7 @@ private:
 private:
   void Diagnose();
 	void Lex(); 
-  void LexTrivia(Trivia trivia);
+  void LexTrivia(Trivia trivia, bool isTrailing);
   void LexIdentifier();
   void LexNumber();
   void LexStrLiteral();
@@ -93,7 +93,6 @@ private:
 public:
   Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
         DiagnosticEngine *de = nullptr);
-
 public:
 
   void Lex(Token &result) {
@@ -111,6 +110,8 @@ public:
 		}
   }
   Token &Peek() { return nextToken; }
+
+	FileID GetSrcID() { return srcID; }
 };
 
 } // namespace stone

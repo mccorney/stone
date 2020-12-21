@@ -87,12 +87,12 @@ public:
   bool IsAtStartOfLine() const { return atStartOfLine; }
 
   /// Set whether this token occurred at the start of a line.
-  void setAtStartOfLine(bool value) { atStartOfLine = value; }
+  void SetAtStartOfLine(bool value) { atStartOfLine = value; }
 
   /// True if this token is an escaped identifier token.
   bool IsEscapedIdentifier() const { return escapedIdentifier; }
   /// Set whether this token is an escaped identifier token.
-  void setEscapedIdentifier(bool value) {
+  void SetEscapedIdentifier(bool value) {
     assert((!value || kind == tk::identifier) &&
            "only identifiers can be escaped identifiers");
     escapedIdentifier = value;

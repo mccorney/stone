@@ -7,7 +7,7 @@
 
 namespace stone {
 
-enum class TriviaKind { Caret };
+enum class TriviaKind { GarbageText };
 
 class TriviaPiece final {
   TriviaKind kind;

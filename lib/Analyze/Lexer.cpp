@@ -137,11 +137,30 @@ void Lexer::Init(const char *bufferStart, const char *curPtr,
 
 void Lexer::Lex() {
 
+	assert(curPtr >= bufferStart && curPtr <= bufferEnd && "Current pointer out of range!");
+
+  leadingTrivia.clear();
+  trailingTrivia.clear();
+
+  if (curPtr == bufferStart) {
+    if (bufferStart < contentStart) {
+      size_t bomLen = contentStart - bufferStart;
+      assert(bomLen == 3 && "UTF-8 BOM is 3 bytes");
+      // Add UTF-8 BOM to LeadingTrivia.
+      leadingTrivia.push_back(TriviaKind::GarbageText, bomLen);
+      curPtr += bomLen;
+    }
+    nextToken.SetAtStartOfLine(true);
+  } else {
+    nextToken.SetAtStartOfLine(false);
+  }
+
+  LexTrivia(leadingTrivia, false);
   while (true) {
   }
 }
 
-void Lexer::LexTrivia(Trivia) {}
+void Lexer::LexTrivia(Trivia trivia, bool isTrailing) {}
 void Lexer::LexChar() {}
 
 void Lexer::LexNumber() {}
