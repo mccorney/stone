@@ -2,10 +2,9 @@
 
 using namespace stone;
 
-
 uint32_t stone::ValidateUTF8Char(const char *&startOfByte, const char *end) {
 
-	return 0;
+  return 0;
 }
 
 static bool IsNewLine(const char ch) {

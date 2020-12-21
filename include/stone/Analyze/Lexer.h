@@ -16,7 +16,6 @@ class LangOptions;
 class Token;
 class Diag;
 
-
 enum class TriviaRetentionMode {
   Without,
   With,

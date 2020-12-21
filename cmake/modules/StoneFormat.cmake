@@ -1,6 +1,7 @@
 set(stone_include_files
 	${STONE_SOURCE_DIR}/include/stone/Core/*.h
 	${STONE_SOURCE_DIR}/include/stone/Analyze/*.h
+	${STONE_SOURCE_DIR}/include/stone/Analyze/*.def
 	${STONE_SOURCE_DIR}/include/stone/System/*.h
 	${STONE_SOURCE_DIR}/include/stone/Gen/*.h
 	${STONE_SOURCE_DIR}/include/stone/*.h
