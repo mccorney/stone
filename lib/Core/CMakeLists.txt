@@ -18,13 +18,13 @@ set(stone_core_sources
 	FileSystemStatCache.cpp
 	Fmt.cpp
 	Identifier.cpp
-	IdentifierTable.cpp
 	Module.cpp
 	SrcLoc.cpp
 	SrcMgr.cpp
 	Stats.cpp
 	Stmt.cpp
 	TextDiagnosticListener.cpp
+	TokenKind.cpp
 	Visitor.cpp
 	Version.cpp
 	Walker.cpp

@@ -501,13 +501,13 @@ void Lexer::LexIdentifier() {
   return CreateToken(kind, tokStart);
 }
 
-/// This is either an identifier or a keyword. 
+/// This is either an identifier or a keyword.
 tk Lexer::GetKindOfIdentifier(StringRef tokStr) {
 
 #define KEYWORD(kw)                                                            \
   if (tokStr == #kw)                                                           \
     return tk::kw_##kw;
-#include "stone/Analyze/TokenKind.def"
+#include "stone/Core/TokenKind.def"
   return tk::identifier;
 }
 void Lexer::LexTrivia(Trivia trivia, bool isTrailing) {}

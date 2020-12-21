@@ -15,7 +15,7 @@ protected:
   LangOptions langOpts;
   FileMgr fm;
   SrcMgr sm;
-  // Lexer lexer;
+
 protected:
   LexerTest() : de(diagOpts, nullptr, false), fm(fmOpts), sm(de, fm) {}
 
@@ -37,7 +37,6 @@ protected:
       Token token;
       lexer->Lex(token);
       tokens.push_back(token);
-
       break;
       // if(token.GetKind() == tk::eof) {
       //	break;

@@ -8,7 +8,6 @@ set(stone_analyze_sources
 	Lexer.cpp
 	Parse.cpp
 	Parser.cpp
-	Token.cpp
 
 	LINK_LIBS
 	StoneCore

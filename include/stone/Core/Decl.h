@@ -2,6 +2,11 @@
 #define STONE_CORE_DECL_H
 
 #include "stone/Core/ASTNode.h"
+#include "stone/Core/DeclContext.h"
+#include "stone/Core/DeclName.h"
+#include "stone/Core/Identifier.h"
+#include "stone/Core/LLVM.h"
+#include "stone/Core/SrcLoc.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -22,16 +27,71 @@
 #include <utility>
 
 namespace stone {
-class alignas(8) Decl : public ASTNode {
-public:
-  enum Kind {};
+class BraceStmt;
+class DeclContext;
+class ASTContext;
 
+enum class DeclKind { Fun };
+
+class alignas(8) Decl : public ASTNode {
 public:
   Decl() = delete;
   Decl(const Decl &) = delete;
   Decl(Decl &&) = delete;
   Decl &operator=(const Decl &) = delete;
   Decl &operator=(Decl &&) = delete;
+
+  friend class DeclContext;
+
+  struct MultipleDC {
+    DeclContext *semanticDC;
+    DeclContext *lexicalDC;
+  };
+
+  llvm::PointerUnion<DeclContext *, MultipleDC *> declCtx;
 };
+
+class NamedDecl : public Decl {
+  /// The name of this declaration, which is typically a normal
+  /// identifier but may also be a special kind of name (C++
+  /// constructor, etc.)
+  // DeclName name;
+  /// Get the identifier that names this declaration, if there is one.
+  ///
+  /// This will return NULL if this declaration has no name (e.g., for
+  /// an unnamed class) or if the name is a special name (C++ constructor,
+  /// Objective-C selector, etc.).
+  // Identifier *GetIdentifier() const { return name.GetAsIdentifier(); }
+};
+
+/*
+class ValueDecl : public NamedDecl {
+};
+
+class VarDecl : public ValueDecl {};
+
+class ParamDecl : public VarDecl {};
+
+class AbstractFunctionDecl : public ValueDecl, public DeclContext {
+protected:
+  // If a function has a body at all, we have either a parsed body AST node or
+  // we have saved the end location of the unparsed body.
+  union {
+    BraceStmt *body;
+  };
+
+public:
+  void SetParams(ASTContext &ac, llvm::ArrayRef<ParamDecl *> params);
+  BraceStmt *GetBody(bool canSynthesize = true) const;
+  /// Set a new body for the function.
+  void SetBody(BraceStmt *stmt BodyKind NewBodyKind);
+};
+class FunDecl final : public AbstractFunctionDecl {
+public:
+  static FunDecl *Create(ASTContext &ac, DeclContext *dc, SrcLoc startLoc);
+};
+
+*/
+
 } // namespace stone
 #endif

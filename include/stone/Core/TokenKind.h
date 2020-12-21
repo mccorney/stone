@@ -7,7 +7,7 @@ namespace stone {
 
 enum class tk {
 #define TOKEN(X) X,
-#include "stone/Analyze/TokenKind.def"
+#include "stone/Core/TokenKind.def"
   MAX
 };
 
