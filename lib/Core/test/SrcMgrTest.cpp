@@ -1,6 +1,6 @@
 #include "stone/Core/SrcMgr.h"
+#include "stone/Core/DiagnosticOptions.h"
 #include "stone/Core/Diagnostics.h"
-//#include "stone/Core/DiagnosticOptions.h"
 #include "stone/Core/FileMgr.h"
 #include "stone/Core/FileSystemOptions.h"
 
@@ -15,13 +15,14 @@ using namespace stone;
 
 class SrcMgrTest : public ::testing::Test {
 protected:
+  DiagnosticOptions diagOpts;
   FileSystemOptions fmOpts;
   FileMgr fm;
-  Diagnostics diags;
+  DiagnosticEngine de;
   SrcMgr sm;
 
 protected:
-  SrcMgrTest() : fm(fmOpts), sm(diags, fm) {}
+  SrcMgrTest() : de(diagOpts, nullptr, false), fm(fmOpts), sm(de, fm) {}
 };
 
 TEST_F(SrcMgrTest, GetColNumber) {
@@ -29,10 +30,10 @@ TEST_F(SrcMgrTest, GetColNumber) {
   const char *Source = "int x;\n"
                        "int y;";
 
-  std::unique_ptr<llvm::MemoryBuffer> Buf =
-      llvm::MemoryBuffer::getMemBuffer(Source);
-  FileID MainFileID = sm.createFileID(std::move(Buf));
-  sm.setMainFileID(MainFileID);
+  auto memBuffer = llvm::MemoryBuffer::getMemBuffer(Source);
+
+  auto MainFileID = sm.CreateFileID(std::move(memBuffer));
+  sm.SetMainFileID(MainFileID);
 
   bool Invalid;
 

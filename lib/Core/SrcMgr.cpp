@@ -349,7 +349,8 @@ SrcLineTable &SrcMgr::getLineTable() {
 // Private 'Create' methods.
 //===----------------------------------------------------------------------===//
 
-SrcMgr::SrcMgr(DiagnosticEngine &de, FileMgr &fileMgr, bool UserFilesAreVolatile)
+SrcMgr::SrcMgr(DiagnosticEngine &de, FileMgr &fileMgr,
+               bool UserFilesAreVolatile)
     : de(de), fileMgr(fileMgr), UserFilesAreVolatile(UserFilesAreVolatile) {
   clearIDTables();
   // TODO: de.setSrcMgr(this);
@@ -563,10 +564,10 @@ FileID SrcMgr::getNextFileID(FileID FID) const {
 // Methods to create new FileID's and macro expansions.
 //===----------------------------------------------------------------------===//
 
-/// createFileID - Create a new FileID for the specified ContentCache and
+/// CreateFileID - Create a new FileID for the specified ContentCache and
 /// include position.  This works regardless of whether the ContentCache
 /// corresponds to a file or some other input source.
-FileID SrcMgr::createFileID(const ContentCache *File, SrcLoc IncludePos,
+FileID SrcMgr::CreateFileID(const ContentCache *File, SrcLoc IncludePos,
                             src::CharacteristicKind FileCharacter, int LoadedID,
                             unsigned LoadedOffset) {
   if (LoadedID < 0) {
@@ -637,7 +638,7 @@ SrcLoc SrcMgr::createExpansionLocImpl(const ExpansionInfo &Info,
   assert(NextLocalOffset + TokLength + 1 > NextLocalOffset &&
          NextLocalOffset + TokLength + 1 <= CurrentLoadedOffset &&
          "Ran out of source locations!");
-  // See createFileID for that +1.
+  // See CreateFileID for that +1.
   NextLocalOffset += TokLength + 1;
   return SrcLoc::getMacroLoc(NextLocalOffset - (TokLength + 1));
 }
@@ -2253,9 +2254,9 @@ SrcMgrForFile::SrcMgrForFile(StringRef FileName, StringRef Content) {
   /*
     SourceMgr = llvm::make_unique<SrcMgr>(*Diagnostics, *fileMgr);
 
-    FileID ID = SourceMgr->createFileID(fileMgr->getFile(FileName),
+    FileID ID = SourceMgr->CreateFileID(fileMgr->getFile(FileName),
                                         SrcLoc(), stone::src::C_User);
     assert(ID.isValid());
-    SourceMgr->setMainFileID(ID);
+    SourceMgr->SetMainFileID(ID);
           */
 }

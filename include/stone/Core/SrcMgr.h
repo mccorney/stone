@@ -785,7 +785,7 @@ public:
   FileID getMainFileID() const { return MainFileID; }
 
   /// Set the file ID for the main source file.
-  void setMainFileID(FileID FID) { MainFileID = FID; }
+  void SetMainFileID(FileID FID) { MainFileID = FID; }
 
   /// Set the file ID for the precompiled preamble.
   void setPreambleFileID(FileID Preamble) {
@@ -804,24 +804,24 @@ public:
   /// being \#included from the specified IncludePosition.
   ///
   /// This translates NULL into standard input.
-  FileID createFileID(const SrcFile *SourceFile, SrcLoc IncludePos,
+  FileID CreateFileID(const SrcFile *SourceFile, SrcLoc IncludePos,
                       src::CharacteristicKind FileCharacter, int LoadedID = 0,
                       unsigned LoadedOffset = 0) {
     const src::ContentCache *IR =
         getOrCreateContentCache(SourceFile, isSystem(FileCharacter));
     assert(IR && "getOrCreateContentCache() cannot return NULL");
-    return createFileID(IR, IncludePos, FileCharacter, LoadedID, LoadedOffset);
+    return CreateFileID(IR, IncludePos, FileCharacter, LoadedID, LoadedOffset);
   }
 
   /// Create a new FileID that represents the specified memory buffer.
   ///
   /// This does no caching of the buffer and takes ownership of the
   /// MemoryBuffer, so only pass a MemoryBuffer to this once.
-  FileID createFileID(std::unique_ptr<llvm::MemoryBuffer> Buffer,
+  FileID CreateFileID(std::unique_ptr<llvm::MemoryBuffer> Buffer,
                       src::CharacteristicKind FileCharacter = src::C_User,
                       int LoadedID = 0, unsigned LoadedOffset = 0,
                       SrcLoc IncludeLoc = SrcLoc()) {
-    return createFileID(
+    return CreateFileID(
         createMemBufferContentCache(Buffer.release(), /*DoNotFree*/ false),
         IncludeLoc, FileCharacter, LoadedID, LoadedOffset);
   }
@@ -832,11 +832,11 @@ public:
   ///
   /// This does not take ownership of the MemoryBuffer. The memory buffer must
   /// outlive the SrcMgr.
-  FileID createFileID(UnownedTag, const llvm::MemoryBuffer *Buffer,
+  FileID CreateFileID(UnownedTag, const llvm::MemoryBuffer *Buffer,
                       src::CharacteristicKind FileCharacter = src::C_User,
                       int LoadedID = 0, unsigned LoadedOffset = 0,
                       SrcLoc IncludeLoc = SrcLoc()) {
-    return createFileID(createMemBufferContentCache(Buffer, /*DoNotFree*/ true),
+    return CreateFileID(createMemBufferContentCache(Buffer, /*DoNotFree*/ true),
                         IncludeLoc, FileCharacter, LoadedID, LoadedOffset);
   }
 
@@ -846,7 +846,7 @@ public:
                            src::CharacteristicKind FileCharacter) {
     FileID ID = translateFile(SourceFile);
     return ID.isValid() ? ID
-                        : createFileID(SourceFile, SrcLoc(), FileCharacter);
+                        : CreateFileID(SourceFile, SrcLoc(), FileCharacter);
   }
 
   /// Return a new SrcLoc that encodes the
@@ -1754,7 +1754,7 @@ private:
   ///
   /// This works regardless of whether the ContentCache corresponds to a
   /// file or some other input source.
-  FileID createFileID(const src::ContentCache *File, SrcLoc IncludePos,
+  FileID CreateFileID(const src::ContentCache *File, SrcLoc IncludePos,
                       src::CharacteristicKind DirCharacter, int LoadedID,
                       unsigned LoadedOffset);
 

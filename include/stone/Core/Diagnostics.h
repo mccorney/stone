@@ -99,9 +99,9 @@ class DiagnosticEngine final {
   llvm::DenseMap<unsigned int, std::unique_ptr<Diagnostic>> diagnostics;
 
 public:
-  DiagnosticEngine(const DiagnosticOptions &diagOpts,
-                   DiagnosticListener *listener = nullptr,
-                   bool ownsListener = true);
+  explicit DiagnosticEngine(const DiagnosticOptions &diagOpts,
+                            DiagnosticListener *listener = nullptr,
+                            bool ownsListener = true);
 
   DiagnosticEngine(const DiagnosticEngine &) = delete;
   DiagnosticEngine &operator=(const DiagnosticEngine &) = delete;

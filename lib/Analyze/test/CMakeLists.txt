@@ -10,5 +10,6 @@ add_stone_unittest(StoneAnalyzeTests
 target_link_libraries(StoneAnalyzeTests
   PRIVATE
 	StoneCore
+	StoneAnalyze
 )
 

@@ -1,15 +1,13 @@
 #ifndef STONE_ANALYSIS_TOKEN_H
 #define STONE_ANALYSIS_TOKEN_H
 
-#include "stone/Core/AST.h"
-
 namespace stone {
 
-namespace tk {
-enum Kind {};
-}
+enum class TokenKind {
 
+};
 class Token final {
+
 public:
   // void SetKind(tk::Kind K);
 public:
