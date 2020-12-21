@@ -62,7 +62,7 @@ class alignas(IdentifierAlignment) Identifier {
   unsigned IsPoisoned : 1;
 
   // True if the identifier is a C++ operator keyword.
-  unsigned IsCPPOperatorKeyword : 1;
+  unsigned IsOperatorKeyword : 1;
 
   // Internal bit set by the member function RecomputeNeedsHandleIdentifier.
   // See comment about RecomputeNeedsHandleIdentifier for more info.
@@ -99,7 +99,7 @@ class alignas(IdentifierAlignment) Identifier {
   Identifier()
       : kind(tk::identifier), BuiltinID(0), IsExtension(false),
         IsFutureCompatKeyword(false), IsPoisoned(false),
-        IsCPPOperatorKeyword(false), NeedsHandleIdentifier(false),
+        IsOperatorKeyword(false), NeedsHandleIdentifier(false),
         IsFromAST(false), ChangedAfterLoad(false), FEChangedAfterLoad(false),
         RevertedTokenID(false), OutOfDate(false), IsModulesImport(false) {}
 
@@ -229,18 +229,14 @@ public:
 
   /// isCPlusPlusOperatorKeyword/setIsCPlusPlusOperatorKeyword controls whether
   /// this identifier is a C++ alternate representation of an operator.
-  void setIsCPlusPlusOperatorKeyword(bool Val = true) {
-    IsCPPOperatorKeyword = Val;
+  void setIsOperatorKeyword(bool Val = true) {
+    IsOperatorKeyword = Val;
   }
-  bool isCPlusPlusOperatorKeyword() const { return IsCPPOperatorKeyword; }
+  bool isOperatorKeyword() const { return IsOperatorKeyword; }
 
   /// Return true if this token is a keyword in the specified language.
   bool isKeyword(const LangOptions &LangOpts) const;
-
-  /// Return true if this token is a C++ keyword in the specified
-  /// language.
-  bool isCPlusPlusKeyword(const LangOptions &LangOpts) const;
-
+ 
   /// Get and set FETokenInfo. The language front-end is allowed to associate
   /// arbitrary metadata with this token.
   void *getFETokenInfo() const { return FETokenInfo; }
@@ -421,7 +417,6 @@ class IdentifierTable {
   // BumpPtrAllocator!
   using HashTableTy = llvm::StringMap<Identifier *, llvm::BumpPtrAllocator>;
   HashTableTy HashTable;
-
   IdentifierLookup *ExternalLookup;
 
 public:
@@ -524,8 +519,7 @@ public:
 };
 
 namespace detail {
-
-/// DeclNameExtra is used as a base of various uncommon special names.
+/// SpecialDeclName is used as a base of various uncommon special names.
 /// This class is needed since DeclName has not enough space to store
 /// the kind of every possible names. Therefore the kind of common names is
 /// stored directly in DeclName, and the kind of uncommon names is
@@ -533,34 +527,33 @@ namespace detail {
 /// DeclName needs the lower 3 bits to store the kind of common names.
 /// DeclNameExtra is tightly coupled to DeclName and any change
 /// here is very likely to require changes in DeclName(Table).
-class alignas(IdentifierAlignment) DeclNameExtra {
+class alignas(IdentifierAlignment) SpecialDeclName {
   friend class stone::DeclName;
   friend class stone::DeclNameTable;
-
 protected:
   /// The kind of "extra" information stored in the DeclName. See
   /// @c ExtraKindOrNumArgs for an explanation of how these enumerator values
   /// are used. Note that DeclName depends on the numerical values
   /// of the enumerators in this enum. See DeclName::StoredNameKind
   /// for more info.
-  enum ExtraKind {
+  enum SpecialKind {
     DeductionGuideName,
     LiteralOperatorName,
     UsingDirective,
   };
 
   /// ExtraKindOrNumArgs has one of the following meaning:
-  ///  * The kind of an uncommon C++ special name. This DeclNameExtra
-  ///    is in this case in fact either a CXXDeductionGuideNameExtra or
-  ///    a CXXLiteralOperatorIdName.
+  ///  * The kind of an uncommon/special name. This SpecialDeclName
+  ///    is in this case in fact either a DeductionGuideNameExtra or
+  ///    a LiteralOperatorIdName.
   ///
-  ///  * It may be also name common to C++ using-directives (CXXUsingDirective),
-  ExtraKind kind;
+  ///  * It may be also name common to using-directives (UsingDirective),
+  SpecialKind kind;
 
-  DeclNameExtra(ExtraKind kind) : kind(kind) {}
+  SpecialDeclName(SpecialKind kind) : kind(kind) {}
 
-  /// Return the corresponding ExtraKind.
-  ExtraKind getKind() const { return kind; }
+  /// Return the corresponding SpecialKind.
+  SpecialKind GetKind() const { return kind; }
 };
 
 } // namespace detail
