@@ -33,11 +33,7 @@ class Lexer final {
   SrcMgr &sm;
   const LangOptions &lo;
 
-  // LexerDiagnostic lexDiag;
-
-  // const char *bufferStart;
-  // const char *curPtr;
-  // const char *bufferEnd;
+  std::unique_ptr<LexerDiagnostic> lexerDiag;
 
   /// Pointer to the first character of the buffer, even in a lexer that
   /// scans a subrange of the buffer.
@@ -83,25 +79,38 @@ public:
 private:
   Lexer(const Lexer &) = delete;
   void operator=(const Lexer &) = delete;
-
   void Init(const char *bufferStart, const char *curPtr, const char *bufferEnd);
 
-public:
-  Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
-        DiagnosticEngine *de = nullptr);
-
-public:
-  void Lex(Token &token);
-
 private:
+  void Diagnose();
+	void Lex(); 
   void LexTrivia(Trivia trivia);
-
   void LexIdentifier();
   void LexNumber();
   void LexStrLiteral();
   void LexChar();
 
 public:
+  Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
+        DiagnosticEngine *de = nullptr);
+
+public:
+
+  void Lex(Token &result) {
+    Trivia leading, trailing;
+    Lex(result, leading, trailing);
+  }
+  void Lex(Token &result, Trivia &leading, Trivia &trailing) {
+    result = nextToken;
+    if (triviaRetention == TriviaRetentionMode::With) {
+      leading = {leadingTrivia};
+      trailing = {trailingTrivia};
+    }
+    if (result.IsNot(tk::eof)){
+			Lex();
+		}
+  }
+  Token &Peek() { return nextToken; }
 };
 
 } // namespace stone

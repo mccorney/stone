@@ -129,9 +129,13 @@ Lexer::Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
 // Init();
 
 void Lexer::Init(const char *bufferStart, const char *curPtr,
-                 const char *bufferEnd) {}
+                 const char *bufferEnd) {
+  if (de) {
+    // de->AddDiagnostic(std::move(lexerDiag));
+  }
+}
 
-void Lexer::Lex(Token &token) {
+void Lexer::Lex() {
 
   while (true) {
   }
