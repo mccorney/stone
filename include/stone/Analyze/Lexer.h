@@ -92,6 +92,8 @@ private:
   void Diagnose();
   void CreateToken(tk kind, const char *tokenStart);
 
+  tk GetKindOfIdentifier(StringRef tokStr);
+
 public:
   Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
         DiagnosticEngine *de = nullptr);

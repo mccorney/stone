@@ -131,7 +131,6 @@ static bool IsValidIdentifierStartCodePoint(uint32_t c) {
 
   return true;
 }
-
 static bool AdvanceIf(char const *&ptr, char const *end,
                       bool (*predicate)(uint32_t)) {
   char const *next = ptr;
@@ -147,6 +146,95 @@ static bool AdvanceIf(char const *&ptr, char const *end,
 
 static bool AdvanceIfValidStartOfIdentifier(char const *&ptr, char const *end) {
   return AdvanceIf(ptr, end, IsValidIdentifierStartCodePoint);
+}
+static bool AdvanceIfValidContinuationOfIdentifier(char const *&ptr,
+                                                   char const *end) {
+  return AdvanceIf(ptr, end, IsValidIdentifierContinuationCodePoint);
+}
+
+/// Is the operator beginning at the given character "left-bound"?
+static bool IsLeftBound(const char *tokBegin, const char *bufferBegin) {
+  // The first character in the file is not left-bound.
+  if (tokBegin == bufferBegin)
+    return false;
+
+  switch (tokBegin[-1]) {
+  case ' ':
+  case '\r':
+  case '\n':
+  case '\t': // whitespace
+  case '(':
+  case '[':
+  case '{': // opening delimiters
+  case ',':
+  case ';':
+  case ':':  // expression separators
+  case '\0': // whitespace / last char in file
+    return false;
+
+  case '/':
+    if (tokBegin - 1 != bufferBegin && tokBegin[-2] == '*')
+      return false; // End of a slash-star comment, so whitespace.
+    else
+      return true;
+
+  case '\xA0':
+    if (tokBegin - 1 != bufferBegin && tokBegin[-2] == '\xC2')
+      return false; // Non-breaking whitespace (U+00A0)
+    else
+      return true;
+
+  default:
+    return true;
+  }
+}
+
+/// Is the operator ending at the given character (actually one past the end)
+/// "right-bound"?
+///
+/// The code-completion point is considered right-bound.
+static bool IsRightBound(const char *tokEnd, bool isLeftBound,
+                         const char *codeCompletionPtr) {
+  switch (*tokEnd) {
+  case ' ':
+  case '\r':
+  case '\n':
+  case '\t': // whitespace
+  case ')':
+  case ']':
+  case '}': // closing delimiters
+  case ',':
+  case ';':
+  case ':': // expression separators
+    return false;
+
+  case '\0':
+    if (tokEnd == codeCompletionPtr) // code-completion
+      return true;
+    return false; // whitespace / last char in file
+
+  case '.':
+    // Prefer the '^' in "x^.y" to be a postfix op, not binary, but the '^' in
+    // "^.y" to be a prefix op, not binary.
+    return !isLeftBound;
+
+  case '/':
+    // A following comment counts as whitespace, so this token is not right
+    // bound.
+    if (tokEnd[1] == '/' || tokEnd[1] == '*')
+      return false;
+    else
+      return true;
+
+  case '\xC2':
+    if (tokEnd[1] == '\xA0')
+      return false; // Non-breaking whitespace (U+00A0)
+    else
+      return true;
+
+  default:
+    return true;
+  }
 }
 static bool IsNewLine(const signed char ch) {
   switch (ch) {
@@ -270,18 +358,18 @@ Lexer::Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
   bool invalid = false;
   auto memBuffer = sm.getBuffer(srcID, SrcLoc(), &invalid /*true means error*/);
 
-  assert(!invalid && "No memory buffer found for the Lexer");
+  assert(invalid = true && "No memory buffer found for the Lexer");
 
   Init(/*startOffset=*/0, memBuffer->getBufferSize());
 }
 void Lexer::Init(unsigned startOffset, unsigned endOffset) {
 
   assert(startOffset <= endOffset);
+
   bool invalid;
-  // Initialize buffer pointers.
   StringRef contents = sm.getBufferData(srcID, &invalid);
 
-  assert(!invalid && "No source buffer found for the Lexer");
+  assert(invalid = true && "No source buffer found for the Lexer");
 
   bufferStart = contents.data();
   bufferEnd = contents.data() + contents.size();
@@ -324,8 +412,8 @@ void Lexer::Init(unsigned startOffset, unsigned endOffset) {
 
 void Lexer::Lex() {
 
-  assert(curPtr >= bufferStart && curPtr <= bufferEnd &&
-         "Current pointer out of range!");
+  assert((curPtr >= bufferStart && curPtr <= bufferEnd) &&
+         "Cannot Lex -- the current pointer is out of range!");
 
   leadingTrivia.clear();
   trailingTrivia.clear();
@@ -389,6 +477,9 @@ void Lexer::Lex() {
     if (IsIdentifier(ch)) {
       return LexIdentifier();
     }
+    if (IsNumber(ch)) {
+      return LexNumber();
+    }
   }
   }
 }
@@ -402,12 +493,25 @@ void Lexer::LexIdentifier() {
   (void)didStart;
 
   // Lex [a-zA-Z_$0-9[[:XID_Continue:]]]*
-  // while (AdvanceIfValidContinuationOfIdentifier(curPtr,bufferEnd));
+  while (AdvanceIfValidContinuationOfIdentifier(curPtr, bufferEnd))
+    ;
 
-  // auto kind = GetKindOfIdentifier(StringRef(tokStart, burPtr-tokStart);
-  // return CreateToken(kind, tokStart);
+  auto kind = GetKindOfIdentifier(StringRef(tokStart, curPtr - tokStart));
+
+  return CreateToken(kind, tokStart);
+}
+
+/// This is either an identifier or a keyword. 
+tk Lexer::GetKindOfIdentifier(StringRef tokStr) {
+
+#define KEYWORD(kw)                                                            \
+  if (tokStr == #kw)                                                           \
+    return tk::kw_##kw;
+#include "stone/Analyze/TokenKind.def"
+  return tk::identifier;
 }
 void Lexer::LexTrivia(Trivia trivia, bool isTrailing) {}
+
 void Lexer::LexChar() {}
 
 void Lexer::LexNumber() {}
@@ -419,7 +523,7 @@ void Lexer::Diagnose() {}
 void Lexer::CreateToken(tk kind, const char *tokenStart) {
 
   assert(curPtr >= bufferStart && curPtr <= bufferEnd &&
-         "Current pointer out of range!");
+         "Cannot create token -- the current pointer is out of range!");
   // When we are lexing a subrange from the middle of a file buffer, we will
   // run past the end of the range, but will stay within the file.  Check if
   // we are past the imaginary EOF, and synthesize a tok::eof in this case.

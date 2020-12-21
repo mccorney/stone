@@ -36,7 +36,12 @@ protected:
     while (true) {
       Token token;
       lexer->Lex(token);
+      tokens.push_back(token);
+
       break;
+      // if(token.GetKind() == tk::eof) {
+      //	break;
+      //}
     }
     return tokens;
   }
@@ -44,7 +49,8 @@ protected:
 
 TEST_F(LexerTest, GetNextToken) {
 
-  llvm::StringRef srcBuffer = "fun";
-
+  llvm::StringRef srcBuffer = "fun\n";
   auto tokens = Lex(srcBuffer);
+
+  ASSERT_EQ(tk::kw_fun, tokens[0].GetKind());
 }
