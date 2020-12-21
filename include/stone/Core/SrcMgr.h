@@ -188,9 +188,9 @@ public:
   ///   will be emitted at.
   ///
   /// \param Invalid If non-NULL, will be set \c true if an error occurred.
-  const llvm::MemoryBuffer *getBuffer(DiagnosticEngine &de, const SrcMgr &SM,
+  const llvm::MemoryBuffer *getBuffer(DiagnosticEngine &de, const SrcMgr &sm,
                                       SrcLoc Loc = SrcLoc(),
-                                      bool *Invalid = nullptr) const;
+                                      bool *invalid = nullptr) const;
 
   /// Returns the size of the content encapsulated by this
   /// ContentCache.

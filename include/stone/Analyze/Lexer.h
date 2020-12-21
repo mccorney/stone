@@ -24,7 +24,7 @@ enum class TriviaRetentionMode {
 /// Given a pointer to the starting byte of a UTF8 character, validate it and
 /// advance the lexer past it.  This returns the encoded character or ~0U if
 /// the encoding is invalid.
-uint32_t ValidateUTF8Char(const char *&startOfByte, const char *end);
+uint32_t ValidateUTF8CharAndAdvance(const char *&startOfByte, const char *end);
 
 class Lexer final {
 
@@ -79,22 +79,24 @@ public:
 private:
   Lexer(const Lexer &) = delete;
   void operator=(const Lexer &) = delete;
-  void Init(const char *bufferStart, const char *curPtr, const char *bufferEnd);
+  void Init(unsigned startOffset, unsigned endOffset);
 
 private:
-  void Diagnose();
-	void Lex(); 
+  void Lex();
   void LexTrivia(Trivia trivia, bool isTrailing);
   void LexIdentifier();
   void LexNumber();
   void LexStrLiteral();
   void LexChar();
 
+  void Diagnose();
+  void CreateToken(tk kind, const char *tokenStart);
+
 public:
   Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
         DiagnosticEngine *de = nullptr);
-public:
 
+public:
   void Lex(Token &result) {
     Trivia leading, trailing;
     Lex(result, leading, trailing);
@@ -105,13 +107,13 @@ public:
       leading = {leadingTrivia};
       trailing = {trailingTrivia};
     }
-    if (result.IsNot(tk::eof)){
-			Lex();
-		}
+    if (result.IsNot(tk::eof)) {
+      Lex();
+    }
   }
   Token &Peek() { return nextToken; }
 
-	FileID GetSrcID() { return srcID; }
+  FileID GetSrcID() { return srcID; }
 };
 
 } // namespace stone

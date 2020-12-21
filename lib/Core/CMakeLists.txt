@@ -9,6 +9,7 @@ set(stone_core_sources
 	ASTConsumer.cpp
 	ASTScope.cpp
 	Builtin.cpp
+	Char.cpp
 	Decl.cpp
 	DeclContext.cpp
 	Diagnostics.cpp

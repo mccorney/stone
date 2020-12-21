@@ -86,6 +86,8 @@
 
 // Miscellaneous tokens. TODO: replace with TOK
 TOKEN(eof)
+// unknown token
+TOKEN(unk)
 TOKEN(code_complete)
 TOKEN(identifier)
 TOKEN(oper_binary_unspaced) // "x+y"

@@ -68,8 +68,7 @@ private:
 ///
 /// It is important that this type remains small. It is currently 32 bits wide.
 class SrcLoc {
-  friend class ASTReader;
-  friend class ASTWriter;
+
   friend class SrcMgr;
 
   unsigned ID = 0;

@@ -36,6 +36,7 @@ protected:
     while (true) {
       Token token;
       lexer->Lex(token);
+      break;
     }
     return tokens;
   }
@@ -43,7 +44,7 @@ protected:
 
 TEST_F(LexerTest, GetNextToken) {
 
-  llvm::StringRef srcBuffer = "fun Main() -> i32 { return 0; }";
+  llvm::StringRef srcBuffer = "fun";
 
   auto tokens = Lex(srcBuffer);
 }
