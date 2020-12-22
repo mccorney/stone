@@ -38,19 +38,19 @@ class Diagnostics {
   friend DiagnosticEngine;
   // bool isActive;
 protected:
-  unsigned int diagnosticID = 0;
+  unsigned int uniqueID = 0;
   unsigned int maxMessages = 0;
-  unsigned int startMessageID = 0;
-  unsigned int endMessageID = 0;
+  unsigned int startID = 0;
+  unsigned int endID = 0;
 
 public:
-  unsigned int GetID() const { return diagnosticID; }
+  unsigned int GetUniqueID() const { return uniqueID; }
 
 protected:
   // Only for Diagnostics
   void Init();
-  unsigned int GetStartMsgID() const { return startMessageID; }
-  unsigned int GetEndMsgID() const { return endMessageID; }
+  unsigned int GetStartID() const { return startID; }
+  unsigned int GetEndID() const { return endID; }
 
 public:
 };

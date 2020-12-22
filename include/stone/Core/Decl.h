@@ -2,7 +2,6 @@
 #define STONE_CORE_DECL_H
 
 #include "stone/Core/ASTNode.h"
-#include "stone/Core/DeclBitfields.h"
 #include "stone/Core/DeclCtx.h"
 #include "stone/Core/DeclName.h"
 #include "stone/Core/Identifier.h"
