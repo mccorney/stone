@@ -2,6 +2,7 @@
 #define LLVM_CLANG_BASIC_IDENTIFIERTABLE_H
 
 #include "stone/Core/LLVM.h"
+#include "stone/Core/Stats.h"
 #include "stone/Core/TokenKind.h"
 
 #include "llvm/ADT/DenseMapInfo.h"
@@ -94,7 +95,7 @@ class alignas(IdentifierAlignment) Identifier {
   // Managed by the language front-end.
   void *FETokenInfo = nullptr;
 
-  llvm::StringMapEntry<Identifier *> *Entry = nullptr;
+  llvm::StringMapEntry<Identifier *> *entry = nullptr;
 
   Identifier()
       : kind(tk::identifier), BuiltinID(0), IsExtension(false),
@@ -125,10 +126,10 @@ public:
 
   /// Return the beginning of the actual null-terminated string for this
   /// identifier.
-  const char *getNameStart() const { return Entry->getKeyData(); }
+  const char *getNameStart() const { return entry->getKeyData(); }
 
   /// Efficiently return the length of this identifier info.
-  unsigned getLength() const { return Entry->getKeyLength(); }
+  unsigned getLength() const { return entry->getKeyLength(); }
 
   /// Return the actual identifier string.
   StringRef getName() const { return StringRef(getNameStart(), getLength()); }
@@ -233,7 +234,7 @@ public:
   bool isOperatorKeyword() const { return IsOperatorKeyword; }
 
   /// Return true if this token is a keyword in the specified language.
-  bool isKeyword(const LangOptions &LangOpts) const;
+  bool IsKeyword(const LangOptions &LangOpts) const;
 
   /// Get and set FETokenInfo. The language front-end is allowed to associate
   /// arbitrary metadata with this token.
@@ -380,29 +381,13 @@ public:
   virtual StringRef Next() = 0;
 };
 
-/// Provides lookups to, and iteration over, IdentiferInfo objects.
-class IdentifierLookup {
+class IdentifierTable;
+class IdentifierTableStat final : public Stat {
+  const IdentifierTable &table;
+
 public:
-  virtual ~IdentifierLookup();
-
-  /// Return the Identifier for the specified named identifier.
-  ///
-  /// Unlike the version in IdentifierTable, this returns a pointer instead
-  /// of a reference.  If the pointer is null then the Identifier cannot
-  /// be found.
-  virtual Identifier *Get(StringRef Name) = 0;
-
-  /// Retrieve an iterator into the set of all identifiers
-  /// known to this identifier lookup source.
-  ///
-  /// This routine provides access to all of the identifiers known to
-  /// the identifier lookup, allowing access to the contents of the
-  /// identifiers without introducing the overhead of constructing
-  /// Identifier objects for each.
-  ///
-  /// \returns A new iterator into the set of known identifiers. The
-  /// caller is responsible for deleting this iterator.
-  virtual IdentifierIterator *GetIdentifiers();
+  IdentifierTableStat(const IdentifierTable &table) : table(table) {}
+  void Print() const override {}
 };
 
 /// Implements an efficient mapping from strings to Identifier nodes.
@@ -410,66 +395,54 @@ public:
 /// This has no other purpose, but this is an extremely performance-critical
 /// piece of the code, as each occurrence of every identifier goes through
 /// here when lexed.
-class IdentifierTable {
-  // Shark shows that using MallocAllocator is *much* slower than using this
-  // BumpPtrAllocator!
-  using HashTableTy = llvm::StringMap<Identifier *, llvm::BumpPtrAllocator>;
-  HashTableTy HashTable;
-  IdentifierLookup *ExternalLookup;
+class IdentifierTable final {
+
+  const LangOptions &langOpts;
+  friend IdentifierTableStat;
+
+  using Entries = llvm::StringMap<Identifier *, llvm::BumpPtrAllocator>;
+  Entries entries;
+
+  // IdentifierTableStat stat;
+public:
+  /// How a keyword is treated in the selected standard.
+  enum KeywordStatus {
+    Disabled, // Disabled
+    Enabled,  // Enabled
+    Future    // Is a keyword in future standard
+  };
 
 public:
-  /// Create the identifier table.
-  explicit IdentifierTable(IdentifierLookup *ExternalLookup = nullptr);
-
   /// Create the identifier table, populating it with info about the
   /// language keywords for the language specified by \p LangOpts.
-  explicit IdentifierTable(const LangOptions &LangOpts,
-                           IdentifierLookup *ExternalLookup = nullptr);
+  explicit IdentifierTable(const LangOptions &langOpts);
 
-  /// Set the external identifier lookup mechanism.
-  void setExternalIdentifierLookup(IdentifierLookup *IILookup) {
-    ExternalLookup = IILookup;
-  }
-
-  /// Retrieve the external identifier lookup object, if any.
-  IdentifierLookup *getExternalIdentifierLookup() const {
-    return ExternalLookup;
-  }
-
-  llvm::BumpPtrAllocator &getAllocator() { return HashTable.getAllocator(); }
+  llvm::BumpPtrAllocator &GetAllocator() { return entries.getAllocator(); }
 
   /// Return the identifier token info for the specified named
   /// identifier.
-  Identifier &Get(StringRef Name) {
-    auto &Entry = *HashTable.insert(std::make_pair(Name, nullptr)).first;
+  Identifier &Get(llvm::StringRef name) {
 
-    Identifier *&II = Entry.second;
-    if (II)
-      return *II;
-
-    // No entry; if we have an external lookup, look there first.
-    if (ExternalLookup) {
-      II = ExternalLookup->Get(Name);
-      if (II)
-        return *II;
+    auto &entry = *entries.insert(std::make_pair(name, nullptr)).first;
+    Identifier *&identifier = entry.second;
+    if (identifier) {
+      return *identifier;
     }
-
     // Lookups failed, make a new Identifier.
-    void *Mem = getAllocator().Allocate<Identifier>();
-    II = new (Mem) Identifier();
+    void *mem = GetAllocator().Allocate<Identifier>();
+    identifier = new (mem) Identifier();
 
     // Make sure getName() knows how to find the Identifier
     // contents.
-    II->Entry = &Entry;
-
-    return *II;
+    identifier->entry = &entry;
+    return *identifier;
   }
 
-  Identifier &Get(StringRef Name, tk k) {
-    Identifier &II = Get(Name);
-    II.kind = k;
-    assert(II.kind == k && "TokenCode too large");
-    return II;
+  Identifier &Get(llvm::StringRef name, tk k) {
+    auto &identifier = Get(name);
+    identifier.kind = k;
+    assert(identifier.kind == k && "TokenCode too large");
+    return identifier;
   }
 
   /// Gets an Identifier for the given name without consulting
@@ -478,38 +451,29 @@ public:
   /// This is a version of Get() meant for external sources that want to
   /// introduce or modify an identifier. If they called Get(), they would
   /// likely end up in a recursion.
-  Identifier &getOwn(StringRef Name) {
-    auto &Entry = *HashTable.insert(std::make_pair(Name, nullptr)).first;
+  Identifier &GetOwn(llvm::StringRef name) {
 
-    Identifier *&II = Entry.second;
-    if (II)
-      return *II;
-
+    auto &entry = *entries.insert(std::make_pair(name, nullptr)).first;
+    Identifier *&identifier = entry.second;
+    if (identifier) {
+      return *identifier;
+    }
     // Lookups failed, make a new Identifier.
-    void *Mem = getAllocator().Allocate<Identifier>();
-    II = new (Mem) Identifier();
+    void *mem = GetAllocator().Allocate<Identifier>();
+    identifier = new (mem) Identifier();
 
     // Make sure getName() knows how to find the Identifier
     // contents.
-    II->Entry = &Entry;
-
-    // If this is the 'import' contextual keyword, mark it as such.
-    if (Name.equals("import"))
-      II->setModulesImport(true);
-
-    return *II;
+    identifier->entry = &entry;
+    return *identifier;
   }
 
-  using iterator = HashTableTy::const_iterator;
-  using const_iterator = HashTableTy::const_iterator;
+  using iterator = Entries::const_iterator;
+  using const_iterator = Entries::const_iterator;
 
-  iterator begin() const { return HashTable.begin(); }
-  iterator end() const { return HashTable.end(); }
-  unsigned size() const { return HashTable.size(); }
-
-  /// Print some statistics to stderr that indicate how well the
-  /// hashing is doing.
-  void PrintStats() const;
+  iterator begin() const { return entries.begin(); }
+  iterator end() const { return entries.end(); }
+  unsigned size() const { return entries.size(); }
 
   /// Populate the identifier table with info about the language keywords
   /// for the language specified by \p LangOpts.

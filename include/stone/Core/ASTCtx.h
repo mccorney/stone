@@ -8,6 +8,7 @@
 #include "stone/Core/LangOptions.h"
 #include "stone/Core/SearchPathOptions.h"
 #include "stone/Core/SrcMgr.h"
+#include "stone/Core/Stats.h"
 
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -53,19 +54,30 @@ class MangleCtx;
 class Module;
 class Stmt;
 class Builtin;
+class ASTCtx;
 
+class ASTCtxStat final : public Stat {
+  const ASTCtx &ac;
+
+public:
+  ASTCtxStat(const ASTCtx &ac) : ac(ac) {}
+
+  void Print() const override {}
+};
 class ASTCtx final {
 
+  friend ASTCtxStat;
+
+  ASTCtxStat stat;
   /// The associated SourceManager object.
   SrcMgr &sm;
 
   /// The language options used to create the AST associated with
   ///  this ASTCtx object.
-  LangOptions &langOpts;
+  const LangOptions &langOpts;
 
-	/// The search path options
-	SearchPathOptions &searchPathOpts;
-
+  /// The search path options
+  const SearchPathOptions &searchPathOpts;
 
   Builtin builtin;
   /// The allocator used to create AST objects.
@@ -73,10 +85,13 @@ class ASTCtx final {
   /// AST objects will be released when the ASTCtx itself is destroyed.
   mutable llvm::BumpPtrAllocator bumpAlloc;
 
+  /// Table for all
+  // llvm::StringMap<Identifier::Aligner, llvm::BumpPtrAllocator &> identifiers;
+  IdentifierTable identifiers;
+
 public:
   ASTCtx(const LangOptions &langOpts, const SearchPathOptions &searchPathOpts,
          SrcMgr &sm);
-
   ~ASTCtx();
 
   ASTCtx(const ASTCtx &) = delete;
@@ -84,7 +99,7 @@ public:
 
 public:
   //
-  Identifier GetIdentifier(llvm::StringRef name);
+  Identifier &GetIdentifier(llvm::StringRef name);
   //
   Builtin &GetBuiltin() const;
   //
@@ -95,6 +110,8 @@ public:
   SrcMgr &GetSrcMgr() { return sm; }
   /// Retrieve the allocator for the given arena.
   llvm::BumpPtrAllocator &GetAllocator() const;
+
+  ASTCtxStat &GetStat() { return stat; }
 
 public:
   /// Return the total amount of physical memory allocated for representing
@@ -108,6 +125,8 @@ public:
     return static_cast<T *>(Allocate(num * sizeof(T), alignof(T)));
   }
   void Deallocate(void *Ptr) const {}
+
+public:
 };
 
 } // namespace stone

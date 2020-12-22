@@ -4,7 +4,6 @@
 #include "stone/Analyze/AnalyzeOptions.h"
 #include "stone/Core/ASTCtx.h"
 #include "stone/Core/Module.h"
-#include "stone/Core/Stats.h"
 
 #include <memory>
 
@@ -15,10 +14,9 @@ public:
   AnalyzeOptions analyzeOpts;
 
 private:
-  std::unique_ptr<ASTCtx> astCtx;
+  std::unique_ptr<ASTCtx> ac;
   std::unique_ptr<stone::Module> m;
-  std::unique_ptr<Stats> stats;
-
+  // StatEngine se;
 public:
   // TODO: Diag *DG;
   Analysis() = delete;
@@ -28,9 +26,9 @@ public:
   Analysis &operator=(Analysis &&) = delete;
 
 public:
-  ASTCtx &GetASTCtx() { return *astCtx.get(); }
+  ASTCtx &GetASTCtx() { return *ac.get(); }
   stone::Module &GetModule() { return *m.get(); }
-  Stats &GetStats() { return *stats.get(); }
+  // StatEngine &GetStats() { return *stats.get(); }
 };
 } // namespace stone
 #endif

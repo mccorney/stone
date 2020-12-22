@@ -3,8 +3,6 @@
 
 #include <cstddef>
 
-namespace stone {
-};
-
+namespace stone {};
 
 #endif

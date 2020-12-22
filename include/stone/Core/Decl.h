@@ -2,12 +2,12 @@
 #define STONE_CORE_DECL_H
 
 #include "stone/Core/ASTNode.h"
+#include "stone/Core/DeclBitfields.h"
 #include "stone/Core/DeclCtx.h"
 #include "stone/Core/DeclName.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LLVM.h"
 #include "stone/Core/SrcLoc.h"
-#include "stone/Core/DeclBitfields.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -35,6 +35,24 @@ class ASTCtx;
 enum class DeclKind { Fun };
 
 class alignas(8) Decl : public ASTNode {
+
+protected:
+  /// Allocate memory for a deserialized declaration.
+  ///
+  /// This routine must be used to allocate memory for any declaration that is
+  /// deserialized from a module file.
+  ///
+  /// \param Size The size of the allocated object.
+  /// \param Ctx The context in which we will allocate memory.
+  /// \param ID The global ID of the deserialized declaration.
+  /// \param Extra The amount of extra space to allocate after the object.
+  void *operator new(std::size_t size, const ASTCtx &astCtx, unsigned ID,
+                     std::size_t extra = 0);
+
+  /// Allocate memory for a non-deserialized declaration.
+  void *operator new(std::size_t size, const ASTCtx &astCtx,
+                     DeclCtx *parentDeclCtx, std::size_t extra = 0);
+
 public:
   Decl() = delete;
   Decl(const Decl &) = delete;

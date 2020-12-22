@@ -5,12 +5,8 @@
 
 namespace stone {
 
-	class StructBitfields {
+class StructBitfields {};
 
-	};
-
-
-};
-
+}; // namespace stone
 
 #endif

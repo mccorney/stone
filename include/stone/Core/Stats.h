@@ -3,7 +3,12 @@
 
 namespace stone {
 
-class Stats {};
+class Stat {
+public:
+  virtual void Print() const = 0;
+};
+
+class StatEngine {};
 } // namespace stone
 
 #endif
