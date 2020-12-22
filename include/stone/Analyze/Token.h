@@ -116,7 +116,7 @@ public:
   /// True if the token is any keyword.
   bool IsKeyword() const {
     switch (kind) {
-#define KEYWORD(X)                                                             \
+#define KEYWORD(X, S)                                                          \
   case tk::kw_##X:                                                             \
     return true;
 #include "stone/Core/TokenKind.def"

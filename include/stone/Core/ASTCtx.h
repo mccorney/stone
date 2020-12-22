@@ -61,7 +61,6 @@ class ASTCtxStat final : public Stat {
 
 public:
   ASTCtxStat(const ASTCtx &ac) : ac(ac) {}
-
   void Print() const override {}
 };
 class ASTCtx final {

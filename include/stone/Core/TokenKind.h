@@ -3,6 +3,9 @@
 
 #include "stone/Core/LLVM.h"
 
+namespace {
+enum { KEYON = 0x1, KEYOFF = 0x2, KEYRSV = 0x4 };
+}
 namespace stone {
 
 enum class tk {

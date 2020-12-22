@@ -57,7 +57,7 @@ class alignas(IdentifierAlignment) Identifier {
   unsigned IsExtension : 1;
 
   // True if the identifier is a keyword in a newer or proposed Standard.
-  unsigned IsFutureCompatKeyword : 1;
+  unsigned isKeywordReserved : 1;
 
   // True if the identifier is poisoned.
   unsigned IsPoisoned : 1;
@@ -99,10 +99,10 @@ class alignas(IdentifierAlignment) Identifier {
 
   Identifier()
       : kind(tk::identifier), BuiltinID(0), IsExtension(false),
-        IsFutureCompatKeyword(false), IsPoisoned(false),
-        IsOperatorKeyword(false), NeedsHandleIdentifier(false),
-        IsFromAST(false), ChangedAfterLoad(false), FEChangedAfterLoad(false),
-        RevertedTokenID(false), OutOfDate(false), IsModulesImport(false) {}
+        isKeywordReserved(false), IsPoisoned(false), IsOperatorKeyword(false),
+        NeedsHandleIdentifier(false), IsFromAST(false), ChangedAfterLoad(false),
+        FEChangedAfterLoad(false), RevertedTokenID(false), OutOfDate(false),
+        IsModulesImport(false) {}
 
 public:
   Identifier(const Identifier &) = delete;
@@ -201,15 +201,16 @@ public:
       RecomputeNeedsHandleIdentifier();
   }
 
-  /// is/setIsFutureCompatKeyword - Initialize information about whether or not
+  /// is/setIsKeywordReserved - Initialize information about whether or not
   /// this language token is a keyword in a newer or proposed Standard. This
   /// controls compatibility warnings, and is only true when not parsing the
   /// corresponding Standard. Once a compatibility problem has been diagnosed
   /// with this keyword, the flag will be cleared.
-  bool isFutureCompatKeyword() const { return IsFutureCompatKeyword; }
-  void setIsFutureCompatKeyword(bool Val) {
-    IsFutureCompatKeyword = Val;
-    if (Val)
+  bool IsKeywordReserved() const { return isKeywordReserved; }
+
+  void SetIsKeywordReserved(bool reserved) {
+    isKeywordReserved = reserved;
+    if (reserved)
       NeedsHandleIdentifier = true;
     else
       RecomputeNeedsHandleIdentifier();
@@ -327,7 +328,7 @@ private:
   /// change to it should be reflected here.
   void RecomputeNeedsHandleIdentifier() {
     NeedsHandleIdentifier = isPoisoned() || isExtensionToken() ||
-                            isFutureCompatKeyword() || isOutOfDate() ||
+                            IsKeywordReserved() || isOutOfDate() ||
                             isModulesImport();
   }
 };

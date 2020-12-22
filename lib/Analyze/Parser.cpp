@@ -3,6 +3,9 @@
 
 using namespace stone;
 
+Parser::Parser(Analysis &analysis, Pipeline *pipeline)
+    : analysis(analysis), pipeline(pipeline), stat(*this) {}
+
 //===----------------------------------------------------------------------===//
 // Decl
 //===----------------------------------------------------------------------===//

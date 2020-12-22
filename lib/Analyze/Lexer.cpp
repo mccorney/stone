@@ -504,7 +504,7 @@ void Lexer::LexIdentifier() {
 /// This is either an identifier or a keyword.
 tk Lexer::GetKindOfIdentifier(StringRef tokStr) {
 
-#define KEYWORD(kw)                                                            \
+#define KEYWORD(kw, S)                                                         \
   if (tokStr == #kw)                                                           \
     return tk::kw_##kw;
 #include "stone/Core/TokenKind.def"

@@ -3,6 +3,9 @@
 
 using namespace stone;
 
+Checker::Checker(Analysis &analysis, Pipeline *pipeline)
+    : analysis(analysis), pipeline(pipeline), stat(*this) {}
+
 // Decl
 void Checker::CheckDecl() {}
 
