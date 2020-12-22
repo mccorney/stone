@@ -2,7 +2,11 @@
 #define STONE_CORE_ASTCTX_H
 
 #include "stone/Core/ASTCtxAlloc.h"
+#include "stone/Core/Builtin.h"
+#include "stone/Core/Identifier.h"
+#include "stone/Core/LangABI.h"
 #include "stone/Core/LangOptions.h"
+#include "stone/Core/SearchPathOptions.h"
 #include "stone/Core/SrcMgr.h"
 
 #include "llvm/ADT/APSInt.h"
@@ -39,7 +43,7 @@
 namespace stone {
 
 class BlockExpr;
-class ABI;
+class LangABI;
 class Decl;
 class ConstructorDecl;
 class MethodDecl;
@@ -48,22 +52,55 @@ class Expr;
 class MangleCtx;
 class Module;
 class Stmt;
+class Builtin;
 
 class ASTCtx final {
 
   /// The associated SourceManager object.
-  SrcMgr &srcMgr;
+  SrcMgr &sm;
 
   /// The language options used to create the AST associated with
   ///  this ASTCtx object.
   LangOptions &langOpts;
 
+	/// The search path options
+	SearchPathOptions &searchPathOpts;
+
+
+  Builtin builtin;
   /// The allocator used to create AST objects.
   /// AST objects are never destructed; rather, all memory associated with the
   /// AST objects will be released when the ASTCtx itself is destroyed.
   mutable llvm::BumpPtrAllocator bumpAlloc;
 
 public:
+  ASTCtx(const LangOptions &langOpts, const SearchPathOptions &searchPathOpts,
+         SrcMgr &sm);
+
+  ~ASTCtx();
+
+  ASTCtx(const ASTCtx &) = delete;
+  ASTCtx &operator=(const ASTCtx &) = delete;
+
+public:
+  //
+  Identifier GetIdentifier(llvm::StringRef name);
+  //
+  Builtin &GetBuiltin() const;
+  //
+  const LangOptions &GetLangOpts() const { return langOpts; }
+  //
+  LangABI *GetLangABI() const;
+  //
+  SrcMgr &GetSrcMgr() { return sm; }
+  /// Retrieve the allocator for the given arena.
+  llvm::BumpPtrAllocator &GetAllocator() const;
+
+public:
+  /// Return the total amount of physical memory allocated for representing
+  /// AST nodes and type information.
+  size_t GetSizeOfMemUsed() const;
+
   void *Allocate(size_t size, unsigned align = 8) const {
     return bumpAlloc.Allocate(size, align);
   }
