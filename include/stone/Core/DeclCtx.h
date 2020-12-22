@@ -2,7 +2,7 @@
 #define STONE_CORE_DECLCONTEXT_H
 
 namespace stone {
-class DeclContext {};
+class DeclCtx {};
 } // namespace stone
 
 #endif

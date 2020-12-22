@@ -5,19 +5,20 @@ set(LLVM_LINK_COMPONENTS
   )
 
 set(stone_core_sources
-	ASTContext.cpp
+	ASTCtx.cpp
 	ASTConsumer.cpp
 	ASTScope.cpp
 	Builtin.cpp
 	Char.cpp
 	Decl.cpp
-	DeclContext.cpp
+	DeclCtx.cpp
 	Diagnostics.cpp
 	Expr.cpp
 	FileMgr.cpp
 	FileSystemStatCache.cpp
 	Fmt.cpp
 	Identifier.cpp
+	LLVMCtx.cpp
 	Module.cpp
 	SrcLoc.cpp
 	SrcMgr.cpp
@@ -27,6 +28,7 @@ set(stone_core_sources
 	TokenKind.cpp
 	Visitor.cpp
 	Version.cpp
+	VirtualTable.cpp
 	Walker.cpp
 
 )

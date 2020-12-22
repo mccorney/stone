@@ -229,14 +229,12 @@ public:
 
   /// isCPlusPlusOperatorKeyword/setIsCPlusPlusOperatorKeyword controls whether
   /// this identifier is a C++ alternate representation of an operator.
-  void setIsOperatorKeyword(bool Val = true) {
-    IsOperatorKeyword = Val;
-  }
+  void setIsOperatorKeyword(bool Val = true) { IsOperatorKeyword = Val; }
   bool isOperatorKeyword() const { return IsOperatorKeyword; }
 
   /// Return true if this token is a keyword in the specified language.
   bool isKeyword(const LangOptions &LangOpts) const;
- 
+
   /// Get and set FETokenInfo. The language front-end is allowed to associate
   /// arbitrary metadata with this token.
   void *getFETokenInfo() const { return FETokenInfo; }
@@ -530,6 +528,7 @@ namespace detail {
 class alignas(IdentifierAlignment) SpecialDeclName {
   friend class stone::DeclName;
   friend class stone::DeclNameTable;
+
 protected:
   /// The kind of "extra" information stored in the DeclName. See
   /// @c ExtraKindOrNumArgs for an explanation of how these enumerator values

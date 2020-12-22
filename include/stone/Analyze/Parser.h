@@ -4,7 +4,7 @@
 #include "stone/Analyze/Analysis.h"
 #include "stone/Analyze/AnalyzeOptions.h"
 #include "stone/Analyze/ParserDiagnostic.h"
-#include "stone/Core/ASTContext.h"
+#include "stone/Core/ASTCtx.h"
 #include "stone/Core/Module.h"
 
 #include <memory>

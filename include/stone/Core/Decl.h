@@ -2,7 +2,7 @@
 #define STONE_CORE_DECL_H
 
 #include "stone/Core/ASTNode.h"
-#include "stone/Core/DeclContext.h"
+#include "stone/Core/DeclCtx.h"
 #include "stone/Core/DeclName.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LLVM.h"
@@ -28,8 +28,8 @@
 
 namespace stone {
 class BraceStmt;
-class DeclContext;
-class ASTContext;
+class DeclCtx;
+class ASTCtx;
 
 enum class DeclKind { Fun };
 
@@ -43,12 +43,12 @@ public:
 
   friend class DeclContext;
 
-  struct MultipleDC {
-    DeclContext *semanticDC;
-    DeclContext *lexicalDC;
+  struct MultipleDeclCtx {
+    DeclCtx *semanticDeclCtx;
+    DeclCtx *lexicalDeclCtx;
   };
 
-  llvm::PointerUnion<DeclContext *, MultipleDC *> declCtx;
+  llvm::PointerUnion<DeclCtx *, MultipleDeclCtx *> declCtx;
 };
 
 class NamedDecl : public Decl {

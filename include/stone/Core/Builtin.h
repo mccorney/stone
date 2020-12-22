@@ -2,6 +2,9 @@
 #define STONE_CORE_BUILTIN_H
 
 namespace stone {
+
+class BuiltinCtx {};
+
 class Builtin {};
 } // namespace stone
 #endif
