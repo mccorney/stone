@@ -34,7 +34,7 @@ class FixIt final {};
 class DiagnosticPrinter {};
 class DiagnosticListener {};
 
-class Diagnostic {
+class Diagnostics {
   friend DiagnosticEngine;
   // bool isActive;
 protected:
@@ -96,7 +96,7 @@ class DiagnosticEngine final {
 
   /// The maximum diagnostic messages per diagnostic
   // unsigned int maxDiagnosticMessages = 1000;
-  llvm::DenseMap<unsigned int, std::unique_ptr<Diagnostic>> diagnostics;
+  llvm::DenseMap<unsigned int, std::unique_ptr<Diagnostics>> entries;
 
 public:
   explicit DiagnosticEngine(const DiagnosticOptions &diagOpts,
@@ -108,14 +108,14 @@ public:
   ~DiagnosticEngine();
 
 public:
-  /// Owns the Diagnostic
+  /// Owns the Diagnostics
   // NOTE: when you add, check for existing, calculate id, start, and end and
   // then load message; diagnostic.messageID = diagnostics.size() +1;
   ////TODO: remove this note: (d1Start = 1, d1End = d1Start + max)
   // (d2Start = d1End + 1  , d2End = d1End + max)
   // update: use maxMessages from Diagnostic to calculate startMsgID, and
   // endMsgID
-  void AddDiagnostic(std::unique_ptr<Diagnostic> diagnostic);
+  void AddDiagnostics(std::unique_ptr<Diagnostics> diagnostics);
 
   // void AddDiagnosticListener(std::unique_ptr<DiagnosticListener> diagnostic);
 };

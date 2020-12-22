@@ -6,7 +6,7 @@
 #include <memory>
 
 namespace stone {
-class CheckerDiagnostic final : public Diagnostic {
+class CheckerDiagnostics final : public Diagnostics {
 public:
 };
 } // namespace stone

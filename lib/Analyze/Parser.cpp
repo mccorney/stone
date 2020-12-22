@@ -4,7 +4,7 @@
 using namespace stone;
 
 Parser::Parser(Analysis &analysis, Pipeline *pipeline)
-    : analysis(analysis), pipeline(pipeline), stat(*this) {}
+    : analysis(analysis), pipeline(pipeline), stats(*this) {}
 
 //===----------------------------------------------------------------------===//
 // Decl
@@ -22,3 +22,5 @@ void Parser::ParseStmt() {}
 // Expr
 //===----------------------------------------------------------------------===//
 void Parser::ParseExpr() {}
+
+void ParserStats::Print() const {}

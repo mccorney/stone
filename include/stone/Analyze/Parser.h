@@ -14,18 +14,20 @@ namespace stone {
 class Parser;
 class Pipeline;
 
-class ParserStat final : public Stat {
+class ParserStats final : public Stats {
   const Parser &parser;
-
 public:
-  ParserStat(const Parser &parser) : parser(parser) {}
-  void Print() const override {}
+  ParserStats(const Parser &parser) : parser(parser) {}
+  void Print() const override;
 };
 
+//class ParserDiagnostics final : public Diagnostics { };
+
+
 class Parser final {
-  friend ParserStat;
+  friend ParserStats;
   Analysis &analysis;
-  ParserStat stat;
+  ParserStats stats;
   Pipeline *pipeline;
 
 public:

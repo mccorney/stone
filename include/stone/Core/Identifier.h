@@ -383,12 +383,12 @@ public:
 };
 
 class IdentifierTable;
-class IdentifierTableStat final : public Stat {
+class IdentifierTableStats final : public Stats {
   const IdentifierTable &table;
 
 public:
-  IdentifierTableStat(const IdentifierTable &table) : table(table) {}
-  void Print() const override {}
+  IdentifierTableStats(const IdentifierTable &table) : table(table) {}
+  void Print() const override;
 };
 
 /// Implements an efficient mapping from strings to Identifier nodes.
@@ -399,7 +399,7 @@ public:
 class IdentifierTable final {
 
   const LangOptions &langOpts;
-  friend IdentifierTableStat;
+  friend IdentifierTableStats;
 
   using Entries = llvm::StringMap<Identifier *, llvm::BumpPtrAllocator>;
   Entries entries;

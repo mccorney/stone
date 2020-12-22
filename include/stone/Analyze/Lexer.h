@@ -33,7 +33,7 @@ class Lexer final {
   SrcMgr &sm;
   const LangOptions &lo;
 
-  std::unique_ptr<LexerDiagnostic> lexerDiag;
+  std::unique_ptr<LexerDiagnostics> diagnostics;
 
   /// Pointer to the first character of the buffer, even in a lexer that
   /// scans a subrange of the buffer.

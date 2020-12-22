@@ -38,13 +38,13 @@ static KeywordStatus GetKeywordStatus(const LangOptions &langOpts,
 /// Returns true if the identifier is a keyword
 bool Identifier::IsKeyword(const LangOptions &langOpts) const {
 
-	switch (kind) {
-#define KEYWORD(NAME, FLAG)                                                   \
-  case tk::kw_##NAME:                                                         \
+  switch (kind) {
+#define KEYWORD(NAME, FLAG)                                                    \
+  case tk::kw_##NAME:                                                          \
     return GetKeywordStatus(langOpts, FLAG) == KeywordStatus::On;
 #include "stone/Core/TokenKind.def"
   default:
-    return false; 
+    return false;
   }
 }
 
@@ -60,8 +60,8 @@ static void AddKeyword(llvm::StringRef keyword, tk kind, unsigned flag,
   if (status == KeywordStatus::Off) {
     return;
   }
-  auto &identifier =  table.Get(keyword, 
-			status == KeywordStatus::Reserved ? tk::identifier : kind);
+  auto &identifier = table.Get(
+      keyword, status == KeywordStatus::Reserved ? tk::identifier : kind);
 
   identifier.SetIsKeywordReserved(status == KeywordStatus::Reserved);
 }
@@ -73,43 +73,40 @@ void IdentifierTable::AddKeywords(const LangOptions &LangOpts) {
 #include "stone/Core/TokenKind.def"
 }
 
-
 //===----------------------------------------------------------------------===//
-// Stats Implementation
+// Stats
 //===----------------------------------------------------------------------===//
-
-/*
 /// PrintStats - Print statistics about how well the identifier table is doing
 /// at hashing identifiers.
-void IdentifierTableStat::Print() const {
-  unsigned NumBuckets = HashTable.getNumBuckets();
-  unsigned NumIdentifiers = HashTable.getNumItems();
-  unsigned NumEmptyBuckets = NumBuckets - NumIdentifiers;
-  unsigned AverageIdentifierSize = 0;
-  unsigned MaxIdentifierLength = 0;
+void IdentifierTableStats::Print() const {
+
+  unsigned numBuckets = table.entries.getNumBuckets();
+  unsigned numIdentifiers = table.entries.getNumItems();
+  unsigned numEmptyBuckets = numBuckets - numIdentifiers;
+  unsigned averageIdentifierSize = 0;
+  unsigned maxIdentifierLength = 0;
 
   // TODO: Figure out maximum times an identifier had to probe for -stats.
   for (llvm::StringMap<Identifier *, llvm::BumpPtrAllocator>::const_iterator
-           I = HashTable.begin(),
-           E = HashTable.end();
+           I = table.entries.begin(),
+           E = table.entries.end();
        I != E; ++I) {
-    unsigned IdLen = I->getKeyLength();
-    AverageIdentifierSize += IdLen;
-    if (MaxIdentifierLength < IdLen)
-      MaxIdentifierLength = IdLen;
+
+    unsigned idLen = I->getKeyLength();
+    averageIdentifierSize += idLen;
+    if (maxIdentifierLength < idLen)
+      maxIdentifierLength = idLen;
   }
 
   fprintf(stderr, "\n*** Identifier Table Stats:\n");
-  fprintf(stderr, "# Identifiers:   %d\n", NumIdentifiers);
-  fprintf(stderr, "# Empty Buckets: %d\n", NumEmptyBuckets);
+  fprintf(stderr, "# Identifiers:   %d\n", numIdentifiers);
+  fprintf(stderr, "# Empty Buckets: %d\n", numEmptyBuckets);
   fprintf(stderr, "Hash density (#identifiers per bucket): %f\n",
-          NumIdentifiers / (double)NumBuckets);
+          numIdentifiers / (double)numBuckets);
   fprintf(stderr, "Ave identifier length: %f\n",
-          (AverageIdentifierSize / (double)NumIdentifiers));
-  fprintf(stderr, "Max identifier length: %d\n", MaxIdentifierLength);
+          (averageIdentifierSize / (double)numIdentifiers));
+  fprintf(stderr, "Max identifier length: %d\n", maxIdentifierLength);
 
   // Compute statistics about the memory allocated for identifiers.
-  HashTable.getAllocator().PrintStats();
+  table.entries.getAllocator().PrintStats();
 }
-
-*/

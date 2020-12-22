@@ -14,7 +14,7 @@ using namespace stone;
 ASTCtx::ASTCtx(const LangOptions &langOpts,
                const SearchPathOptions &searchPathOpts, SrcMgr &sm)
     : langOpts(langOpts), searchPathOpts(searchPathOpts), sm(sm),
-      identifiers(langOpts), stat(*this) {
+      identifiers(langOpts), stats(*this) {
 
   builtin.Init(*this);
 }
@@ -22,3 +22,5 @@ Identifier &ASTCtx::GetIdentifier(llvm::StringRef name) {
   return identifiers.Get(name);
 }
 size_t ASTCtx::GetSizeOfMemUsed() const { return bumpAlloc.getTotalMemory(); }
+
+void ASTCtxStats::Print() const {}

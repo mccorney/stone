@@ -14,18 +14,18 @@ namespace stone {
 class Checker;
 class Pipeline;
 
-class CheckerStat final : public Stat {
+class CheckerStats final : public Stats {
   const Checker &checker;
 
 public:
-  CheckerStat(const Checker &checker) : checker(checker) {}
-  void Print() const override {}
+  CheckerStats(const Checker &checker) : checker(checker) {}
+  void Print() const override;
 };
 
 class Checker final {
-  friend CheckerStat;
+  friend CheckerStats;
   Analysis &analysis;
-  CheckerStat stat;
+  CheckerStats stats;
   Pipeline *pipeline;
 
 public:

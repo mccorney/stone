@@ -56,18 +56,18 @@ class Stmt;
 class Builtin;
 class ASTCtx;
 
-class ASTCtxStat final : public Stat {
+class ASTCtxStats final : public Stats {
   const ASTCtx &ac;
 
 public:
-  ASTCtxStat(const ASTCtx &ac) : ac(ac) {}
-  void Print() const override {}
+  ASTCtxStats(const ASTCtx &ac) : ac(ac) {}
+  void Print() const override;
 };
 class ASTCtx final {
 
-  friend ASTCtxStat;
+  friend ASTCtxStats;
 
-  ASTCtxStat stat;
+  ASTCtxStats stats;
   /// The associated SourceManager object.
   SrcMgr &sm;
 
@@ -110,7 +110,7 @@ public:
   /// Retrieve the allocator for the given arena.
   llvm::BumpPtrAllocator &GetAllocator() const;
 
-  ASTCtxStat &GetStat() { return stat; }
+  ASTCtxStats &GetStats() { return stats; }
 
 public:
   /// Return the total amount of physical memory allocated for representing

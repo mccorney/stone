@@ -10,8 +10,9 @@ DiagnosticEngine::DiagnosticEngine(const DiagnosticOptions &diagOpts,
 
 DiagnosticEngine::~DiagnosticEngine() {}
 
-void DiagnosticEngine::AddDiagnostic(std::unique_ptr<Diagnostic> diagnostic) {
+void DiagnosticEngine::AddDiagnostics(
+    std::unique_ptr<Diagnostics> diagnostics) {
 
-  // diagnostic->diagnosticID  = de.size() + 1;
-  // diagnostics.insert(diagnostic->diagnosticID, std::move(diagnostic));
+  // diagnostics->diagnosticID  = de.size() + 1;
+  // entries.insert(diagnostics->diagnosticID, std::move(diagnostics));
 }
