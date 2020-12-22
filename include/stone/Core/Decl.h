@@ -7,6 +7,7 @@
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LLVM.h"
 #include "stone/Core/SrcLoc.h"
+#include "stone/Core/DeclBitfields.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
