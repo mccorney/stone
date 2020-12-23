@@ -1,0 +1,17 @@
+module Physics; 
+
+
+space Physics.Mechanics {
+	public fun Fire(const Projectile* projectile) -> bool {
+		return true; 
+	}
+}
+
+space Physics.Quantum {
+	public fun Fire(const Particle* particle) -> bool {
+		return true; 
+	}
+
+}
+
+

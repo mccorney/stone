@@ -18,8 +18,9 @@ private:
   std::unique_ptr<stone::Module> m;
   // StatEngine se;
 public:
-  // TODO: Diag *DG;
-  Analysis() = delete;
+  Analysis(const LangOptions &langOpts, const SearchPathOptions &searchPathOpts,
+           SrcMgr &sm);
+
   Analysis(const Analysis &) = delete;
   Analysis(Analysis &&) = delete;
   Analysis &operator=(const Analysis &) = delete;

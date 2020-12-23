@@ -132,7 +132,7 @@ public:
   unsigned getLength() const { return entry->getKeyLength(); }
 
   /// Return the actual identifier string.
-  StringRef getName() const { return StringRef(getNameStart(), getLength()); }
+  StringRef GetName() const { return StringRef(getNameStart(), getLength()); }
 
   /// If this is a source-language token (e.g. 'for'), this API
   /// can be used to cause the lexer to map identifiers to source-language
@@ -311,12 +311,12 @@ public:
   ///   function(<#int x#>);
   /// \endcode
   bool isEditorPlaceholder() const {
-    return getName().startswith("<#") && getName().endswith("#>");
+    return GetName().startswith("<#") && GetName().endswith("#>");
   }
 
   /// Provide less than operator for lexicographical sorting.
   bool operator<(const Identifier &RHS) const {
-    return getName() < RHS.getName();
+    return GetName() < RHS.GetName();
   }
 
 private:
@@ -404,15 +404,6 @@ class IdentifierTable final {
   using Entries = llvm::StringMap<Identifier *, llvm::BumpPtrAllocator>;
   Entries entries;
 
-  // IdentifierTableStat stat;
-public:
-  /// How a keyword is treated in the selected standard.
-  enum KeywordStatus {
-    Disabled, // Disabled
-    Enabled,  // Enabled
-    Future    // Is a keyword in future standard
-  };
-
 public:
   /// Create the identifier table, populating it with info about the
   /// language keywords for the language specified by \p LangOpts.
@@ -433,7 +424,7 @@ public:
     void *mem = GetAllocator().Allocate<Identifier>();
     identifier = new (mem) Identifier();
 
-    // Make sure getName() knows how to find the Identifier
+    // Make sure GetName() knows how to find the Identifier
     // contents.
     identifier->entry = &entry;
     return *identifier;
@@ -463,7 +454,7 @@ public:
     void *mem = GetAllocator().Allocate<Identifier>();
     identifier = new (mem) Identifier();
 
-    // Make sure getName() knows how to find the Identifier
+    // Make sure GetName() knows how to find the Identifier
     // contents.
     identifier->entry = &entry;
     return *identifier;

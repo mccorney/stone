@@ -2,6 +2,10 @@
 #define STONE_CORE_TYPES_H
 #include <string>
 
-namespace stone {} // namespace stone
+namespace stone {
+
+class Type {};
+
+} // namespace stone
 
 #endif

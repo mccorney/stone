@@ -27,13 +27,19 @@
 #include <utility>
 
 namespace stone {
+
 class BraceStmt;
 class DeclCtx;
 class ASTCtx;
+class DeclContext;
 
 enum class DeclKind { Fun };
 
-class alignas(8) Decl : public ASTNode {
+class alignas(8) Decl {
+
+  DeclKind kind;
+  SrcLoc loc;
+  DeclCtx *dc;
 
 protected:
   /// Allocate memory for a deserialized declaration.
@@ -67,49 +73,46 @@ public:
   };
 
   llvm::PointerUnion<DeclCtx *, MultipleDeclCtx *> declCtx;
+
+protected:
+  Decl(DeclKind kind, DeclCtx *dc, SrcLoc loc) : kind(kind), dc(dc), loc(loc) {}
 };
 
-class NamedDecl : public Decl {
+class NamingDecl : public Decl {
   /// The name of this declaration, which is typically a normal
   /// identifier but may also be a special kind of name (C++
   /// constructor, etc.)
-  // DeclName name;
+  DeclName name;
+
+protected:
+  NamingDecl(DeclKind kind, DeclCtx *dc, SrcLoc loc, DeclName dn)
+      : Decl(kind, dc, loc), name(dn) {}
+
+public:
   /// Get the identifier that names this declaration, if there is one.
   ///
   /// This will return NULL if this declaration has no name (e.g., for
-  /// an unnamed class) or if the name is a special name (C++ constructor,
-  /// Objective-C selector, etc.).
-  // Identifier *GetIdentifier() const { return name.GetAsIdentifier(); }
+  /// an unnamed class) or if the name is a special name such ast a C++
+  /// constructor.
+  Identifier *GetIdentifier() const { return name.GetAsIdentifier(); }
+
+  /// Get the name of identifier for this declaration as a StringRef.
+  ///
+  /// This requires that the declaration have a name and that it be a simple
+  /// identifier.
+  llvm::StringRef GetName() const {
+    // TODO: assert(name.IsIdentifier() && "Name is not a simple identifier");
+    return GetIdentifier() ? GetIdentifier()->GetName() : "";
+  }
 };
 
-/*
-class ValueDecl : public NamedDecl {
+class ValueDecl : public NamingDecl {};
+
+
+class ModuleDecl : public Decl {
+
 };
-
-class VarDecl : public ValueDecl {};
-
-class ParamDecl : public VarDecl {};
-
-class AbstractFunctionDecl : public ValueDecl, public DeclContext {
-protected:
-  // If a function has a body at all, we have either a parsed body AST node or
-  // we have saved the end location of the unparsed body.
-  union {
-    BraceStmt *body;
-  };
-
-public:
-  void SetParams(ASTContext &ac, llvm::ArrayRef<ParamDecl *> params);
-  BraceStmt *GetBody(bool canSynthesize = true) const;
-  /// Set a new body for the function.
-  void SetBody(BraceStmt *stmt BodyKind NewBodyKind);
-};
-class FunDecl final : public AbstractFunctionDecl {
-public:
-  static FunDecl *Create(ASTContext &ac, DeclContext *dc, SrcLoc startLoc);
-};
-
-*/
+class SpaceDecl : public Decl {};
 
 } // namespace stone
 #endif

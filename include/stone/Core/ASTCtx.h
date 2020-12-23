@@ -9,6 +9,7 @@
 #include "stone/Core/SearchPathOptions.h"
 #include "stone/Core/SrcMgr.h"
 #include "stone/Core/Stats.h"
+#include "stone/Core/Type.h"
 
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -66,8 +67,8 @@ public:
 class ASTCtx final {
 
   friend ASTCtxStats;
-
   ASTCtxStats stats;
+
   /// The associated SourceManager object.
   SrcMgr &sm;
 
@@ -85,8 +86,9 @@ class ASTCtx final {
   mutable llvm::BumpPtrAllocator bumpAlloc;
 
   /// Table for all
-  // llvm::StringMap<Identifier::Aligner, llvm::BumpPtrAllocator &> identifiers;
   IdentifierTable identifiers;
+
+  mutable llvm::SmallVector<Type *, 0> types;
 
 public:
   ASTCtx(const LangOptions &langOpts, const SearchPathOptions &searchPathOpts,

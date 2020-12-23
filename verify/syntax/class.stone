@@ -1,6 +1,10 @@
 
-
-class C0 {
+class C0 {	
 }
 
+fun C0::this() { 
+}
+fun C0::defer() { 
+	
+}
 

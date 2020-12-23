@@ -11,10 +11,10 @@ public:
 };
 
 class StatEngine {
-
+public:
+  StatEngine();
   /// Owns the Stats
   void AddStats(std::unique_ptr<Stats> stats);
-
   ///
   void Print();
 };

@@ -1,0 +1,14 @@
+use Physics;  
+
+fun Main() -> i32 {
+
+	let projectile = new Projectile();
+	let particle = new Particle();
+
+	Mechanics.Fire(projectile); 
+	Quantum.Fire(projectile);
+
+	free projectile;
+	free particle; 
+}
+

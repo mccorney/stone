@@ -16,13 +16,13 @@ class Pipeline;
 
 class ParserStats final : public Stats {
   const Parser &parser;
+
 public:
   ParserStats(const Parser &parser) : parser(parser) {}
   void Print() const override;
 };
 
-//class ParserDiagnostics final : public Diagnostics { };
-
+// class ParserDiagnostics final : public Diagnostics { };
 
 class Parser final {
   friend ParserStats;
@@ -39,6 +39,8 @@ public:
 
   //
   void ParseDecl();
+	
+	void ParseSpaceDecl();
 
 public:
   // Stmt
