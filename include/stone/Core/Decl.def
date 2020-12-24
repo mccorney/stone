@@ -2,11 +2,20 @@
 #define BASE_DECL(Id, Parent)
 #endif
 
+
+#ifndef CONTEXT_BASE_DECL
+#define CONTEXT_BASE_DECL(Id, Parent)
+#endif
+
+
 #ifndef NAMING_DECL
 #define NAMING_DECL(Id, Parent) DECL(Id, Parent)
 #endif
 
 
+#ifndef NOMINAL_TYPE_DECL
+#define NOMINAL_TYPE_DECL(Id, Parent) NAMING_DECL(Id, Parent)
+#endif
 
 
 /// CONTEXT_DECL(Id, Parent)
@@ -90,15 +99,15 @@
 /// NOMINAL_TYPE_DECL(Id, Parent)
 ///   Used for subclasses of NominalTypeDecl.  The default behavior is
 ///   to do the same as for ITERABLE_GENERIC_VALUE_DECL.
-#ifndef NOMINAL_TYPE_DECL
-#define NOMINAL_TYPE_DECL(Id, Parent) ITERABLE_GENERIC_VALUE_DECL(Id, Parent)
-#endif
+//#ifndef NOMINAL_TYPE_DECL
+//#define NOMINAL_TYPE_DECL(Id, Parent) ITERABLE_GENERIC_VALUE_DECL(Id, Parent)
+//#endif
 
-/// BASE_FUNCTION_DECL(Id, Parent)
+/// FUNCTION_DECL(Id, Parent)
 ///   Used for subclasses of AbstractFunction. The default behavior is
 ///   to do the same as for GENERIC_VALUE_DECL.
-#ifndef BASE_FUNCTION_DECL
-#define BASE_FUNCTION_DECL(Id, Parent) GENERIC_VALUE_DECL(Id, Parent)
+#ifndef FUNCTION_DECL
+#define FUNCTION_DECL(Id, Parent) GENERIC_VALUE_DECL(Id, Parent)
 #endif
 
 /// VALUE_DECL(Id, Parent)
@@ -123,21 +132,29 @@
 		NAMING_DECL(Use,					NamingDecl)
 		NAMING_DECL(Label,				NamingDecl)
 		DECL_RANGE(Naming, Space, Label)
+		BASE_DECL(Value,								NamingDecl) 
+			BASE_DECL(Type,								ValueDecl)
+				CONTEXT_BASE_DECL(NominalType,			TypeDecl)
+					NOMINAL_TYPE_DECL(Enum,		NominalTypeDecl)
+					NOMINAL_TYPE_DECL(Struct,	NominalTypeDecl)
+					NOMINAL_TYPE_DECL(Class,	NominalTypeDecl)
+					NOMINAL_TYPE_DECL(Interface,	NominalTypeDecl)
+					DECL_RANGE(NominalType,		Enum, Interface)
+				VALUE_DECL(TypeAlias,				TypeDecl)
+				DECL_RANGE(Type,		Enum,		TypeAlias)
+			BASE_DECL(Sequence, ValueDecl)
+				BASE_DECL(Function, SequenceDecl)
+					FUNCTION_DECL(Constructor, FunctionDecl)
+					FUNCTION_DECL(Destructor,  FunctionDecl)
+					FUNCTION_DECL(Fun,				 FunctionDecl)
+				BASE_DECL(Storage, SequenceDecl)
+					VALUE_DECL(Var,  StorageDecl)
+						VALUE_DECL(Param, VarDecl)
 
-		//BASE_DECL(Type,				NamingDecl)
-			//TYPE_DECL(TypeAlias,		TypeDecl)
-			//ABSTRACE_DECL(NominalType, TypeDecl)
-				//NOMINAL_TYPE(Enum, NominalType)
-				//NOMINAL_TYPE(Struct, NominalType)
-				//NOMINAL_TYPE(Class, NominalType)
-
-		//BASE_DECL(Vlue,				NamingDecl)
-
-
+		NAMING_DECL(Template, NamingDecl)	
 	DECL(IfConfig, Decl)
-	LAST_DECL(IfConfig)
-
-
+	DECL(Block, Decl)
+	LAST_DECL(Block)
 
 #undef NAMING_DECL
 #undef NOMINAL_TYPE_DECL
