@@ -3,11 +3,3 @@
 struct S0 {	
 }
 
-
-// Maybe
-fun S0::this() { 
-}
-fun S0::defer() { 
-	
-}
-

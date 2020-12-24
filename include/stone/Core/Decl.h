@@ -28,16 +28,33 @@
 
 namespace stone {
 
+class Decl;
 class BraceStmt;
 class DeclCtx;
 class ASTCtx;
 class DeclContext;
 
-enum class DeclKind { Fun };
+class DeclStats final : public Stats {
+  const Decl &declaration;
+
+public:
+  DeclStats(const Decl &declaration) : declaration(declaration) {}
+  void Print() const override;
+};
 
 class alignas(8) Decl {
 
-  DeclKind kind;
+public:
+  enum Kind {
+#define DECL(Id, Parent) Id,
+#define LAST_DECL(Id) LastDecl = Id,
+#define DECL_RANGE(Id, FirstId, LastId) \
+  First##Id##Decl = FirstId, Last##Id##Decl = LastId,
+#include "stone/Core/Decl.def"
+  };
+
+  friend DeclStats;
+  Decl::Kind kind;
   SrcLoc loc;
   DeclCtx *dc;
 
@@ -47,11 +64,11 @@ protected:
   /// This routine must be used to allocate memory for any declaration that is
   /// deserialized from a module file.
   ///
-  /// \param Size The size of the allocated object.
-  /// \param Ctx The context in which we will allocate memory.
-  /// \param ID The global ID of the deserialized declaration.
-  /// \param Extra The amount of extra space to allocate after the object.
-  void *operator new(std::size_t size, const ASTCtx &astCtx, unsigned ID,
+  /// \param size The size of the allocated object.
+  /// \param astCtx The context in which we will allocate memory.
+  /// \param declID The global ID of the deserialized declaration.
+  /// \param extra The amount of extra space to allocate after the object.
+  void *operator new(std::size_t size, const ASTCtx &astCtx, unsigned declID,
                      std::size_t extra = 0);
 
   /// Allocate memory for a non-deserialized declaration.
@@ -75,7 +92,8 @@ public:
   llvm::PointerUnion<DeclCtx *, MultipleDeclCtx *> declCtx;
 
 protected:
-  Decl(DeclKind kind, DeclCtx *dc, SrcLoc loc) : kind(kind), dc(dc), loc(loc) {}
+  Decl(Decl::Kind kind, DeclCtx *dc, SrcLoc loc)
+      : kind(kind), dc(dc), loc(loc) {}
 };
 
 class NamingDecl : public Decl {
@@ -85,8 +103,8 @@ class NamingDecl : public Decl {
   DeclName name;
 
 protected:
-  NamingDecl(DeclKind kind, DeclCtx *dc, SrcLoc loc, DeclName dn)
-      : Decl(kind, dc, loc), name(dn) {}
+  NamingDecl(Decl::Kind kind, DeclCtx *dc, SrcLoc loc, DeclName name)
+      : Decl(kind, dc, loc), name(name) {}
 
 public:
   /// Get the identifier that names this declaration, if there is one.
@@ -108,11 +126,13 @@ public:
 
 class ValueDecl : public NamingDecl {};
 
+class ModuleDecl : public Decl {};
 
-class ModuleDecl : public Decl {
-
+class SpaceDecl : public NamingDecl {
+public:
+  SpaceDecl(DeclCtx *dc, SrcLoc loc, DeclName name)
+      : NamingDecl(Decl::Kind::Space, dc, loc, name) {}
 };
-class SpaceDecl : public Decl {};
 
 } // namespace stone
 #endif

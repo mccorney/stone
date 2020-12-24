@@ -2,9 +2,9 @@
 class C0 {	
 }
 
-fun C0::this() { 
+C0::this() { 
 }
-fun C0::defer() { 
+C0::defer() { 
 	
 }
 

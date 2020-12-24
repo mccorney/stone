@@ -535,6 +535,7 @@ void Lexer::CreateToken(tk kind, const char *tokenStart) {
 
   llvm::StringRef tokenText{tokenStart,
                             static_cast<size_t>(curPtr - tokenStart)};
+
   if (triviaRetention == TriviaRetentionMode::With && kind != tk::eof) {
     assert(trailingTrivia.empty() && "TrailingTrivia is empty here");
     LexTrivia(trailingTrivia, /* IsForTrailingTrivia */ true);

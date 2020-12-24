@@ -14,30 +14,27 @@ class C0 :  CI {
 	public System* system = null;  
 }
 
-fun C0::this(Options* options, Context* context) {
+C0::new(Options* options, Context* context) {
 
 	this.options = options;
 	this.context = context; 
 	this.system = new System(); 
 }
-fun C0::defer() { 
+C0::defer(){ 
 	free system;
 	free options; 
 }
-public fun C0::Print() -> void {
 
+
+// Leaning this way
+init C0::Init(Options* options, Context* context) {
+	this.options = options;
+	this.context = context; 
+	this.system = new System(); 
+}
+[test]
+defer C0::Defer() { 
+	free system;
+	free options; 
 }
 
-any<T> interface Collection {
-
-}
-
-any<T> class Array : Collection<T> {
-
-}
-
-any<T> fun Move() -> void {
-
-}
-
-}

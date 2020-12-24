@@ -1,6 +1,13 @@
-#ifndef ABSTRACT_DECL
-#define ABSTRACT_DECL(Id, Parent)
+#ifndef BASE_DECL
+#define BASE_DECL(Id, Parent)
 #endif
+
+#ifndef NAMING_DECL
+#define NAMING_DECL(Id, Parent) DECL(Id, Parent)
+#endif
+
+
+
 
 /// CONTEXT_DECL(Id, Parent)
 ///   Used for Decls that are also DeclContexts. The default behavior is to do
@@ -87,11 +94,11 @@
 #define NOMINAL_TYPE_DECL(Id, Parent) ITERABLE_GENERIC_VALUE_DECL(Id, Parent)
 #endif
 
-/// ABSTRACT_FUNCTION_DECL(Id, Parent)
+/// BASE_FUNCTION_DECL(Id, Parent)
 ///   Used for subclasses of AbstractFunction. The default behavior is
 ///   to do the same as for GENERIC_VALUE_DECL.
-#ifndef ABSTRACT_FUNCTION_DECL
-#define ABSTRACT_FUNCTION_DECL(Id, Parent) GENERIC_VALUE_DECL(Id, Parent)
+#ifndef BASE_FUNCTION_DECL
+#define BASE_FUNCTION_DECL(Id, Parent) GENERIC_VALUE_DECL(Id, Parent)
 #endif
 
 /// VALUE_DECL(Id, Parent)
@@ -111,51 +118,28 @@
 #define LAST_DECL(Id)
 #endif
 
-// NOTE: For performance, maximize the numer of [important] abstract Decls
-// where "First_XYZDecl" == 0 to improve isa/dyn_cast code gen.
+	BASE_DECL(Naming,						Decl)
+		NAMING_DECL(Space,				NamingDecl)
+		NAMING_DECL(Use,					NamingDecl)
+		NAMING_DECL(Label,				NamingDecl)
+		DECL_RANGE(Naming, Space, Label)
 
-ABSTRACT_DECL(Value, Decl)
-  ABSTRACT_DECL(Type, ValueDecl)
-    ABSTRACT_DECL(GenericType, TypeDecl)
-      ABSTRACT_DECL(NominalType, GenericTypeDecl)
-        NOMINAL_TYPE_DECL(Enum, NominalTypeDecl)
-        NOMINAL_TYPE_DECL(Struct, NominalTypeDecl)
-        NOMINAL_TYPE_DECL(Class, NominalTypeDecl)
-        NOMINAL_TYPE_DECL(Interface, NominalTypeDecl)
-        DECL_RANGE(NominalType, Enum, Interface)
-  
-      GENERIC_VALUE_DECL(TypeAlias, GenericTypeDecl)
-      DECL_RANGE(GenericType, Enum, TypeAlias)
-    ABSTRACT_DECL(AbstractTypeParam, TypeDecl)
-      VALUE_DECL(GenericTypeParam, AbstractTypeParamDecl)
-      DECL_RANGE(AbstractTypeParam, GenericTypeParam, AssociatedType)
-    CONTEXT_VALUE_DECL(Module, TypeDecl)
-    DECL_RANGE(Type, Enum, Module)
-  ABSTRACT_DECL(AbstractStorage, ValueDecl)
-    VALUE_DECL(Var, AbstractStorageDecl)
-      VALUE_DECL(Param, VarDecl)
-    GENERIC_VALUE_DECL(Subscript, AbstractStorageDecl)
-    DECL_RANGE(AbstractStorage, Var, Subscript)
-  ABSTRACT_DECL(AbstractFunction, ValueDecl)
-    ABSTRACT_FUNCTION_DECL(Constructor, AbstractFunctionDecl)
-    ABSTRACT_FUNCTION_DECL(Destructor, AbstractFunctionDecl)
-    ABSTRACT_FUNCTION_DECL(Fun, AbstractFunctionDecl)
-    DECL_RANGE(AbstractFunction, Constructor, Accessor)
+		//BASE_DECL(Type,				NamingDecl)
+			//TYPE_DECL(TypeAlias,		TypeDecl)
+			//ABSTRACE_DECL(NominalType, TypeDecl)
+				//NOMINAL_TYPE(Enum, NominalType)
+				//NOMINAL_TYPE(Struct, NominalType)
+				//NOMINAL_TYPE(Class, NominalType)
 
-  CONTEXT_VALUE_DECL(EnumElement, ValueDecl)
-  DECL_RANGE(Value, Enum, EnumElement)
-
-ITERABLE_GENERIC_DECL(Extension, Decl)
-CONTEXT_DECL(TopLevelCode, Decl)
+		//BASE_DECL(Vlue,				NamingDecl)
 
 
-DECL(Import, Decl)
-DECL(IfConfig, Decl)
-DECL(EnumCase, Decl)
+	DECL(IfConfig, Decl)
+	LAST_DECL(IfConfig)
 
 
-LAST_DECL(PostfixOperator)
 
+#undef NAMING_DECL
 #undef NOMINAL_TYPE_DECL
 #undef CONTEXT_DECL
 #undef ITERABLE_NONGENERIC_DECL
@@ -165,10 +149,10 @@ LAST_DECL(PostfixOperator)
 #undef CONTEXT_VALUE_DECL
 #undef GENERIC_VALUE_DECL
 #undef ITERABLE_GENERIC_VALUE_DECL
-#undef ABSTRACT_FUNCTION_DECL
+#undef BASE_FUNCTION_DECL
 #undef VALUE_DECL
 #undef DECL_RANGE
-#undef ABSTRACT_DECL
+#undef BASE_DECL
 #undef OPERATOR_DECL
 #undef DECL
 #undef LAST_DECL

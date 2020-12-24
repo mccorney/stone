@@ -4,6 +4,8 @@
 
 namespace stone {
 
+class TypeLoc {};
+
 class Type {};
 
 } // namespace stone

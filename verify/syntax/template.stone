@@ -1,0 +1,14 @@
+
+
+any<T> interface Collection<T> {
+
+}
+
+any<T> class Array<T> : Collection<T> {
+
+}
+
+any<T> fun Move() -> void {
+
+}
+

@@ -39,8 +39,8 @@ public:
 
   //
   void ParseDecl();
-	
-	void ParseSpaceDecl();
+
+  void ParseSpaceDecl();
 
 public:
   // Stmt

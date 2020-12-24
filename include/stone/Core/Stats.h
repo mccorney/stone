@@ -2,10 +2,17 @@
 #define STONE_CORE_STATS_H
 
 #include "stone/Core/Mem.h"
+#include <iostream>
 
 namespace stone {
 
 class Stats {
+protected:
+  llvm::raw_ostream &os;
+
+public:
+  Stats() : os(llvm::outs()) {}
+
 public:
   virtual void Print() const = 0;
 };

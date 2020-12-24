@@ -5,7 +5,7 @@
 
 namespace stone {
 
-class Module : public Decl {};
+class Module : public NamingDecl {};
 
 } // namespace stone
 

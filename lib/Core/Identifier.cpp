@@ -98,7 +98,8 @@ void IdentifierTableStats::Print() const {
       maxIdentifierLength = idLen;
   }
 
-  fprintf(stderr, "\n*** Identifier Table Stats:\n");
+  os << "\n*** Identifier Table Stats: " << '\n';
+
   fprintf(stderr, "# Identifiers:   %d\n", numIdentifiers);
   fprintf(stderr, "# Empty Buckets: %d\n", numEmptyBuckets);
   fprintf(stderr, "Hash density (#identifiers per bucket): %f\n",

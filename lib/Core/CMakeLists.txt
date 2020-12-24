@@ -10,6 +10,7 @@ set(stone_core_sources
 	ASTScope.cpp
 	Builtin.cpp
 	Char.cpp
+	Comment.cpp
 	Decl.cpp
 	DeclCtx.cpp
 	Diagnostics.cpp
@@ -24,8 +25,10 @@ set(stone_core_sources
 	SrcMgr.cpp
 	Stats.cpp
 	Stmt.cpp
+	Template.cpp
 	TextDiagnosticListener.cpp
 	TokenKind.cpp
+	Type.cpp
 	Visitor.cpp
 	Version.cpp
 	VirtualTable.cpp

@@ -1,6 +1,6 @@
 
 
 fun Main() -> void {
-	for {
+	for() {
 	}
 }
