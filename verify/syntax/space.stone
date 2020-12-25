@@ -9,6 +9,10 @@ space System.Maths {
 space System.Physics {
 
 	public fun Fire(const Particle* particle) -> bool {
+		return true; 
+	}
+	public fun Collided(const Particle* particle) -> auto {
+		return false; 
 	}
 
 }

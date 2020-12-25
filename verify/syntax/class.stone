@@ -1,3 +1,4 @@
+module Stone.Syntax 
 
 class C0 {	
 }

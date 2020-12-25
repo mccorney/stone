@@ -3,6 +3,7 @@
 #include "stone/Core/Identifier.h"
 namespace stone {
 
+class DeclNameLoc {};
 class DeclName {
 public:
   // TODO:

@@ -15,7 +15,7 @@ public:
 
 private:
   std::unique_ptr<ASTCtx> ac;
-  std::unique_ptr<stone::Module> m;
+  std::unique_ptr<stone::ModuleDecl> md;
   // StatEngine se;
 public:
   Analysis(const LangOptions &langOpts, const SearchPathOptions &searchPathOpts,
@@ -28,7 +28,7 @@ public:
 
 public:
   ASTCtx &GetASTCtx() { return *ac.get(); }
-  stone::Module &GetModule() { return *m.get(); }
+  stone::ModuleDecl &GetModule() { return *md.get(); }
   // StatEngine &GetStats() { return *stats.get(); }
 };
 } // namespace stone

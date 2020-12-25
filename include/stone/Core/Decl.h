@@ -48,9 +48,9 @@ public:
   enum Kind {
 #define DECL(Id, Parent) Id,
 #define LAST_DECL(Id) LastDecl = Id,
-#define DECL_RANGE(Id, FirstId, LastId) \
+#define DECL_RANGE(Id, FirstId, LastId)                                        \
   First##Id##Decl = FirstId, Last##Id##Decl = LastId,
-#include "stone/Core/Decl.def"
+#include "stone/Core/DeclKind.def"
   };
 
   friend DeclStats;
@@ -124,14 +124,30 @@ public:
   }
 };
 
-class ValueDecl : public NamingDecl {};
-
-class ModuleDecl : public Decl {};
+class ValueDecl : public NamingDecl {
+public:
+};
 
 class SpaceDecl : public NamingDecl {
 public:
   SpaceDecl(DeclCtx *dc, SrcLoc loc, DeclName name)
       : NamingDecl(Decl::Kind::Space, dc, loc, name) {}
+};
+
+class FunctionDecl : public ValueDecl, public DeclCtx {};
+
+class FunDecl : public FunctionDecl {};
+
+class ConstructorInitializer final {
+public:
+};
+
+class ConstructorDecl : public FunctionDecl {
+public:
+};
+
+class DestructorDecl : public FunctionDecl {
+public:
 };
 
 } // namespace stone
