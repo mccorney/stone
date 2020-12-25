@@ -2,6 +2,7 @@
 #define STONE_CORE_EXPR_H
 
 #include "stone/Core/ASTNode.h"
+#include "stone/Core/ExprKind.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -24,8 +25,7 @@
 namespace stone {
 
 class Expr : public ASTNode {
-public:
-  enum Kind {};
+  expr::Kind kind;
 
 public:
   Expr() = delete;
@@ -33,6 +33,9 @@ public:
   Expr(Expr &&) = delete;
   Expr &operator=(const Expr &) = delete;
   Expr &operator=(Expr &&) = delete;
+
+public:
+  expr::Kind GetKind() { return kind; }
 };
 } // namespace stone
 #endif

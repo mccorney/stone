@@ -197,9 +197,9 @@ inline void operator delete(void *Ptr, const stone::ASTContext &C, size_t) {
 /// @param Alignment The alignment of the allocated memory (if the underlying
 ///                  allocator supports it).
 /// @return The allocated memory. Could be nullptr.
-inline void *operator new[](size_t bytes, const stone::ASTContext &C,
+inline void *operator new[](size_t bytes, const stone::ASTContext &astCtx,
                             size_t alignment /* = 8 */) {
-  return C.Allocate(bytes, alignment);
+  return astCtx.Allocate(bytes, alignment);
 }
 
 /// Placement delete[] companion to the new[] above.
@@ -208,8 +208,9 @@ inline void *operator new[](size_t bytes, const stone::ASTContext &C,
 /// invoking it directly; see the new[] operator for more details. This operator
 /// is called implicitly by the compiler if a placement new[] expression using
 /// the ASTContext throws in the object constructor.
-inline void operator delete[](void *Ptr, const stone::ASTContext &C, size_t) {
-  C.Deallocate(Ptr);
+inline void operator delete[](void *Ptr, const stone::ASTContext &astCtx,
+                              size_t) {
+  astCtx.Deallocate(Ptr);
 }
 
 #endif

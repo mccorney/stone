@@ -2,6 +2,7 @@
 #define STONE_CORE_STMT_H
 
 #include "stone/Core/ASTNode.h"
+#include "stone/Core/StmtKind.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -24,8 +25,7 @@
 namespace stone {
 
 class Stmt : public ASTNode {
-public:
-  enum Kind {};
+  stmt::Kind kind;
 
 public:
   Stmt() = delete;
@@ -33,6 +33,8 @@ public:
   Stmt(Stmt &&) = delete;
   Stmt &operator=(const Stmt &) = delete;
   Stmt &operator=(Stmt &&) = delete;
+public:
+  stmt::Kind GetKind() { return kind; }
 };
 
 } // namespace stone

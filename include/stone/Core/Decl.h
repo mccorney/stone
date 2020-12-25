@@ -3,6 +3,7 @@
 
 #include "stone/Core/ASTNode.h"
 #include "stone/Core/DeclBits.h"
+#include "stone/Core/DeclKind.h"
 #include "stone/Core/DeclName.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LLVM.h"
@@ -42,18 +43,8 @@ public:
 };
 
 class alignas(8) Decl {
-
-public:
-  enum Kind {
-#define DECL(Id, Parent) Id,
-#define LAST_DECL(Id) LastDecl = Id,
-#define DECL_RANGE(Id, FirstId, LastId)                                        \
-  First##Id##Decl = FirstId, Last##Id##Decl = LastId,
-#include "stone/Core/DeclKind.def"
-  };
-
   friend DeclStats;
-  Decl::Kind kind;
+  decl::Kind kind;
   SrcLoc loc;
   DeclContext *dc;
 
@@ -90,8 +81,11 @@ public:
 
   llvm::PointerUnion<DeclContext *, MultipleDeclContext *> declCtx;
 
+public:
+  decl::Kind GetKind() { return kind; }
+
 protected:
-  Decl(Decl::Kind kind, DeclContext *dc, SrcLoc loc)
+  Decl(decl::Kind kind, DeclContext *dc, SrcLoc loc)
       : kind(kind), dc(dc), loc(loc) {}
 };
 
@@ -162,7 +156,7 @@ class NamingDecl : public Decl {
   DeclName name;
 
 protected:
-  NamingDecl(Decl::Kind kind, DeclContext *dc, SrcLoc loc, DeclName name)
+  NamingDecl(decl::Kind kind, DeclContext *dc, SrcLoc loc, DeclName name)
       : Decl(kind, dc, loc), name(name) {}
 
 public:
@@ -190,7 +184,7 @@ public:
 class SpaceDecl : public NamingDecl {
 public:
   SpaceDecl(DeclContext *dc, SrcLoc loc, DeclName name)
-      : NamingDecl(Decl::Kind::Space, dc, loc, name) {}
+      : NamingDecl(decl::Kind::Space, dc, loc, name) {}
 };
 
 class DeclaratorDecl : public ValueDecl {
