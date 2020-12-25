@@ -62,6 +62,10 @@ int Run(llvm::ArrayRef<const char *> args) {
 
   System system;
   system.Init(args);
+  // Perform a quick help check
+  if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
+    return stone::Help(HelpMode::System);
+  }
   // system.Build();
   return system.Run();
 }

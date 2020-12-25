@@ -17,18 +17,18 @@ int Gen(Compiler &compiler) {}
 
 } // namespace stone
 int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
-                   void *MainAddr, Pipeline *P) {
-
-  if (Args[0] == "-help") {
-    stone::Help(HelpMode::Compile);
-    return ret::ok;
-  }
+                   void *MainAddr, Pipeline *pipeline) {
 
   Compiler compiler;
   compiler.Init(Args);
+
+  // Perform a quick help check
+  if (compiler.compileOpts.GetAction()->GetKind() == ActionKind::Help) {
+    return stone::Help(HelpMode::Compile);
+  }
   // stone::Analyze(compiler.GetAnalysis());
   // This is not needed.
-  if (compiler.Run(P) == ret::err) {
+  if (compiler.Run(pipeline) == ret::err) {
     return ret::err;
   }
   // Transformer transformer;

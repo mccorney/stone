@@ -22,6 +22,8 @@ class alignas(ActionAlignment) Action {
   ActionKind kind;
   llvm::StringMapEntry<Action *> *entry = nullptr;
 
+  unsigned chosen : 1;
+
 public:
   ActionKind GetKind() { return kind; }
 };
@@ -85,6 +87,7 @@ public:
     auto &entry = *entries.insert(std::make_pair(name, nullptr)).first;
     Action *&action = entry.second;
     if (action) {
+      action->chosen = true;
       return *action;
     }
     // Lookups failed, make a new Action.

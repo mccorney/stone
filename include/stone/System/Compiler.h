@@ -12,8 +12,6 @@ namespace stone {
 class Pipeline;
 class Compiler final {
   Pipeline *pipeline = nullptr;
-  ActionTable actions;
-
 public:
   CompileOptions compileOpts;
   std::unique_ptr<Analysis> analysis;

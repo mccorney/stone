@@ -8,5 +8,6 @@ ActionTable::ActionTable(const LangOptions &langOpts) : langOpts(langOpts) {
 
 static void AddAction() {}
 
-
 void ActionTable::AddActions(const LangOptions &LangOpts) { AddAction(); }
+
+void ActionTableStats::Print() const {}

@@ -3,7 +3,8 @@
 
 using namespace stone;
 
-System::System() : actions(systemOpts.langOpts) {}
+System::System()  {}
 
 void System::Init(llvm::ArrayRef<const char *> Args) {}
+
 int System::Run() { return ret::ok; }

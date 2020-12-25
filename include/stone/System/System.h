@@ -7,11 +7,10 @@
 #include "llvm/ADT/ArrayRef.h"
 
 namespace stone {
-class System final {
-  ActionTable actions;
-  SystemOptions systemOpts;
 
+class System final {
 public:
+	SystemOptions systemOpts;
   // Action *A; // The action that creates the work
   // llvm::PriorityQueue<Process*> ProcessQueue;
   // llvm::PriorityQueue<Work> WorkQueue;

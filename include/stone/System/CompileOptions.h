@@ -7,7 +7,8 @@
 
 namespace stone {
 
-struct CompileOptions final : public BasicOptions {
+class CompileOptions final : public BasicOptions {
+public:
   GenOptions genOpts;
   AnalyzeOptions analyzeOpts;
 };

@@ -1,13 +1,19 @@
 #ifndef STONE_SYSTEM_BASICOPTIONS_H
 #define STONE_SYSTEM_BASICOPTIONS_H
 
-#include "stone/System/ActionKind.h"
+#include "stone/System/Action.h"
 
 namespace stone {
 
-struct BasicOptions {
-  ActionKind actionKind;
+class BasicOptions {
+  ActionTable actions;
+
+public:
   LangOptions langOpts;
+  BasicOptions() : actions(langOpts) {}
+
+public:
+  Action *GetAction() { return nullptr; }
 };
 } // namespace stone
 
