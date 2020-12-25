@@ -2,6 +2,7 @@
 #define STONE_SYSTEM_COMPILER_H
 
 #include "stone/Analyze/Analysis.h"
+#include "stone/System/Action.h"
 #include "stone/System/CompileOptions.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -11,6 +12,7 @@ namespace stone {
 class Pipeline;
 class Compiler final {
   Pipeline *pipeline = nullptr;
+  ActionTable actions;
 
 public:
   CompileOptions compileOpts;

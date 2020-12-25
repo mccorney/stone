@@ -1,5 +1,5 @@
-#ifndef STONE_SYSTEM_SYSTEM_OPTIONS_H
-#define STONE_SYSTEM_SYSTEM_OPTINOS_H
+#ifndef STONE_SYSTEM_SYSTEMOPTIONS_H
+#define STONE_SYSTEM_SYSTEMOPTIONS_H
 
 #include "stone/System/BasicOptions.h"
 

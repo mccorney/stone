@@ -7,6 +7,7 @@ namespace stone {
 
 struct BasicOptions {
   ActionKind actionKind;
+  LangOptions langOpts;
 };
 } // namespace stone
 

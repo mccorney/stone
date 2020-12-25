@@ -1,13 +1,16 @@
 #ifndef STONE_SYSTEM_SYSTEM_H
 #define STONE_SYSTEM_SYSTEM_H
 
+#include "stone/System/Action.h"
+#include "stone/System/SystemOptions.h"
+
 #include "llvm/ADT/ArrayRef.h"
 
 namespace stone {
 class System final {
-  // Compilation
-public:
-  // SystemOptions SysOpts;
+  ActionTable actions;
+  SystemOptions systemOpts;
+
 public:
   // Action *A; // The action that creates the work
   // llvm::PriorityQueue<Process*> ProcessQueue;

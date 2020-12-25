@@ -22,6 +22,7 @@ set( LLVM_LINK_COMPONENTS
   )
 
 set(stone_system_sources
+	Action.cpp
 	Compile.cpp
 	Compiler.cpp
 	CompileProcess.cpp
