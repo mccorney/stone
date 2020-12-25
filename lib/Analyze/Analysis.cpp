@@ -6,5 +6,5 @@ using namespace stone;
 Analysis::Analysis(const LangOptions &langOpts,
                    const SearchPathOptions &pathOpts, SrcMgr &sm) {
 
-  ac.reset(new ASTCtx(langOpts, pathOpts, sm));
+  ac.reset(new ASTContext(langOpts, pathOpts, sm));
 }

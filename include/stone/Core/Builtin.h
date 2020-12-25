@@ -4,7 +4,7 @@
 namespace stone {
 
 class BuiltinCtx {};
-class ASTCtx;
+class ASTContext;
 
 class Builtin final {
 
@@ -17,8 +17,8 @@ class Builtin final {
   Builtin(const Builtin &) = delete;
   void operator=(const Builtin &) = delete;
 
-  void InitType(ASTCtx &astCtx);
-  void InitTypes(ASTCtx &astCtx);
+  void InitType(ASTContext &astCtx);
+  void InitTypes(ASTContext &astCtx);
 
   BuiltinID builtinID;
 
@@ -26,7 +26,7 @@ public:
   Builtin() = default;
   ~Builtin();
 
-  void Init(ASTCtx &astCtx);
+  void Init(ASTContext &astCtx);
 };
 
 } // namespace stone

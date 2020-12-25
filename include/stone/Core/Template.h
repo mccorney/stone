@@ -2,7 +2,6 @@
 #define STONE_CORE_TEMPLATEDECL_H
 
 #include "stone/Core/Decl.h"
-#include "stone/Core/DeclCtx.h"
 #include "stone/Core/DeclName.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LLVM.h"

@@ -1,7 +1,7 @@
 #ifndef STONE_CORE_ASTCTX_H
 #define STONE_CORE_ASTCTX_H
 
-#include "stone/Core/ASTCtxAlloc.h"
+#include "stone/Core/ASTContextAlloc.h"
 #include "stone/Core/Builtin.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LangABI.h"
@@ -55,25 +55,25 @@ class MangleCtx;
 class Module;
 class Stmt;
 class Builtin;
-class ASTCtx;
+class ASTContext;
 
-class ASTCtxStats final : public Stats {
-  const ASTCtx &ac;
+class ASTContextStats final : public Stats {
+  const ASTContext &ac;
 
 public:
-  ASTCtxStats(const ASTCtx &ac) : ac(ac) {}
+  ASTContextStats(const ASTContext &ac) : ac(ac) {}
   void Print() const override;
 };
-class ASTCtx final {
+class ASTContext final {
 
-  friend ASTCtxStats;
-  ASTCtxStats stats;
+  friend ASTContextStats;
+  ASTContextStats stats;
 
   /// The associated SourceManager object.
   SrcMgr &sm;
 
   /// The language options used to create the AST associated with
-  ///  this ASTCtx object.
+  ///  this ASTContext object.
   const LangOptions &langOpts;
 
   /// The search path options
@@ -82,7 +82,7 @@ class ASTCtx final {
   Builtin builtin;
   /// The allocator used to create AST objects.
   /// AST objects are never destructed; rather, all memory associated with the
-  /// AST objects will be released when the ASTCtx itself is destroyed.
+  /// AST objects will be released when the ASTContext itself is destroyed.
   mutable llvm::BumpPtrAllocator bumpAlloc;
 
   /// Table for all
@@ -91,12 +91,12 @@ class ASTCtx final {
   mutable llvm::SmallVector<Type *, 0> types;
 
 public:
-  ASTCtx(const LangOptions &langOpts, const SearchPathOptions &searchPathOpts,
-         SrcMgr &sm);
-  ~ASTCtx();
+  ASTContext(const LangOptions &langOpts,
+             const SearchPathOptions &searchPathOpts, SrcMgr &sm);
+  ~ASTContext();
 
-  ASTCtx(const ASTCtx &) = delete;
-  ASTCtx &operator=(const ASTCtx &) = delete;
+  ASTContext(const ASTContext &) = delete;
+  ASTContext &operator=(const ASTContext &) = delete;
 
 public:
   //
@@ -112,7 +112,7 @@ public:
   /// Retrieve the allocator for the given arena.
   llvm::BumpPtrAllocator &GetAllocator() const;
 
-  ASTCtxStats &GetStats() { return stats; }
+  ASTContextStats &GetStats() { return stats; }
 
 public:
   /// Return the total amount of physical memory allocated for representing
@@ -131,19 +131,19 @@ public:
 };
 
 } // namespace stone
-/// Placement new for using the ASTCtx's allocator.
+/// Placement new for using the ASTContext's allocator.
 ///
-/// This placement form of operator new uses the ASTCtx's allocator for
+/// This placement form of operator new uses the ASTContext's allocator for
 /// obtaining memory.
 ///
-/// IMPORTANT: These are also declared in stone/AST/ASTCtxAllocate.h!
+/// IMPORTANT: These are also declared in stone/AST/ASTContextAllocate.h!
 /// Any changes here need to also be made there.
 ///
 /// We intentionally avoid using a nothrow specification here so that the calls
 /// to this operator will not perform a null check on the result -- the
 /// underlying allocator never returns null pointers.
 ///
-/// Usage looks like this (assuming there's an ASTCtx 'Context' in scope):
+/// Usage looks like this (assuming there's an ASTContext 'Context' in scope):
 /// @code
 /// // Default alignment (8)
 /// IntegerLiteral *Ex = new (Context) IntegerLiteral(arguments);
@@ -151,15 +151,15 @@ public:
 /// IntegerLiteral *Ex2 = new (Context, 4) IntegerLiteral(arguments);
 /// @endcode
 /// Memory allocated through this placement new operator does not need to be
-/// explicitly freed, as ASTCtx will free all of this memory when it gets
+/// explicitly freed, as ASTContext will free all of this memory when it gets
 /// destroyed. Please note that you cannot use delete on the pointer.
 ///
 /// @param Bytes The number of bytes to allocate. Calculated by the compiler.
-/// @param C The ASTCtx that provides the allocator.
+/// @param C The ASTContext that provides the allocator.
 /// @param Alignment The alignment of the allocated memory (if the underlying
 ///                  allocator supports it).
 /// @return The allocated memory. Could be nullptr.
-inline void *operator new(size_t bytes, const stone::ASTCtx &C,
+inline void *operator new(size_t bytes, const stone::ASTContext &C,
                           size_t alignment /* = 8 */) {
   return C.Allocate(bytes, alignment);
 }
@@ -169,19 +169,19 @@ inline void *operator new(size_t bytes, const stone::ASTCtx &C,
 /// This operator is just a companion to the new above. There is no way of
 /// invoking it directly; see the new operator for more details. This operator
 /// is called implicitly by the compiler if a placement new expression using
-/// the ASTCtx throws in the object constructor.
-inline void operator delete(void *Ptr, const stone::ASTCtx &C, size_t) {
+/// the ASTContext throws in the object constructor.
+inline void operator delete(void *Ptr, const stone::ASTContext &C, size_t) {
   C.Deallocate(Ptr);
 }
 
-/// This placement form of operator new[] uses the ASTCtx's allocator for
+/// This placement form of operator new[] uses the ASTContext's allocator for
 /// obtaining memory.
 ///
 /// We intentionally avoid using a nothrow specification here so that the calls
 /// to this operator will not perform a null check on the result -- the
 /// underlying allocator never returns null pointers.
 ///
-/// Usage looks like this (assuming there's an ASTCtx 'Context' in scope):
+/// Usage looks like this (assuming there's an ASTContext 'Context' in scope):
 /// @code
 /// // Default alignment (8)
 /// char *data = new (Context) char[10];
@@ -189,15 +189,15 @@ inline void operator delete(void *Ptr, const stone::ASTCtx &C, size_t) {
 /// char *data = new (Context, 4) char[10];
 /// @endcode
 /// Memory allocated through this placement new[] operator does not need to be
-/// explicitly freed, as ASTCtx will free all of this memory when it gets
+/// explicitly freed, as ASTContext will free all of this memory when it gets
 /// destroyed. Please note that you cannot use delete on the pointer.
 ///
 /// @param Bytes The number of bytes to allocate. Calculated by the compiler.
-/// @param C The ASTCtx that provides the allocator.
+/// @param C The ASTContext that provides the allocator.
 /// @param Alignment The alignment of the allocated memory (if the underlying
 ///                  allocator supports it).
 /// @return The allocated memory. Could be nullptr.
-inline void *operator new[](size_t bytes, const stone::ASTCtx &C,
+inline void *operator new[](size_t bytes, const stone::ASTContext &C,
                             size_t alignment /* = 8 */) {
   return C.Allocate(bytes, alignment);
 }
@@ -207,8 +207,8 @@ inline void *operator new[](size_t bytes, const stone::ASTCtx &C,
 /// This operator is just a companion to the new[] above. There is no way of
 /// invoking it directly; see the new[] operator for more details. This operator
 /// is called implicitly by the compiler if a placement new[] expression using
-/// the ASTCtx throws in the object constructor.
-inline void operator delete[](void *Ptr, const stone::ASTCtx &C, size_t) {
+/// the ASTContext throws in the object constructor.
+inline void operator delete[](void *Ptr, const stone::ASTContext &C, size_t) {
   C.Deallocate(Ptr);
 }
 

@@ -1,7 +1,7 @@
 #include "stone/Core/Decl.h"
-#include "stone/Core/ASTCtx.h"
+#include "stone/Core/ASTContext.h"
 #include "stone/Core/Decl.h"
-#include "stone/Core/DeclCtx.h" //DeclContextInternals.h"
+//#include "stone/Core/DeclContextInternals.h"
 // TODO: #include "stone/Core/Friend.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LLVM.h"
@@ -32,7 +32,7 @@
 
 using namespace stone;
 
-void *Decl::operator new(std::size_t size, const ASTCtx &astCtx,
+void *Decl::operator new(std::size_t size, const ASTContext &astCtx,
                          unsigned globalDeclID, std::size_t extra) {
   // Allocate an extra 8 bytes worth of storage, which ensures that the
   // resulting pointer will still be 8-byte aligned.
@@ -52,15 +52,15 @@ void *Decl::operator new(std::size_t size, const ASTCtx &astCtx,
   return result;
 }
 
-void *Decl::operator new(std::size_t size, const ASTCtx &astCtx,
-                         DeclCtx *parentDeclCtx, std::size_t extra) {
+void *Decl::operator new(std::size_t size, const ASTContext &astCtx,
+                         DeclContext *parentDeclContext, std::size_t extra) {
 
   /*TODO:
-    assert(!parent || &parent->GetParentASTCtx() == &astCtx);
+    assert(!parent || &parent->GetParentASTContext() == &astCtx);
     // With local visibility enabled, we track the owning module even for local
     // declarations. We create the TU decl early and may not yet know what the
     // LangOpts are, so conservatively allocate the storage.
-    if (astCtx.GetLangOpts().TrackLocalOwningModule() || !parentDeclCtx) {
+    if (astCtx.GetLangOpts().TrackLocalOwningModule() || !parentDeclContext) {
       // Ensure required alignment of the resulting object by adding extra
       // padding at the start if required.
       size_t extraAlign =
@@ -72,7 +72,7 @@ void *Decl::operator new(std::size_t size, const ASTCtx &astCtx,
       buffer += extraAlign;
 
       auto *parentModule =
-          parentDeclCtx ? cast<Decl>(parentDeclCtx)->GetOwningModule() :
+          parentDeclContext ? cast<Decl>(parentDeclContext)->GetOwningModule() :
     nullptr;
 
       return new (buffer) Module*(parentModule) + 1;
@@ -84,7 +84,7 @@ void *Decl::operator new(std::size_t size, const ASTCtx &astCtx,
 
 // stone::Module *Decl::GetOwningModule() const {
 //  assert(IsFromASTFile() && "Not from AST file?");
-//  return GetASTCtx().GetExternalSource()->GetModule(GetOwningModuleID());
+//  return GetASTContext().GetExternalSource()->GetModule(GetOwningModuleID());
 //}
 //
 //

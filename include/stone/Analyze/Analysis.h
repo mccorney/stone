@@ -2,7 +2,7 @@
 #define STONE_ANALYSIS_ANALYSIS_H
 
 #include "stone/Analyze/AnalyzeOptions.h"
-#include "stone/Core/ASTCtx.h"
+#include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 
 #include <memory>
@@ -14,7 +14,7 @@ public:
   AnalyzeOptions analyzeOpts;
 
 private:
-  std::unique_ptr<ASTCtx> ac;
+  std::unique_ptr<ASTContext> ac;
   std::unique_ptr<stone::ModuleDecl> md;
   // StatEngine se;
 public:
@@ -27,7 +27,7 @@ public:
   Analysis &operator=(Analysis &&) = delete;
 
 public:
-  ASTCtx &GetASTCtx() { return *ac.get(); }
+  ASTContext &GetASTContext() { return *ac.get(); }
   stone::ModuleDecl &GetModule() { return *md.get(); }
   // StatEngine &GetStats() { return *stats.get(); }
 };

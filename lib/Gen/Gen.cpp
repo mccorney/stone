@@ -1,5 +1,5 @@
 #include "stone/Gen/Gen.h"
-#include "stone/Core/ASTCtx.h"
+#include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 #include "stone/Core/Ret.h"
 #include "stone/Gen/Backend.h"

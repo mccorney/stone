@@ -4,7 +4,7 @@
 #include "stone/Analyze/Analysis.h"
 #include "stone/Analyze/AnalyzeOptions.h"
 #include "stone/Analyze/CheckerDiagnostic.h"
-#include "stone/Core/ASTCtx.h"
+#include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 #include "stone/Core/Stats.h"
 

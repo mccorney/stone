@@ -1,4 +1,4 @@
-#include "stone/Core/ASTCtx.h"
+#include "stone/Core/ASTContext.h"
 
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/Statistic.h"
@@ -11,16 +11,18 @@
 
 using namespace stone;
 
-ASTCtx::ASTCtx(const LangOptions &langOpts,
-               const SearchPathOptions &searchPathOpts, SrcMgr &sm)
+ASTContext::ASTContext(const LangOptions &langOpts,
+                       const SearchPathOptions &searchPathOpts, SrcMgr &sm)
     : langOpts(langOpts), searchPathOpts(searchPathOpts), sm(sm),
       identifiers(langOpts), stats(*this) {
 
   builtin.Init(*this);
 }
-Identifier &ASTCtx::GetIdentifier(llvm::StringRef name) {
+Identifier &ASTContext::GetIdentifier(llvm::StringRef name) {
   return identifiers.Get(name);
 }
-size_t ASTCtx::GetSizeOfMemUsed() const { return bumpAlloc.getTotalMemory(); }
+size_t ASTContext::GetSizeOfMemUsed() const {
+  return bumpAlloc.getTotalMemory();
+}
 
-void ASTCtxStats::Print() const {}
+void ASTContextStats::Print() const {}

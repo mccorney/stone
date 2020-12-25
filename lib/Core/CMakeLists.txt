@@ -5,14 +5,14 @@ set(LLVM_LINK_COMPONENTS
   )
 
 set(stone_core_sources
-	ASTCtx.cpp
+	ASTContext.cpp
 	ASTConsumer.cpp
 	ASTScope.cpp
 	Builtin.cpp
 	Char.cpp
 	Comment.cpp
 	Decl.cpp
-	DeclCtx.cpp
+	DeclContext.cpp
 	Diagnostics.cpp
 	Expr.cpp
 	FileMgr.cpp

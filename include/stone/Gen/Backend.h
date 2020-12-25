@@ -1,7 +1,7 @@
 #ifndef STONE_GEN_BACKEND_H
 #define STONE_GEN_BACKEND_H
 
-#include "stone/Core/ASTCtx.h"
+#include "stone/Core/ASTContext.h"
 #include "stone/Core/LLVM.h"
 
 namespace llvm {
@@ -15,12 +15,12 @@ class TargetMachine;
 
 namespace stone {
 class Pipeline;
-class ASTCtx;
+class ASTContext;
 struct GenOptions;
 
 class Backend final {
 public:
-  int ToNative(ASTCtx &astCtx, llvm::Module *llvmModule,
+  int ToNative(ASTContext &astCtx, llvm::Module *llvmModule,
                const GenOptions &genOpts, Pipeline *pipeline = nullptr);
   bool ToObject();
   bool ToAssembly();

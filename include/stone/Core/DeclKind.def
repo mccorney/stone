@@ -2,16 +2,13 @@
 #define BASE_DECL(Id, Parent)
 #endif
 
-
 #ifndef CONTEXT_BASE_DECL
 #define CONTEXT_BASE_DECL(Id, Parent)
 #endif
 
-
 #ifndef NAMING_DECL
 #define NAMING_DECL(Id, Parent) DECL(Id, Parent)
 #endif
-
 
 #ifndef NOMINAL_TYPE_DECL
 #define NOMINAL_TYPE_DECL(Id, Parent) NAMING_DECL(Id, Parent)
@@ -88,7 +85,8 @@
 #ifdef VALUE_DECL
 #define ITERABLE_GENERIC_VALUE_DECL(Id, Parent) VALUE_DECL(Id, Parent)
 #else
-#define ITERABLE_GENERIC_VALUE_DECL(Id, Parent) ITERABLE_GENERIC_DECL(Id,Parent)
+#define ITERABLE_GENERIC_VALUE_DECL(Id, Parent)                                \
+  ITERABLE_GENERIC_DECL(Id, Parent)
 #endif
 #endif
 
@@ -130,45 +128,44 @@
 #define LAST_DECL(Id)
 #endif
 
-BASE_DECL(Naming,						Decl)
-	NAMING_DECL(Space,				NamingDecl)
-	NAMING_DECL(Use,					NamingDecl)
-	NAMING_DECL(Label,				NamingDecl) // break, continue, and goto
+BASE_DECL(Naming, Decl)
+	NAMING_DECL(Space, NamingDecl)
+	NAMING_DECL(Use, NamingDecl)
+	NAMING_DECL(Label, NamingDecl) // break, continue, and goto
 	DECL_RANGE(Naming, Space, Label)
-	BASE_DECL(Value,								NamingDecl) 
-		BASE_DECL(Type,								ValueDecl)
-			CONTEXT_BASE_DECL(NominalType,			TypeDecl)
-				NOMINAL_TYPE_DECL(Enum,		NominalTypeDecl)
-				NOMINAL_TYPE_DECL(Struct,	NominalTypeDecl)
-				NOMINAL_TYPE_DECL(Class,	NominalTypeDecl)
-				NOMINAL_TYPE_DECL(Interface,	NominalTypeDecl)
-				DECL_RANGE(NominalType,		Enum, Interface)
-			VALUE_DECL(TypeAlias,				TypeDecl)
-			DECL_RANGE(Type,		Enum,		TypeAlias)
-		BASE_DECL(Declarator,	ValueDecl)
+	BASE_DECL(Value, NamingDecl)
+		BASE_DECL(Type, ValueDecl)
+			CONTEXT_BASE_DECL(NominalType, TypeDecl)
+				NOMINAL_TYPE_DECL(Enum, NominalTypeDecl)
+				NOMINAL_TYPE_DECL(Struct, NominalTypeDecl)
+				NOMINAL_TYPE_DECL(Class, NominalTypeDecl)
+				NOMINAL_TYPE_DECL(Interface, NominalTypeDecl)
+				DECL_RANGE(NominalType, Enum, Interface)
+			VALUE_DECL(TypeAlias, TypeDecl)
+			DECL_RANGE(Type, Enum, TypeAlias)
+		BASE_DECL(Declarator, ValueDecl)
 			CONTEXT_BASE_DECL(Function, DeclaratorDecl)
 				FUNCTION_DECL(Constructor, FunctionDecl)
-				FUNCTION_DECL(Destructor,  FunctionDecl)
-				FUNCTION_DECL(Fun,				 FunctionDecl)
+				FUNCTION_DECL(Destructor, FunctionDecl)
+				FUNCTION_DECL(Fun, FunctionDecl)
 				DECL_RANGE(Function, Constructor, Fun)
-				BASE_DECL(Storage, ValueDecl)
-					VALUE_DECL(Var,  StorageDecl)
-						VALUE_DECL(Param, VarDecl)
+		BASE_DECL(Storage, ValueDecl)
+			VALUE_DECL(Var, StorageDecl)
+			VALUE_DECL(Param, VarDecl)
 		CONTEXT_VALUE_DECL(Module, TypeDecl)
 	BASE_DECL(Template, NamingDecl)
-		TEMPLATE_DECL(FunctionTemplate, Template) 
-    TEMPLATE_DECL(ClassTemplate, Template)
+		TEMPLATE_DECL(FunctionTemplate, Template)
+		TEMPLATE_DECL(ClassTemplate, Template)
 		TEMPLATE_DECL(StructTemplate, Template)
 		TEMPLATE_DECL(InterfaceTemplate, Template)
-    TEMPLATE_DECL(VarTemplate, Template)
-    TEMPLATE_DECL(TypeAliasTemplate, Template)
+		TEMPLATE_DECL(VarTemplate, Template)
+		TEMPLATE_DECL(TypeAliasTemplate, Template)
 		TEMPLATE_DECL(BuiltinTemplate, Template)
 		DECL_RANGE(Template, FunctionTemplate, BuiltinTemplate)
 
 DECL(IfConfig, Decl)
 DECL(Block, Decl)
 LAST_DECL(Block)
-
 
 #undef NAMING_DECL
 #undef NOMINAL_TYPE_DECL
