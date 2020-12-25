@@ -33,9 +33,12 @@ public:
   Stmt(Stmt &&) = delete;
   Stmt &operator=(const Stmt &) = delete;
   Stmt &operator=(Stmt &&) = delete;
+
 public:
   stmt::Kind GetKind() { return kind; }
 };
+
+class ValueStmt : public Stmt {};
 
 } // namespace stone
 #endif

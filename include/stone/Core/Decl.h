@@ -42,7 +42,7 @@ public:
   void Print() const override;
 };
 
-class alignas(8) Decl {
+class alignas(8) Decl : public ASTNode {
   friend DeclStats;
   decl::Kind kind;
   SrcLoc loc;

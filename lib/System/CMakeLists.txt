@@ -22,25 +22,20 @@ set( LLVM_LINK_COMPONENTS
   )
 
 set(stone_system_sources
-	Action.cpp
 	Compile.cpp
 	Compiler.cpp
-	CompilerAction.cpp
 	CompileProcess.cpp
 	Compiler.cpp
-	CompilerConsumer.cpp
-	CompilerFile.cpp
+	CompileFile.cpp
 	Help.cpp
-	LangStd.cpp
 	Link.cpp
 	LinkProcess.cpp
 	Options.cpp
+	Phase.cpp
 	Process.cpp
-	ProcessAction.cpp
 	Run.cpp
 	System.cpp
 	ToolChain.cpp
-	Work.cpp
 
 	LINK_LIBS
 	StoneAnalyze

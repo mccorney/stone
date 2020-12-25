@@ -2,7 +2,7 @@
 #define STONE_SYSTEM_COMPILER_H
 
 #include "stone/Analyze/Analysis.h"
-#include "stone/System/CompilerOptions.h"
+#include "stone/System/CompileOptions.h"
 
 #include "llvm/ADT/ArrayRef.h"
 
@@ -11,10 +11,9 @@ namespace stone {
 class Pipeline;
 class Compiler final {
   Pipeline *pipeline = nullptr;
-  // Action that triggers the Compiler;
-  // CompilerAction* Trigger;
+
 public:
-  CompilerOptions compilerOpts;
+  CompileOptions compileOpts;
   std::unique_ptr<Analysis> analysis;
 
 public:

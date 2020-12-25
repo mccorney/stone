@@ -1,9 +1,8 @@
 #ifndef STONE_CORE_EXPR_H
 #define STONE_CORE_EXPR_H
 
-#include "stone/Core/ASTNode.h"
 #include "stone/Core/ExprKind.h"
-
+#include "stone/Core/Stmt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/PointerUnion.h"
@@ -24,7 +23,7 @@
 
 namespace stone {
 
-class Expr : public ASTNode {
+class Expr : public ValueStmt {
   expr::Kind kind;
 
 public:
@@ -35,7 +34,6 @@ public:
   Expr &operator=(Expr &&) = delete;
 
 public:
-  expr::Kind GetKind() { return kind; }
 };
 } // namespace stone
 #endif

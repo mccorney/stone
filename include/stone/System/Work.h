@@ -1,3 +1,0 @@
-
-
-class Work : public Process {}
