@@ -3,7 +3,7 @@
 
 namespace stone {
 
-class LangCtx {
+class LangContext {
   // Target info
 };
 } // namespace stone

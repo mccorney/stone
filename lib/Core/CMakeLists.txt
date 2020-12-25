@@ -19,7 +19,7 @@ set(stone_core_sources
 	FileSystemStatCache.cpp
 	Fmt.cpp
 	Identifier.cpp
-	LLVMCtx.cpp
+	LLVMContext.cpp
 	Module.cpp
 	SrcLoc.cpp
 	SrcMgr.cpp

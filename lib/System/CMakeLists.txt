@@ -37,6 +37,7 @@ set(stone_system_sources
 	Run.cpp
 	System.cpp
 	ToolChain.cpp
+	Task.cpp
 
 	LINK_LIBS
 	StoneAnalyze

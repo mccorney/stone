@@ -4,9 +4,8 @@
 #include "stone/System/BasicOptions.h"
 
 namespace stone {
-class SystemOptions final : public BasicOptions { 
-	public:
-
+class SystemOptions final : public BasicOptions {
+public:
 };
 } // namespace stone
 

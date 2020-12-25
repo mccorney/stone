@@ -21,11 +21,29 @@ class alignas(ActionAlignment) Action {
   friend class ActionTable;
   ActionKind kind;
   llvm::StringMapEntry<Action *> *entry = nullptr;
-
   unsigned chosen : 1;
 
 public:
+  Action(const Action &) = delete;
+  Action &operator=(const Action &) = delete;
+  Action(Action &&) = delete;
+  Action &operator=(Action &&) = delete;
+
+public:
+  Action() : kind(ActionKind::Parse) {}
   ActionKind GetKind() { return kind; }
+
+  /// Return the beginning of the actual null-terminated string for this
+  /// identifier.
+  const char *GetNameStart() const { return entry->getKeyData(); }
+
+  /// Efficiently return the length of this identifier info.
+  unsigned GetLength() const { return entry->getKeyLength(); }
+
+  /// Return the actual identifier string.
+  llvm::StringRef GetName() const {
+    return llvm::StringRef(GetNameStart(), GetLength());
+  }
 };
 
 class ActionTable;

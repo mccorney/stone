@@ -2,15 +2,17 @@
 #define STONE_SYSTEM_PROCESS_H
 
 #include "stone/System/Phase.h"
-#include "stone/System/System.h"
 
 namespace stone {
+class Task;
+class System;
+
 class Process final {
-  Phase &trigger;
+  Task &trigger;
   System &system;
 
 public:
-  Process(Phase &trigger, System &system) : trigger(trigger), system(system) {}
+  Process(Task &trigger, System &system) : trigger(trigger), system(system) {}
 
 public:
   // llvm::SmallVector<Process *, 10> deps;

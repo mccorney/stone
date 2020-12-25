@@ -4,7 +4,7 @@
 #include "llvm/IR/LLVMContext.h"
 
 namespace stone {
-llvm::LLVMContext &GetLLVMCtx();
+llvm::LLVMContext &GetLLVMContext();
 } // namespace stone
 
 #endif

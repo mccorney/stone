@@ -4,7 +4,7 @@
 #include "stone/Core/LLVM.h"
 
 namespace {
-enum { KEYON = 0x1, KEYOFF = 0x2, KEYRSV = 0x4 };
+enum { TOKON = 0x1, TOKOFF = 0x2, TOKRSV = 0x4 };
 }
 namespace stone {
 

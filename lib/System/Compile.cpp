@@ -9,6 +9,7 @@
 using namespace stone;
 
 namespace stone {
+
 int Analyze(Compiler &compiler) {
 
   // stond::Analyze(compiler.GetAnalysis());
@@ -16,6 +17,7 @@ int Analyze(Compiler &compiler) {
 int Gen(Compiler &compiler) {}
 
 } // namespace stone
+
 int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
                    void *MainAddr, Pipeline *pipeline) {
 

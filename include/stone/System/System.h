@@ -5,18 +5,23 @@
 #include "stone/System/SystemOptions.h"
 
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/PriorityQueue.h"
 
 namespace stone {
+class Process;
 
 class System final {
 public:
-	SystemOptions systemOpts;
-  // Action *A; // The action that creates the work
-  // llvm::PriorityQueue<Process*> ProcessQueue;
-  // llvm::PriorityQueue<Work> WorkQueue;
+  SystemOptions systemOpts;
+  llvm::PriorityQueue<Process *> queue;
+
 private:
-  // void BuildOpts(llvm::ArrayRef<const char*> Args);
-  void BuildWorkQueue();
+  void BuildTasks();
+  void BuildProcs();
+  void BuildQueue();
+
+private:
+  void BuildOpts(llvm::ArrayRef<const char *> Args);
 
 public:
   System();

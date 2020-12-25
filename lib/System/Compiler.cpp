@@ -3,7 +3,7 @@
 #include "stone/Core/Ret.h"
 using namespace stone;
 
-Compiler::Compiler()  {}
+Compiler::Compiler() {}
 
 void Compiler::Init(llvm::ArrayRef<const char *> args) {}
 

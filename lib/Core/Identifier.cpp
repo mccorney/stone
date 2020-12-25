@@ -27,10 +27,10 @@ enum class KeywordStatus {
 };
 static KeywordStatus GetKeywordStatus(const LangOptions &langOpts,
                                       unsigned flag) {
-  if (flag & KEYON) {
+  if (flag & TOKON) {
     return KeywordStatus::On;
   }
-  if (flag & KEYRSV) {
+  if (flag & TOKRSV) {
     return KeywordStatus::Reserved;
   }
   return KeywordStatus::Off;
