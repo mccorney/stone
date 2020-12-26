@@ -2,9 +2,11 @@
 #include "stone/Core/Fmt.h"
 #include "stone/Core/LLVM.h"
 #include "stone/Core/Ret.h"
+#include "stone/System/Compilation.h"
 #include "stone/System/Compile.h"
 #include "stone/System/Help.h"
 #include "stone/System/System.h"
+#include "stone/System/ToolChain.h"
 
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
@@ -41,6 +43,33 @@ std::string GetExecutablePath(const char *arg0) {
 
 namespace stone {
 
+void SetInstallDir(llvm::ArrayRef<const char *> &argv, System &system,
+                   bool canonicalPrefixes) {
+  // Attempt to find the original path used to invoke the driver, to determine
+  // the installed path. We do this manually, because we want to support that
+  // path being a symlink.
+  llvm::SmallString<128> InstalledPath(argv[0]);
+
+  // Do a PATH lookup, if there are no directory components.
+  if (llvm::sys::path::filename(InstalledPath) == InstalledPath) {
+    if (llvm::ErrorOr<std::string> Tmp = llvm::sys::findProgramByName(
+            llvm::sys::path::filename(InstalledPath.str()))) {
+      InstalledPath = *Tmp;
+    }
+  }
+
+  // FIXME: We don't actually canonicalize this, we just make it absolute.
+  if (canonicalPrefixes) {
+    llvm::sys::fs::make_absolute(InstalledPath);
+  }
+
+  llvm::StringRef InstalledPathParent(
+      llvm::sys::path::parent_path(InstalledPath));
+  if (llvm::sys::fs::exists(InstalledPathParent)) {
+    system.SetInstalledDir(InstalledPathParent);
+  }
+}
+
 int Run(llvm::ArrayRef<const char *> args) {
   if (args.size() == 0) {
     return ret::err;
@@ -52,6 +81,9 @@ int Run(llvm::ArrayRef<const char *> args) {
     return ret::err;
 
   llvm::InitializeAllTargets();
+
+  std::string executablePath = GetExecutablePath(args[0]);
+
   // auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
   // -compile ?
   auto arg0 = args[1];
@@ -60,17 +92,20 @@ int Run(llvm::ArrayRef<const char *> args) {
     // Args.data() + Args.size()), Arg0)
   }
 
-  /*
-System system;
-system.Init(args);
-// Perform a quick help check
-if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
-return stone::Help(HelpMode::System);
-}
-// system.Build();
-return system.Run();
+  bool canonicalPrefixes = false;
 
-  */
+  System system(executablePath, llvm::sys::getDefaultTargetTriple());
+  stone::SetInstallDir(args, system, canonicalPrefixes);
+  // TODO: system.SetTargetAndMode(TargetAndMode);
+  auto argList = system.BuildArgList(args);
+
+  // Perform a quick help check
+  if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
+    return stone::Help(HelpMode::System);
+  }
+  auto toolChain = system.BuildToolChain(*argList.get());
+
+  auto compilation = system.BuildCompilation(*toolChain.get(), *argList.get());
   return 0;
 }
 

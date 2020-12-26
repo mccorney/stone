@@ -3,6 +3,7 @@
 
 #include "stone/Core/Mem.h"
 #include "stone/System/Action.h"
+#include "stone/System/Compilation.h"
 #include "stone/System/SystemOptions.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -14,6 +15,7 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/StringSaver.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 #include <list>
 #include <map>
@@ -39,6 +41,7 @@ namespace stone {
 class Task;
 class Process;
 class Compilation;
+class ToolChain;
 
 struct SystemOutput {
   enum class CompileMode {
@@ -77,7 +80,7 @@ public:
 
   /// The path the driver executable was in, as invoked from the
   /// command line.
-  std::string driverPath;
+  std::string driverDir;
 
   /// The original path to the clang executable.
   std::string stoneExecutablePath;
@@ -149,18 +152,27 @@ private:
   void BuildOpts(llvm::ArrayRef<const char *> args);
 
 public:
-  System(llvm::StringRef stoneExecutable, llvm::StringRef targetTriple,
+  System(llvm::StringRef stoneExecutablePath, llvm::StringRef targetTriple,
          llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs = nullptr);
 
-  void Init(llvm::ArrayRef<const char *> args);
-  Compilation &BuildCompilation();
+  /// Parse the given list of strings into an InputArgList.
+  std::unique_ptr<llvm::opt::InputArgList>
+  BuildArgList(llvm::ArrayRef<const char *> args);
+
+  /// This uses a std::unique_ptr instead of returning a toolchain by value
+  /// because ToolChain has virtual methods.
+  std::unique_ptr<ToolChain>
+  BuildToolChain(const llvm::opt::InputArgList &argList);
+
+  std::unique_ptr<Compilation>
+  BuildCompilation(const ToolChain &toolChain,
+                   const llvm::opt::InputArgList &argList);
 
 public:
   const std::string &GetConfigFile() const { return cfgFile; }
   const llvm::opt::OptTable &GetOptTable() const {
     return systemOpts.GetOptTable();
   }
-
   // const DiagnosticsEngine &GetDiagEngine() const { return Diags; }
   llvm::vfs::FileSystem &GetVFS() const { return *vfs; }
 
@@ -170,8 +182,14 @@ public:
   const std::string &GetDriverTitle() { return driverTitle; }
   void SetDriverTitle(std::string v) { driverTitle = std::move(v); }
 
-public:
-  int Run();
+  /// Get the path to where the clang executable was installed.
+  const char *GetInstalledDir() const {
+    if (!installedDir.empty())
+      return installedDir.c_str();
+    return driverDir.c_str();
+  }
+  void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
+
 };
 
 } // namespace stone

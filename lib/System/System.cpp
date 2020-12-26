@@ -1,5 +1,6 @@
 #include "stone/System/System.h"
 #include "stone/Core/Ret.h"
+#include "stone/System/ToolChain.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/STLExtras.h"
@@ -24,7 +25,6 @@
 #include "llvm/Support/Program.h"
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/TargetRegistry.h"
-#include "llvm/Support/VirtualFileSystem.h"
 #include "llvm/Support/raw_ostream.h"
 
 using namespace stone;
@@ -41,6 +41,12 @@ System::System(llvm::StringRef stoneExecutable, llvm::StringRef targetTriple,
     this->vfs = llvm::vfs::getRealFileSystem();
 }
 
-void System::Init(llvm::ArrayRef<const char *> Args) {}
+std::unique_ptr<llvm::opt::InputArgList>
+System::BuildArgList(llvm::ArrayRef<const char *> args) {}
 
-int System::Run() { return ret::ok; }
+std::unique_ptr<ToolChain>
+System::BuildToolChain(const llvm::opt::InputArgList &argList) {}
+
+std::unique_ptr<Compilation>
+System::BuildCompilation(const ToolChain &toolChain,
+                         const llvm::opt::InputArgList &argList) {}

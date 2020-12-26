@@ -12,6 +12,7 @@ protected:
 
 public:
   Stats() : os(llvm::outs()) {}
+  virtual ~Stats() {}
 
 public:
   virtual void Print() const = 0;
