@@ -7,14 +7,15 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include(CMakeParseArguments)
 
+# Make sure to include and invoke properties first 
+include(StoneProperties)
+set_stone_properties(STONE)
+
 include(StoneCore)
 include(StoneTblGen)
 include(StoneFormat)
 include(StoneTests)
 
-# Make sure to include and invoke properties first 
-include(StoneProperties)
-set_stone_properties(STONE)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

@@ -60,14 +60,18 @@ int Run(llvm::ArrayRef<const char *> args) {
     // Args.data() + Args.size()), Arg0)
   }
 
-  System system;
-  system.Init(args);
-  // Perform a quick help check
-  if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
-    return stone::Help(HelpMode::System);
-  }
-  // system.Build();
-  return system.Run();
+  /*
+System system;
+system.Init(args);
+// Perform a quick help check
+if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
+return stone::Help(HelpMode::System);
+}
+// system.Build();
+return system.Run();
+
+  */
+  return 0;
 }
 
 } // namespace stone

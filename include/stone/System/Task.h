@@ -5,12 +5,9 @@
 
 namespace stone {
 
-class Task {
-};
+class Task {};
 
-class CompileTask {
-};
-
+class CompileTask {};
 
 } // namespace stone
 #endif
