@@ -153,7 +153,22 @@ public:
          llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs = nullptr);
 
   void Init(llvm::ArrayRef<const char *> args);
-  Compilation &Build();
+  Compilation &BuildCompilation();
+
+public:
+  const std::string &GetConfigFile() const { return cfgFile; }
+  const llvm::opt::OptTable &GetOptTable() const {
+    return systemOpts.GetOptTable();
+  }
+
+  // const DiagnosticsEngine &GetDiagEngine() const { return Diags; }
+  llvm::vfs::FileSystem &GetVFS() const { return *vfs; }
+
+  bool GetCheckInputFilesExist() const { return checkInputFilesExist; }
+  void SetCheckInputFilesExist(bool v) { checkInputFilesExist = v; }
+
+  const std::string &GetDriverTitle() { return driverTitle; }
+  void SetDriverTitle(std::string v) { driverTitle = std::move(v); }
 
 public:
   int Run();

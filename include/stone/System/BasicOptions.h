@@ -16,7 +16,7 @@ public:
 
 public:
   Action *GetAction() { return nullptr; }
-  llvm::opt::OptTable &GetOptTable() { return *optTable.get(); }
+  llvm::opt::OptTable &GetOptTable() const { return *optTable.get(); }
 };
 } // namespace stone
 
