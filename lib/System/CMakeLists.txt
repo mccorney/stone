@@ -34,6 +34,7 @@ set(stone_system_sources
 	Compiler.cpp
 	CompileFile.cpp
 	DarwinToolChain.cpp
+	FileType.cpp
 	Help.cpp
 	Link.cpp
 	LinkProcess.cpp

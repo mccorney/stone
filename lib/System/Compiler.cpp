@@ -5,7 +5,12 @@ using namespace stone;
 
 Compiler::Compiler() {}
 
-void Compiler::Init(llvm::ArrayRef<const char *> args) {}
+/// Parse the given list of strings into an InputArgList.
+std::unique_ptr<llvm::opt::InputArgList>
+Compiler::BuildArgList(llvm::ArrayRef<const char *> args) {
+
+  return nullptr;
+}
 
 int Compiler::Run(Pipeline *pipeline) {
 

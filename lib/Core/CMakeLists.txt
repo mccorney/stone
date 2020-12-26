@@ -9,6 +9,7 @@ set(stone_core_sources
 	ASTConsumer.cpp
 	ASTScope.cpp
 	Builtin.cpp
+	BumpTable.cpp
 	Char.cpp
 	Comment.cpp
 	Decl.cpp

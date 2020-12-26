@@ -19,7 +19,10 @@ public:
 
 public:
   Compiler();
-  void Init(llvm::ArrayRef<const char *> Args);
+  /// Parse the given list of strings into an InputArgList.
+  std::unique_ptr<llvm::opt::InputArgList>
+  BuildArgList(llvm::ArrayRef<const char *> args);
+
   int Run(Pipeline *P = nullptr);
 
 public:

@@ -18,11 +18,11 @@ int Gen(Compiler &compiler) {}
 
 } // namespace stone
 
-int stone::Compile(llvm::ArrayRef<const char *> Args, const char *Arg0,
-                   void *MainAddr, Pipeline *pipeline) {
+int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
+                   void *mainAddr, Pipeline *pipeline) {
 
   Compiler compiler;
-  compiler.Init(Args);
+  auto argList = compiler.BuildArgList(args);
 
   // Perform a quick help check
   if (compiler.compileOpts.GetAction()->GetKind() == ActionKind::Help) {

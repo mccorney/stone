@@ -7,6 +7,7 @@
 namespace stone {
 
 class BasicOptions {
+  Action *action = nullptr;
   ActionTable actions;
   std::unique_ptr<llvm::opt::OptTable> optTable;
 
@@ -15,7 +16,10 @@ public:
   BasicOptions() : actions(langOpts), optTable(stone::CreateOptTable()) {}
 
 public:
-  Action *GetAction() { return nullptr; }
+  Action *GetAction() {
+    assert(action && "No action");
+    return action;
+  }
   llvm::opt::OptTable &GetOptTable() const { return *optTable.get(); }
 };
 } // namespace stone

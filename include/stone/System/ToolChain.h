@@ -20,6 +20,23 @@ class ToolChain {
 
 protected:
   ToolChain(const System &system, const llvm::Triple &triple);
+
+public:
+  virtual ~ToolChain() = default;
+
+  const System &GetSystem() const { return system; }
+  const llvm::Triple &GetTriple() const { return triple; }
+
+  /// Construct a Process for the action \p JA, taking the given information
+  /// into account.
+  ///
+  /// This method dispatches to the various \c constructInvocation methods,
+  /// which may be overridden by platform-specific subclasses.
+  std::unique_ptr<Process> ConstructProcess(/*const JobAction &JA, Compilation &C,
+                                    SmallVectorImpl<const Job *> &&inputs,
+                                    ArrayRef<const Action *> inputActions,
+                                    std::unique_ptr<CommandOutput> output,
+                                    const OutputInfo &OI*/) const;
 };
 
 class UnixToolChain : public ToolChain {

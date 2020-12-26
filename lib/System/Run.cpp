@@ -102,11 +102,10 @@ int Run(llvm::ArrayRef<const char *> args) {
 
   // TODO: system.SetTargetAndMode(TargetAndMode);
   auto argList = system.BuildArgList(args);
-
   // Perform a quick help check
-  // if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
-  //  return stone::Help(HelpMode::System);
-  //}
+  if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
+    return stone::Help(HelpMode::System);
+  }
   // auto toolChain = system.BuildToolChain(*argList.get());
 
   // auto compilation = system.BuildCompilation(*toolChain.get(),
