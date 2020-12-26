@@ -14,8 +14,8 @@ class OptTable;
 }
 } // namespace llvm
 namespace stone {
-
 namespace opts {
+
 enum OptionFlag {
   CompileOption = (1 << 4),
   NoCompileOption = (1 << 5),

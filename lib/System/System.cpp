@@ -34,7 +34,7 @@ System::System(llvm::StringRef stoneExecutable, llvm::StringRef targetTriple,
     : vfs(std::move(vfs)), stoneExecutablePath(stoneExecutablePath),
       /*sysRoot(DEFAULT_SYSROOT),*/
       driverTitle("Stone Compiler"), targetTriple(targetTriple),
-      strSaver(bumpAlloc), checkInputFilesExist(true) {
+      strSaver(bumpAlloc), checkInputFilesExist(true), os(llvm::outs()) {
 
   // Provide a sane fallback if no VFS is specified.
   if (!this->vfs)
@@ -42,10 +42,72 @@ System::System(llvm::StringRef stoneExecutable, llvm::StringRef targetTriple,
 }
 
 std::unique_ptr<llvm::opt::InputArgList>
-System::BuildArgList(llvm::ArrayRef<const char *> args) {}
+System::BuildArgList(llvm::ArrayRef<const char *> args) {
+
+  unsigned includedFlagsBitmask = 0;
+  unsigned excludedFlagsBitmask = opts::NoSystemOption;
+  unsigned missingArgIndex, missingArgCount;
+
+  std::unique_ptr<llvm::opt::InputArgList> argList =
+      llvm::make_unique<llvm::opt::InputArgList>(
+          systemOpts.GetOptTable().ParseArgs(
+              args, missingArgIndex, missingArgCount, includedFlagsBitmask,
+              excludedFlagsBitmask));
+
+  assert(argList && "No input argument list.");
+
+  // Check for missing argument error.
+  if (missingArgCount) {
+    os << "D(SrcLoc(),"
+       << "msg::error_missing_arg_value,"
+       << "argList->getArgString(missingArgIndex),"
+       << "missingArgCount" << '\n';
+    return nullptr;
+  }
+
+  // Check for unknown arguments.
+  for (const llvm::opt::Arg *arg : argList->filtered(opts::UNKNOWN)) {
+    os << "D(SourceLoc(), "
+       << "msg::error_unknown_arg,"
+       << "arg->getAsString(*ArgList));" << '\n';
+  }
+
+  return argList;
+}
 
 std::unique_ptr<ToolChain>
-System::BuildToolChain(const llvm::opt::InputArgList &argList) {}
+System::BuildToolChain(const llvm::opt::InputArgList &argList) {
+
+  if (const llvm::opt::Arg *arg = argList.getLastArg(opts::Target)) {
+    targetTriple = llvm::Triple::normalize(arg->getValue());
+  }
+  llvm::Triple target(targetTriple);
+
+  switch (target.getOS()) {
+
+  case llvm::Triple::Darwin:
+  case llvm::Triple::MacOSX: {
+    llvm::Optional<llvm::Triple> targetVariant;
+    if (const llvm::opt::Arg *A = argList.getLastArg(opts::TargetVariant)) {
+      targetVariant = llvm::Triple(llvm::Triple::normalize(A->getValue()));
+    }
+    return llvm::make_unique<DarwinToolChain>(*this, target, targetVariant);
+  }
+  case llvm::Triple::Linux:
+    return llvm::make_unique<LinuxToolChain>(*this, target);
+  case llvm::Triple::FreeBSD:
+    return llvm::make_unique<FreeBSDToolChain>(*this, target);
+  case llvm::Triple::OpenBSD:
+    return llvm::make_unique<OpenBSDToolChain>(*this, target);
+  case llvm::Triple::Win32:
+    return llvm::make_unique<WinToolChain>(*this, target);
+  default:
+    os << "D(SourceLoc(),"
+       << "msg::error_unknown_target,"
+       << "ArgList.getLastArg(options::OPT_target)->getValue());" << '\n';
+    break;
+  }
+}
 
 std::unique_ptr<Compilation>
 System::BuildCompilation(const ToolChain &toolChain,

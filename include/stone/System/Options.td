@@ -125,5 +125,5 @@ def ShowProcs : Flag<["-"], "sys-show-procs">,
 Flags<[DebugOption]>,
 HelpText<"Show time in the lifecycle of actions and jobs">;
 
-def PrimaryFile : Separate<["-"], "primary-file">,
+def MainFile : Separate<["-"], "main-file">,
   HelpText<"Produce output for this file, not the whole module">;

@@ -66,7 +66,14 @@ struct SystemOutput {
   std::string sdkPath;
 };
 
+class Driver final {
+public:
+  Driver(System &system);
+};
+
 class System final {
+  llvm::raw_ostream &os;
+
 public:
   SystemOptions systemOpts;
   llvm::PriorityQueue<Process *> queue;
@@ -189,7 +196,6 @@ public:
     return driverDir.c_str();
   }
   void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
-
 };
 
 } // namespace stone

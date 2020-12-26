@@ -1,5 +1,4 @@
 
-
 space System.Maths {
 
 	public fun Sin() -> void {

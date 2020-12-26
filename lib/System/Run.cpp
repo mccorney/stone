@@ -71,12 +71,15 @@ void SetInstallDir(llvm::ArrayRef<const char *> &argv, System &system,
 }
 
 int Run(llvm::ArrayRef<const char *> args) {
+
   if (args.size() == 0) {
     return ret::err;
   }
+
   if (args.size() == 1) {
     return stone::Help(HelpMode::System);
   }
+
   if (llvm::sys::Process::FixupStandardFileDescriptors())
     return ret::err;
 
@@ -96,16 +99,19 @@ int Run(llvm::ArrayRef<const char *> args) {
 
   System system(executablePath, llvm::sys::getDefaultTargetTriple());
   stone::SetInstallDir(args, system, canonicalPrefixes);
+
   // TODO: system.SetTargetAndMode(TargetAndMode);
   auto argList = system.BuildArgList(args);
 
   // Perform a quick help check
-  if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
-    return stone::Help(HelpMode::System);
-  }
-  auto toolChain = system.BuildToolChain(*argList.get());
+  // if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
+  //  return stone::Help(HelpMode::System);
+  //}
+  // auto toolChain = system.BuildToolChain(*argList.get());
 
-  auto compilation = system.BuildCompilation(*toolChain.get(), *argList.get());
+  // auto compilation = system.BuildCompilation(*toolChain.get(),
+  // *argList.get());
+  //
   return 0;
 }
 
@@ -126,5 +132,6 @@ int stone::Run(int argc, const char **args) {
       argsToExpand);
 
   llvm::ArrayRef<const char *> argsToProcess(argsToExpand);
+
   return stone::Run(argsToProcess);
 }

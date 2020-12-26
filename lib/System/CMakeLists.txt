@@ -33,6 +33,7 @@ set(stone_system_sources
 	CompileProcess.cpp
 	Compiler.cpp
 	CompileFile.cpp
+	DarwinToolChain.cpp
 	Help.cpp
 	Link.cpp
 	LinkProcess.cpp
@@ -42,6 +43,8 @@ set(stone_system_sources
 	Run.cpp
 	System.cpp
 	ToolChain.cpp
+	UnixToolChain.cpp
+	WinToolChain.cpp
 	Task.cpp
 
 	LINK_LIBS
