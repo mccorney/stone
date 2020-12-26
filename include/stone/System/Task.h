@@ -6,8 +6,11 @@
 namespace stone {
 
 class Task {
-  llvm::SmallVector<Task *, 10> deps;
 };
+
+class CompileTask {
+};
+
 
 } // namespace stone
 #endif
