@@ -23,7 +23,7 @@ enum OptionFlag {
   NoSystemOption = (1 << 7),
   DebugOption = (1 << 8),
 };
-/*
+
 enum ID {
   INVALID = 0, // This is not an option ID.
 #define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, PARAM,  \
@@ -33,9 +33,6 @@ enum ID {
   LAST
 #undef OPTION
 };
-
-*/
-
 } // namespace opts
 std::unique_ptr<llvm::opt::OptTable> CreateOptTable();
 } // namespace stone

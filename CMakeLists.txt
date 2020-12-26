@@ -7,16 +7,17 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include(CMakeParseArguments)
 
-# Make sure to include and invoke properties first 
-include(StoneProperties)
-set_stone_properties(STONE)
-
 include(StoneCore)
 include(StoneTblGen)
 include(StoneFormat)
 include(StoneTests)
 
+# Make sure to include and invoke properties first 
+include(StoneProperties)
+set_stone_properties(STONE)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 include_directories(BEFORE
   ${CMAKE_CURRENT_BINARY_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -28,13 +29,12 @@ message(STATUS "Stone Compiler Version: ${STONE_VERSION}")
 # Install the path for the lib files 
 install_stone()
 
-
 add_definitions( -D_GNU_SOURCE )
 
 option(STONE_BUILD_TOOLS
   "Build the Stone tools. If OFF, just generate build targets." ON)
 
-#add_subdirectory(include)
+add_subdirectory(include)
 add_subdirectory(lib)
 add_subdirectory(tools)
 #add_subdirectory(verify)

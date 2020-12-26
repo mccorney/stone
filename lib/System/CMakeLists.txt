@@ -1,3 +1,7 @@
+set(LLVM_LINK_COMPONENTS
+	Option
+)
+
 set( LLVM_LINK_COMPONENTS
   ${LLVM_TARGETS_TO_BUILD}
 	BitReader
@@ -46,6 +50,9 @@ set(stone_system_sources
 )
 add_stone_library(StoneSystem
 	${stone_system_sources}
+
+	DEPENDS
+	StoneOptions
 )
 
 

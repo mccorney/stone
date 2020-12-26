@@ -19,6 +19,7 @@ macro(set_stone_properties product)
 	set(STONE_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 	set(STONE_LIB_DIR "${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib/stone")
 	set(STONE_STATIC_LIB_DIR "${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib/stone_static")
+ 
 
 endmacro()
 
