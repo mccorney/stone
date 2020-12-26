@@ -24,6 +24,7 @@ set( LLVM_LINK_COMPONENTS
 set(stone_system_sources
 	Action.cpp
 	Compile.cpp
+	Compilation.cpp
 	Compiler.cpp
 	CompileProcess.cpp
 	Compiler.cpp

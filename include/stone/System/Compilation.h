@@ -6,8 +6,7 @@
 namespace stone {
 class Compilation final {
 public:
-  int Run();
+	int Execute();
 };
-
 } // namespace stone
 #endif
