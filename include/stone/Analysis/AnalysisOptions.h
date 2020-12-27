@@ -3,7 +3,8 @@
 
 namespace stone {
 
-struct AnalysisOptions final {};
+/// This will be used for Checker and Parser
+class AnalysisOptions final {};
 
 } // namespace stone
 #endif

@@ -13,11 +13,11 @@ using namespace stone;
 int stone::Gen(stone::ModuleDecl *moduleDecl, const stone::Context &ctx,
                const GenOptions &genOpts, Pipeline *pipeline) {
 
-	assert(moduleDecl && "No Module"); 
-	
-	//llvm::Module *llvmModule = stone::ToIR(moduleDecl, pipeline);
-	//assert(llvmModule && "No LLVM Module"); 
-	
+  assert(moduleDecl && "No Module");
+
+  // llvm::Module *llvmModule = stone::ToIR(moduleDecl, pipeline);
+  // assert(llvmModule && "No LLVM Module");
+
   // From Backend.h
   // stone::ToAssembly();
   // stone::ToObject();

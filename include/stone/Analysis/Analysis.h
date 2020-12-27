@@ -4,6 +4,7 @@
 #include "stone/Analysis/AnalysisOptions.h"
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
+#include "stone/Core/SearchPathOptions.h"
 
 #include <memory>
 
@@ -15,10 +16,15 @@ public:
 
 private:
   std::unique_ptr<ASTContext> ac;
+  const stone::Context &ctx;
+  const SearchPathOptions &pathOpts;
+  SrcMgr &sm;
+
   mutable ModuleDecl *mainModule = nullptr;
   // StatEngine se;
 public:
-  Analysis(Context &ctx, const SearchPathOptions &searchPathOpts, SrcMgr &sm);
+  Analysis(const stone::Context &ctx, const SearchPathOptions &pathOpts,
+           SrcMgr &sm);
 
   Analysis(const Analysis &) = delete;
   Analysis(Analysis &&) = delete;

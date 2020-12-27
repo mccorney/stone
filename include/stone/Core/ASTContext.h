@@ -75,7 +75,7 @@ class ASTContext final {
 
   /// The language options used to create the AST associated with
   ///  this ASTContext object.
-  Context &context;
+  const stone::Context &ctx;
 
   /// The search path options
   const SearchPathOptions &searchPathOpts;
@@ -92,7 +92,8 @@ class ASTContext final {
   mutable llvm::SmallVector<Type *, 0> types;
 
 public:
-  ASTContext(Context &context, const SearchPathOptions &spOpts, SrcMgr &sm);
+  ASTContext(const stone::Context &ctx, const SearchPathOptions &pathOpts,
+             SrcMgr &sm);
   ~ASTContext();
 
   ASTContext(const ASTContext &) = delete;
@@ -104,7 +105,7 @@ public:
   //
   Builtin &GetBuiltin() const;
   //
-  Context &GetContext() const { return context; }
+  const stone::Context &GetContext() const { return ctx; }
   //
   LangABI *GetLangABI() const;
   //

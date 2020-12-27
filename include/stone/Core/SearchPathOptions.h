@@ -4,7 +4,7 @@
 namespace stone {
 
 /// Options for controlling diagnostics.
-struct SearchPathOptions {};
+class SearchPathOptions {};
 
 } // namespace stone
 

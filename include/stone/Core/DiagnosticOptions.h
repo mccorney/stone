@@ -6,7 +6,7 @@
 namespace stone {
 
 /// Options for controlling diagnostics.
-struct DiagnosticOptions final {
+class DiagnosticOptions final {
 public:
   /// Indicates whether textual diagnostics should use color.
   bool useColor = false;

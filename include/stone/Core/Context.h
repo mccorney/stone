@@ -19,7 +19,10 @@ public:
 public:
   llvm::raw_ostream &Out() { return os; }
   DiagnosticEngine &GetDiagEngine() { return diagEngine; }
+  const LangOptions &GetLangOptions() const { return langOpts; }
   LangOptions &GetLangOptions() { return langOpts; }
+
+  DiagnosticOptions &GetDiagOptions() { return diagOpts; }
 };
 
 } // namespace stone
