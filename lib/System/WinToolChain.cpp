@@ -2,5 +2,5 @@
 
 using namespace stone;
 
-WinToolChain::WinToolChain(const System &system, const llvm::Triple &triple)
-    : ToolChain(system, triple) {}
+WinToolChain::WinToolChain(const Driver &driver, const llvm::Triple &triple)
+    : ToolChain(driver, triple) {}

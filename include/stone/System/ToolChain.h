@@ -15,16 +15,16 @@
 namespace stone {
 
 class ToolChain {
-  const System &system;
+  const Driver &driver;
   const llvm::Triple triple;
 
 protected:
-  ToolChain(const System &system, const llvm::Triple &triple);
+  ToolChain(const Driver &driver, const llvm::Triple &triple);
 
 public:
   virtual ~ToolChain() = default;
 
-  const System &GetSystem() const { return system; }
+  const Driver &GetDriver() const { return driver; }
   const llvm::Triple &GetTriple() const { return triple; }
 
   /// Construct a Process for the action \p JA, taking the given information
@@ -41,7 +41,7 @@ public:
 
 class UnixToolChain : public ToolChain {
 public:
-  UnixToolChain(const System &system, const llvm::Triple &triple);
+  UnixToolChain(const Driver &driver, const llvm::Triple &triple);
   ~UnixToolChain() = default;
 };
 
@@ -49,31 +49,31 @@ class DarwinToolChain final : public ToolChain {
   const llvm::Optional<llvm::Triple> &targetVariant;
 
 public:
-  DarwinToolChain(const System &system, const llvm::Triple &triple,
+  DarwinToolChain(const Driver &driver, const llvm::Triple &triple,
                   const llvm::Optional<llvm::Triple> &targetVariant);
   ~DarwinToolChain() = default;
 };
 
 class LinuxToolChain final : public UnixToolChain {
 public:
-  LinuxToolChain(const System &system, const llvm::Triple &triple);
+  LinuxToolChain(const Driver &driver, const llvm::Triple &triple);
   ~LinuxToolChain() = default;
 };
 
 class FreeBSDToolChain final : public UnixToolChain {
 public:
-  FreeBSDToolChain(const System &system, const llvm::Triple &triple);
+  FreeBSDToolChain(const Driver &driver, const llvm::Triple &triple);
   ~FreeBSDToolChain() = default;
 };
 class OpenBSDToolChain final : public UnixToolChain {
 public:
-  OpenBSDToolChain(const System &system, const llvm::Triple &triple);
+  OpenBSDToolChain(const Driver &driver, const llvm::Triple &triple);
   ~OpenBSDToolChain() = default;
 };
 
 class WinToolChain : public ToolChain {
 public:
-  WinToolChain(const System &system, const llvm::Triple &triple);
+  WinToolChain(const Driver &driver, const llvm::Triple &triple);
   ~WinToolChain() = default;
 };
 

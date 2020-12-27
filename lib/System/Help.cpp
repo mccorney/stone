@@ -3,8 +3,8 @@
 
 int stone::Help(HelpMode Mode) {
 
-  if (Mode == HelpMode::System) {
-  } else if (Mode == HelpMode::Compile) {
+  if (Mode == HelpMode::Driver) {
+  } else if (Mode == HelpMode::Compiler) {
   }
   return ret::ok;
 }

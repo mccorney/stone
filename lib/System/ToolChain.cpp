@@ -2,5 +2,5 @@
 
 using namespace stone;
 
-ToolChain::ToolChain(const System &system, const llvm::Triple &triple)
-    : system(system), triple(triple) {}
+ToolChain::ToolChain(const Driver &driver, const llvm::Triple &triple)
+    : driver(driver), triple(triple) {}

@@ -1,18 +1,16 @@
 #ifndef STONE_SYSTEM_PROCESS_H
 #define STONE_SYSTEM_PROCESS_H
 
-#include "stone/System/Phase.h"
-
 namespace stone {
 class Task;
-class System;
+class Driver;
 
 class Process final {
   Task &trigger;
-  System &system;
+  Driver &driver;
 
 public:
-  Process(Task &trigger, System &system) : trigger(trigger), system(system) {}
+  Process(Task &trigger, Driver &driver) : trigger(trigger), driver(driver) {}
 
 public:
   // llvm::SmallVector<Process *, 10> deps;

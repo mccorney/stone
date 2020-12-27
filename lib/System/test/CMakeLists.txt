@@ -10,6 +10,6 @@ target_link_libraries(StoneSystemTests
   PRIVATE
 	StoneCore
 	StoneGen
-	StoneAnalyze
+	StoneAnalysis
 )
 

@@ -3,7 +3,7 @@
 
 namespace stone {
 
-enum class HelpMode { Compile, System };
+enum class HelpMode { Compiler, Driver };
 int Help(HelpMode Mode);
 } // namespace stone
 

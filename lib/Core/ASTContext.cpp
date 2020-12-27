@@ -11,10 +11,10 @@
 
 using namespace stone;
 
-ASTContext::ASTContext(const LangOptions &langOpts,
-                       const SearchPathOptions &searchPathOpts, SrcMgr &sm)
-    : langOpts(langOpts), searchPathOpts(searchPathOpts), sm(sm),
-      identifiers(langOpts), stats(*this) {
+ASTContext::ASTContext(Context &context, const SearchPathOptions &spOpts,
+                       SrcMgr &sm)
+    : context(context), searchPathOpts(spOpts), sm(sm),
+      identifiers(context.GetLangOptions()), stats(*this) {
 
   builtin.Init(*this);
 }

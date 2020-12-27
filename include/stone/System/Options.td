@@ -11,10 +11,10 @@ def CompileOption : OptionFlag;
 def NoCompileOption : OptionFlag;
 
 // The option should not be accepted by the build.
-def SystemOption : OptionFlag;
+def DriverOption : OptionFlag;
 
 // The option should not be accepted by the build.
-def NoSystemOption : OptionFlag;
+def NoDriverOption : OptionFlag;
 
 // The option should not be accepted by the build.
 def DebugOption : OptionFlag;
@@ -72,7 +72,7 @@ HelpText<"Parse and type-check input file(s) and dump AST(s)">, ActionOpt,
 Flags<[CompileOption]>;
 
 def Help : Flag<["-", "--"], "help">, 
-Flags<[CompileOption, SystemOption]>,
+Flags<[CompileOption, DriverOption]>,
 HelpText<"Display available options">, ActionOpt;
 
 def h : Flag<["-"], "h">, Alias<Help>;
@@ -83,24 +83,24 @@ HelpText<"Display available options, including hidden options">;
 
 
 def Version : Flag<["-", "--"], "version">,
-Flags<[SystemOption]>,
+Flags<[DriverOption]>,
 HelpText<"Print version information and exit">, ActionOpt;
 
 def v : Flag<["-"], "v">, 
-Flags<[SystemOption]>,
+Flags<[DriverOption]>,
 HelpText<"Show commands to run and use verbose output">;
 
-def Link : Flag<["-"], "sys-link">,
+def Link : Flag<["-"], "link">,
 HelpText<"Specifies a library which should be linked against">, ActionOpt,
-Flags<[SystemOption]>;
+Flags<[DriverOption]>;
 
 //GENERAL OPTIONS 
-def Target : Separate<["-"], "sys-target">,
-Flags<[CompileOption, SystemOption]>,
+def Target : Separate<["-"], "target">,
+Flags<[CompileOption, DriverOption]>,
 HelpText<"Generate code for the given target">;
 
-def TargetVariant : Separate<["-"], "sys-target-variant">,
-  Flags<[CompileOption, SystemOption]>,
+def TargetVariant : Separate<["-"], "target-variant">,
+  Flags<[CompileOption, DriverOption]>,
   HelpText<"Generate 'zippered' code for macCatalyst that can run on the specified"
            " variant target triple in addition to the main -target triple">;
 
@@ -109,19 +109,19 @@ HelpText<"Generate code for a particular CPU variant">;
 
 // DEV OPTIONS 
 
-def ShowAction : Flag<["-"], "sys-show-action">,
+def ShowAction : Flag<["-"], "show-action">,
 Flags<[DebugOption]>,
 HelpText<"Show every step in the lifecycle of the actions">;
 
-def ShowTasks : Flag<["-"], "sys-show-tasks">,
+def ShowTasks : Flag<["-"], "show-tasks">,
 Flags<[DebugOption]>,
 HelpText<"Show every step in the lifecycle of the actions">;
 
-def ShowTime : Flag<["-"], "sys-show-time">,
+def ShowTime : Flag<["-"], "show-time">,
 Flags<[DebugOption]>,
 HelpText<"Show time in the lifecycle of actions and jobs">;
 
-def ShowProcs : Flag<["-"], "sys-show-procs">,
+def ShowProcs : Flag<["-"], "show-procs">,
 Flags<[DebugOption]>,
 HelpText<"Show time in the lifecycle of actions and jobs">;
 

@@ -3,6 +3,7 @@
 
 #include "stone/Core/ASTContextAlloc.h"
 #include "stone/Core/Builtin.h"
+#include "stone/Core/Context.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LangABI.h"
 #include "stone/Core/LangOptions.h"
@@ -74,7 +75,7 @@ class ASTContext final {
 
   /// The language options used to create the AST associated with
   ///  this ASTContext object.
-  const LangOptions &langOpts;
+  Context &context;
 
   /// The search path options
   const SearchPathOptions &searchPathOpts;
@@ -91,8 +92,7 @@ class ASTContext final {
   mutable llvm::SmallVector<Type *, 0> types;
 
 public:
-  ASTContext(const LangOptions &langOpts,
-             const SearchPathOptions &searchPathOpts, SrcMgr &sm);
+  ASTContext(Context &context, const SearchPathOptions &spOpts, SrcMgr &sm);
   ~ASTContext();
 
   ASTContext(const ASTContext &) = delete;
@@ -104,7 +104,7 @@ public:
   //
   Builtin &GetBuiltin() const;
   //
-  const LangOptions &GetLangOpts() const { return langOpts; }
+  Context &GetContext() const { return context; }
   //
   LangABI *GetLangABI() const;
   //

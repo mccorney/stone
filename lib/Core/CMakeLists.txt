@@ -12,8 +12,8 @@ set(stone_core_sources
 	BumpTable.cpp
 	Char.cpp
 	Comment.cpp
+	Context.cpp
 	Decl.cpp
-	DeclContext.cpp
 	Diagnostics.cpp
 	Expr.cpp
 	FileMgr.cpp

@@ -11,11 +11,11 @@ include(CMakeParseArguments)
 include(StoneProperties)
 set_stone_properties(STONE)
 
+# Now, we can include these
 include(StoneCore)
 include(StoneTblGen)
 include(StoneFormat)
 include(StoneTests)
-
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

@@ -4,8 +4,8 @@
 #include "stone/Core/Ret.h"
 #include "stone/System/Compilation.h"
 #include "stone/System/Compile.h"
+#include "stone/System/Driver.h"
 #include "stone/System/Help.h"
-#include "stone/System/System.h"
 #include "stone/System/ToolChain.h"
 
 #include "llvm/ADT/SmallString.h"
@@ -43,7 +43,7 @@ std::string GetExecutablePath(const char *arg0) {
 
 namespace stone {
 
-void SetInstallDir(llvm::ArrayRef<const char *> &argv, System &system,
+void SetInstallDir(llvm::ArrayRef<const char *> &argv, Driver &driver,
                    bool canonicalPrefixes) {
   // Attempt to find the original path used to invoke the driver, to determine
   // the installed path. We do this manually, because we want to support that
@@ -66,7 +66,7 @@ void SetInstallDir(llvm::ArrayRef<const char *> &argv, System &system,
   llvm::StringRef InstalledPathParent(
       llvm::sys::path::parent_path(InstalledPath));
   if (llvm::sys::fs::exists(InstalledPathParent)) {
-    system.SetInstalledDir(InstalledPathParent);
+    driver.SetInstalledDir(InstalledPathParent);
   }
 }
 
@@ -77,7 +77,7 @@ int Run(llvm::ArrayRef<const char *> args) {
   }
 
   if (args.size() == 1) {
-    return stone::Help(HelpMode::System);
+    return stone::Help(HelpMode::Driver);
   }
 
   if (llvm::sys::Process::FixupStandardFileDescriptors())
@@ -97,18 +97,18 @@ int Run(llvm::ArrayRef<const char *> args) {
 
   bool canonicalPrefixes = false;
 
-  System system(executablePath, llvm::sys::getDefaultTargetTriple());
-  stone::SetInstallDir(args, system, canonicalPrefixes);
+  Driver driver(executablePath, llvm::sys::getDefaultTargetTriple());
+  stone::SetInstallDir(args, driver, canonicalPrefixes);
 
-  // TODO: system.SetTargetAndMode(TargetAndMode);
-  auto argList = system.BuildArgList(args);
+  // TODO: driver.SetTargetAndMode(TargetAndMode);
+  auto argList = driver.BuildArgList(args);
   // Perform a quick help check
-  if (system.systemOpts.GetAction()->GetKind() == ActionKind::Help) {
-    return stone::Help(HelpMode::System);
+  if (driver.driverOpts.GetAction()->GetKind() == ActionKind::Help) {
+    return stone::Help(HelpMode::Driver);
   }
-  // auto toolChain = system.BuildToolChain(*argList.get());
+  // auto toolChain = driver.BuildToolChain(*argList.get());
 
-  // auto compilation = system.BuildCompilation(*toolChain.get(),
+  // auto compilation = driver.BuildCompilation(*toolChain.get(),
   // *argList.get());
   //
   return 0;

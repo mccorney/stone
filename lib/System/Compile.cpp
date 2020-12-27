@@ -1,5 +1,5 @@
 #include "stone/System/Compile.h"
-#include "stone/Analyze/Analyze.h"
+#include "stone/Analysis/Analysis.h"
 #include "stone/Core/Ret.h"
 #include "stone/Gen/Gen.h"
 #include "stone/SubSystem.h"
@@ -10,9 +10,9 @@ using namespace stone;
 
 namespace stone {
 
-int Analyze(Compiler &compiler) {
+int Analysis(Compiler &compiler) {
 
-  // stond::Analyze(compiler.GetAnalysis());
+  // stond::Analysis(compiler.GetAnalysis());
 }
 int Gen(Compiler &compiler) {}
 
@@ -21,18 +21,23 @@ int Gen(Compiler &compiler) {}
 int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, Pipeline *pipeline) {
 
-  Compiler compiler;
+  Compiler compiler(pipeline);
   auto argList = compiler.BuildArgList(args);
 
+  if (compiler.compileOpts.showHelp) {
+    compiler.PrintHelp();
+    return ret::ok;
+  }
+
   // Perform a quick help check
-  if (compiler.compileOpts.GetAction()->GetKind() == ActionKind::Help) {
-    return stone::Help(HelpMode::Compile);
-  }
-  // stone::Analyze(compiler.GetAnalysis());
+  // if (compiler.compileOpts.GetAction()->GetKind() == ActionKind::Help) {
+  //  return stone::Help(HelpMode::Compiler);
+  //}
+  // stone::Analysis(compiler.GetAnalysis());
   // This is not needed.
-  if (compiler.Run(pipeline) == ret::err) {
-    return ret::err;
-  }
+  // if (compiler.Run(pipeline) == ret::err) {
+  //  return ret::err;
+  //}
   // Transformer transformer;
 
   // stone::Gen(C.GetAnalysis().GetModule(), C.compilerOpts.genOpts, P);

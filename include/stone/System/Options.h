@@ -19,8 +19,8 @@ namespace opts {
 enum OptionFlag {
   CompileOption = (1 << 4),
   NoCompileOption = (1 << 5),
-  SystemOption = (1 << 6),
-  NoSystemOption = (1 << 7),
+  DriverOption = (1 << 6),
+  NoDriverOption = (1 << 7),
   DebugOption = (1 << 8),
 };
 

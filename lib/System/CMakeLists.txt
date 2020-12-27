@@ -34,6 +34,7 @@ set(stone_system_sources
 	Compiler.cpp
 	CompileFile.cpp
 	DarwinToolChain.cpp
+	Driver.cpp
 	FileType.cpp
 	Help.cpp
 	Link.cpp
@@ -42,14 +43,14 @@ set(stone_system_sources
 	Phase.cpp
 	Process.cpp
 	Run.cpp
-	System.cpp
+	Session.cpp
 	ToolChain.cpp
 	UnixToolChain.cpp
 	WinToolChain.cpp
 	Task.cpp
 
 	LINK_LIBS
-	StoneAnalyze
+	StoneAnalysis
 	StoneGen
 )
 add_stone_library(StoneSystem
