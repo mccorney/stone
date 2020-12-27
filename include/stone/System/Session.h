@@ -20,7 +20,7 @@ namespace stone {
 class Session : public Context {
 
   SessionOptions &sessionOpts;
-  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fileSystem;
 
 protected:
   /// Bit flags for OptTable
@@ -33,7 +33,11 @@ protected:
   std::string targetTriple;
 
 public:
-  llvm::vfs::FileSystem &GetVFS() const { return *vfs; }
+
+  void SetFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs) {
+    fileSystem = fs;
+  }
+  llvm::vfs::FileSystem &GetFS() const { return *fileSystem; }
   //
   /// When the session was started.
   ///
@@ -69,10 +73,6 @@ public:
   void SetTargetTriple(llvm::StringRef triple);
 
   llvm::StringRef GetTargetTriple() const { return langOpts.target.str(); }
-
- const llvm::opt::OptTable &GetOptTable() const {
-    return sessionOpts.GetOptTable();
-  }
 
   // virtual llvm::StringRef GetName() = 0;
 };

@@ -158,7 +158,7 @@ public:
 
 public:
   const std::string &GetConfigFile() const { return cfgFile; }
- 
+
   bool GetCheckInputFilesExist() const { return checkInputFilesExist; }
   void SetCheckInputFilesExist(bool v) { checkInputFilesExist = v; }
 

@@ -34,9 +34,7 @@ Driver::Driver(llvm::StringRef stoneExecutable)
       stoneExecutablePath(stoneExecutablePath),
       /*sysRoot(DEFAULT_SYSROOT),*/
       driverTitle("Stone Compiler"), strSaver(bumpAlloc),
-      checkInputFilesExist(true) {
-
-}
+      checkInputFilesExist(true) {}
 /// Parse the given list of strings into an InputArgList.
 bool Driver::Build(llvm::ArrayRef<const char *> args) {
 

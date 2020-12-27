@@ -4,7 +4,7 @@
 using namespace stone;
 
 Session::Session(SessionOptions &sessionOpts)
-    : sessionOpts(sessionOpts), vfs(llvm::vfs::getRealFileSystem()) {}
+    : sessionOpts(sessionOpts), fileSystem(llvm::vfs::getRealFileSystem()) {}
 
 Session::~Session() {}
 
