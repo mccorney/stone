@@ -4,7 +4,7 @@
 
 
 ## Lexical Structure
-	### Whitespace and Comments
+	##Whitespace and Comments
 
 ## Constants 
 

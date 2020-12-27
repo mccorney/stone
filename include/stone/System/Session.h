@@ -33,7 +33,6 @@ protected:
   std::string targetTriple;
 
 public:
-
   void SetFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs) {
     fileSystem = fs;
   }

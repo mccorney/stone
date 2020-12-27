@@ -10,19 +10,18 @@
 
 using namespace stone;
 
-int stone::Gen(stone::Module &langModule, const GenOptions &genOpts,
-               Pipeline *pipeline) {
+int stone::Gen(stone::ModuleDecl *moduleDecl, const stone::Context &ctx,
+               const GenOptions &genOpts, Pipeline *pipeline) {
 
-  Transformer transformer;
-  llvm::Module *llvmModule = transformer.ToIR(langModule, pipeline);
-
-  Backend backend;
-
-  // Native native;
-
-  // backend.ToAssembly();
-  // backend.ToObject();
-  // B.ToNative(M.GetASTContext(), M, P);
+	assert(moduleDecl && "No Module"); 
+	
+	//llvm::Module *llvmModule = stone::ToIR(moduleDecl, pipeline);
+	//assert(llvmModule && "No LLVM Module"); 
+	
+  // From Backend.h
+  // stone::ToAssembly();
+  // stone::ToObject();
+  // stone::ToNative(M.GetASTContext(), M, P);
 
   return ret::ok;
 }

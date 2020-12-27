@@ -5,16 +5,12 @@ namespace stone {
 class ASTContext;
 class Pipeline;
 struct GenOptions;
-class Module;
-class Transformation;
+class ModuleDecl;
+class Context;
 
 // May want to pass Module instead
-int Gen(stone::Module &langModule, const GenOptions &genOpts,
-        Pipeline *pipeline = nullptr);
-
-int Gen(Transformation &transformation, const GenOptions &genOpts,
-        Pipeline *pipeline = nullptr);
-
+int Gen(stone::ModuleDecl *moduleDecl, const stone::Context &ctx,
+        const GenOptions &genOpts, Pipeline *pipeline = nullptr);
 } // namespace stone
 
 #endif

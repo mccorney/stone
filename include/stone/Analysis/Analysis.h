@@ -15,11 +15,10 @@ public:
 
 private:
   std::unique_ptr<ASTContext> ac;
-  std::unique_ptr<stone::ModuleDecl> md;
+  mutable ModuleDecl *mainModule = nullptr;
   // StatEngine se;
 public:
-  Analysis(Context &context, const SearchPathOptions &searchPathOpts,
-           SrcMgr &sm);
+  Analysis(Context &ctx, const SearchPathOptions &searchPathOpts, SrcMgr &sm);
 
   Analysis(const Analysis &) = delete;
   Analysis(Analysis &&) = delete;

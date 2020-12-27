@@ -8,36 +8,18 @@
 
 using namespace stone;
 
-namespace stone {
-
-int Analysis(Compiler &compiler) {
-
-  // stond::Analysis(compiler.GetAnalysis());
-}
-int Gen(Compiler &compiler) {}
-
-} // namespace stone
-
 int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, Pipeline *pipeline) {
 
   Compiler compiler(pipeline);
   if (compiler.Build(args)) {
-    compiler.Run();
+    if (compiler.Run()) {
+      return ret::err;
+    }
   }
-
-  // Perform a quick help check
-  // if (compiler.compileOpts.GetAction()->GetKind() == ActionKind::Help) {
-  //  return stone::Help(HelpMode::Compiler);
-  //}
-  // stone::Analysis(compiler.GetAnalysis());
-  // This is not needed.
-  // if (compiler.Run(pipeline) == ret::err) {
-  //  return ret::err;
-  //}
-  // Transformer transformer;
-
-  // stone::Gen(C.GetAnalysis().GetModule(), C.compilerOpts.genOpts, P);
+  // We are not passing the compiler directly, we are pass stone::Context
+  return stone::Gen(compiler.GetAnalysis().GetMainModule(), compiler,
+                    compiler.compileOpts.genOpts, pipeline);
 
   return ret::ok;
 }

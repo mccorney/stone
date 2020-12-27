@@ -3,7 +3,7 @@
 
 namespace stone {
 
-struct GenOptions final {};
+class GenOptions final {};
 
 } // namespace stone
 
