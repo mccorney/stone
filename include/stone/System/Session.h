@@ -15,6 +15,13 @@
 namespace stone {
 
 class Session : public Context {
+
+protected:
+  unsigned includedFlagsBitmask = 0;
+  unsigned excludedFlagsBitmask = 0;
+  unsigned missingArgIndex;
+  unsigned missingArgCount;
+
   /// Target triple.
   // std::string targetTriple;
 public:
@@ -34,12 +41,19 @@ public:
 public:
   Session();
   ~Session();
-public:
+
+protected:
   virtual std::unique_ptr<llvm::opt::InputArgList>
   BuildArgList(llvm::ArrayRef<const char *> args) = 0;
 
+public:
+  ///
+  virtual bool Build(llvm::ArrayRef<const char *> args) = 0;
+  ///
   virtual int Run() = 0;
+  ///
   virtual void PrintCycle() = 0;
+  ///
   virtual void PrintHelp() = 0;
 
   // virtual llvm::StringRef GetName() = 0;

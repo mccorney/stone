@@ -11,8 +11,6 @@
 namespace stone {
 
 class Pipeline;
-class ModuleDecl;
-
 class Compiler final : public Session {
   Pipeline *pipeline = nullptr;
 
@@ -20,17 +18,22 @@ public:
   CompileOptions compileOpts;
   std::unique_ptr<Analysis> analysis;
 
-public:
-  Compiler(Pipeline *pipeline = nullptr);
+protected:
   /// Parse the given list of strings into an InputArgList.
   std::unique_ptr<llvm::opt::InputArgList>
   BuildArgList(llvm::ArrayRef<const char *> args) override;
+
+public:
+  Compiler(Pipeline *pipeline = nullptr);
+
+  /// Parse the given list of strings into an InputArgList.
+  bool Build(llvm::ArrayRef<const char *> args) override;
 
   int Run() override;
   /// Parse the given list of strings into an InputArgList.
   void PrintCycle() override;
   void PrintHelp() override;
- 
+
 public:
   Analysis &GetAnalysis() { return *analysis.get(); }
 };

@@ -3,8 +3,8 @@
 
 using namespace stone;
 
-Analysis::Analysis(Context &context, 
-		const SearchPathOptions &pathOpts, SrcMgr &sm) {
+Analysis::Analysis(Context &context, const SearchPathOptions &pathOpts,
+                   SrcMgr &sm) {
 
   ac.reset(new ASTContext(context, pathOpts, sm));
 }

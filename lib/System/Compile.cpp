@@ -22,11 +22,8 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, Pipeline *pipeline) {
 
   Compiler compiler(pipeline);
-  auto argList = compiler.BuildArgList(args);
-
-  if (compiler.compileOpts.showHelp) {
-    compiler.PrintHelp();
-    return ret::ok;
+  if (compiler.Build(args)) {
+    compiler.Run();
   }
 
   // Perform a quick help check

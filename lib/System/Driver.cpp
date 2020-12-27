@@ -41,14 +41,17 @@ Driver::Driver(llvm::StringRef stoneExecutable, llvm::StringRef targetTriple,
   if (!this->vfs)
     this->vfs = llvm::vfs::getRealFileSystem();
 }
+/// Parse the given list of strings into an InputArgList.
+bool Driver::Build(llvm::ArrayRef<const char *> args) {
+
+  auto argList = BuildArgList(args);
+  return true;
+}
 
 std::unique_ptr<llvm::opt::InputArgList>
 Driver::BuildArgList(llvm::ArrayRef<const char *> args) {
 
-  unsigned includedFlagsBitmask = 0;
-  unsigned excludedFlagsBitmask = opts::NoDriverOption;
-  unsigned missingArgIndex, missingArgCount;
-
+  excludedFlagsBitmask = opts::NoDriverOption;
   std::unique_ptr<llvm::opt::InputArgList> argList =
       llvm::make_unique<llvm::opt::InputArgList>(
           driverOpts.GetOptTable().ParseArgs(
@@ -118,4 +121,9 @@ void Driver::PrintCycle() {}
 
 void Driver::PrintHelp() {}
 
-int Driver::Run() {}
+int Driver::Run() {
+  // Perform a quick help check
+  if (driverOpts.GetAction()->GetKind() == ActionKind::Help) {
+    PrintHelp();
+  }
+}

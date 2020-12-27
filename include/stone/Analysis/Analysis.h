@@ -28,9 +28,9 @@ public:
 
 public:
   ASTContext &GetASTContext() { return *ac.get(); }
-  //stone::ModuleDecl &GetModule() { return *md.get(); }
-	//
- /// Retrieve the main module containing the files being compiled.
+  // stone::ModuleDecl &GetModule() { return *md.get(); }
+  //
+  /// Retrieve the main module containing the files being compiled.
   ModuleDecl *GetMainModule() const;
 
   /// Replace the current main module with a new one. This is used for top-level

@@ -101,10 +101,9 @@ int Run(llvm::ArrayRef<const char *> args) {
   stone::SetInstallDir(args, driver, canonicalPrefixes);
 
   // TODO: driver.SetTargetAndMode(TargetAndMode);
-  auto argList = driver.BuildArgList(args);
-  // Perform a quick help check
-  if (driver.driverOpts.GetAction()->GetKind() == ActionKind::Help) {
-    return stone::Help(HelpMode::Driver);
+  if (driver.Build(args)) {
+
+    return driver.Run();
   }
   // auto toolChain = driver.BuildToolChain(*argList.get());
 

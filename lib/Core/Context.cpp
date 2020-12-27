@@ -2,5 +2,5 @@
 
 using namespace stone;
 
-//TODO: 
+// TODO:
 Context::Context() : diagEngine(diagOpts, nullptr, false), os(llvm::outs()) {}

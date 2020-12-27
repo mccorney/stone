@@ -127,19 +127,16 @@ private:
   /// Arguments originated from command line.
   std::unique_ptr<llvm::opt::InputArgList> clOpts;
 
+protected:
+  /// Parse the given list of strings into an InputArgList.
+  std::unique_ptr<llvm::opt::InputArgList>
+  BuildArgList(llvm::ArrayRef<const char *> args) override;
+
 private:
   void BuildTasks();
   void BuildProcs();
   void BuildQueue();
   void BuildOpts(llvm::ArrayRef<const char *> args);
-
-public:
-  Driver(llvm::StringRef stoneExecutablePath, llvm::StringRef targetTriple,
-         llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs = nullptr);
-
-  /// Parse the given list of strings into an InputArgList.
-  std::unique_ptr<llvm::opt::InputArgList>
-  BuildArgList(llvm::ArrayRef<const char *> args) override;
 
   /// This uses a std::unique_ptr instead of returning a toolchain by value
   /// because ToolChain has virtual methods.
@@ -149,6 +146,13 @@ public:
   std::unique_ptr<Compilation>
   BuildCompilation(const ToolChain &toolChain,
                    const llvm::opt::InputArgList &argList);
+
+public:
+  Driver(llvm::StringRef stoneExecutablePath, llvm::StringRef targetTriple,
+         llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs = nullptr);
+
+  /// Parse the given list of strings into an InputArgList.
+  bool Build(llvm::ArrayRef<const char *> args) override;
 
   int Run() override;
   ///
