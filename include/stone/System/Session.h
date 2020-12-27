@@ -2,6 +2,8 @@
 #define STONE_SYSTEM_SESSION_H
 
 #include "stone/Core/Context.h"
+#include "stone/System/SessionOptions.h"
+
 #include "llvm/ADT/ArrayRef.h"
 
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
@@ -11,21 +13,27 @@
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/Chrono.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 namespace stone {
 
 class Session : public Context {
 
+  SessionOptions &sessionOpts;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs;
+
 protected:
+  /// Bit flags for OptTable
   unsigned includedFlagsBitmask = 0;
   unsigned excludedFlagsBitmask = 0;
   unsigned missingArgIndex;
   unsigned missingArgCount;
 
-  /// Target triple.
-  // std::string targetTriple;
+  /// Default target triple.
+  std::string targetTriple;
+
 public:
-  // llvm::vfs::FileSystem &GetVFS() const { return *vfs; }
+  llvm::vfs::FileSystem &GetVFS() const { return *vfs; }
   //
   /// When the session was started.
   ///
@@ -39,12 +47,12 @@ public:
   llvm::sys::TimePoint<> endTime = llvm::sys::TimePoint<>::min();
 
 public:
-  Session();
+  Session(SessionOptions &sessionOpts);
   ~Session();
 
 protected:
-  virtual std::unique_ptr<llvm::opt::InputArgList>
-  BuildArgList(llvm::ArrayRef<const char *> args) = 0;
+  std::unique_ptr<llvm::opt::InputArgList>
+  BuildArgList(llvm::ArrayRef<const char *> args);
 
 public:
   ///
@@ -55,6 +63,16 @@ public:
   virtual void PrintCycle() = 0;
   ///
   virtual void PrintHelp() = 0;
+
+  void SetTargetTriple(const llvm::Triple &triple);
+
+  void SetTargetTriple(llvm::StringRef triple);
+
+  llvm::StringRef GetTargetTriple() const { return langOpts.target.str(); }
+
+ const llvm::opt::OptTable &GetOptTable() const {
+    return sessionOpts.GetOptTable();
+  }
 
   // virtual llvm::StringRef GetName() = 0;
 };

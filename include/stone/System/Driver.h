@@ -75,7 +75,7 @@ public:
   /// command line.
   std::string driverDir;
 
-  /// The original path to the clang executable.
+  /// The original path to the stone executable.
   std::string stoneExecutablePath;
 
   /// sysroot, if present
@@ -102,12 +102,7 @@ public:
   /// User directory for config files.
   std::string userConfigDir;
 
-  llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs;
-
 private:
-  /// Raw target triple.
-  std::string targetTriple;
-
   /// Name of configuration file if used.
   std::string cfgFile;
 
@@ -127,11 +122,6 @@ private:
   /// Arguments originated from command line.
   std::unique_ptr<llvm::opt::InputArgList> clOpts;
 
-protected:
-  /// Parse the given list of strings into an InputArgList.
-  std::unique_ptr<llvm::opt::InputArgList>
-  BuildArgList(llvm::ArrayRef<const char *> args) override;
-
 private:
   void BuildTasks();
   void BuildProcs();
@@ -148,8 +138,7 @@ private:
                    const llvm::opt::InputArgList &argList);
 
 public:
-  Driver(llvm::StringRef stoneExecutablePath, llvm::StringRef targetTriple,
-         llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs = nullptr);
+  Driver(llvm::StringRef executablePath);
 
   /// Parse the given list of strings into an InputArgList.
   bool Build(llvm::ArrayRef<const char *> args) override;
@@ -169,13 +158,7 @@ public:
 
 public:
   const std::string &GetConfigFile() const { return cfgFile; }
-
-  const llvm::opt::OptTable &GetOptTable() const {
-    return driverOpts.GetOptTable();
-  }
-  // const DiagnosticsEngine &GetDiagEngine() const { return Diags; }
-  llvm::vfs::FileSystem &GetVFS() const { return *vfs; }
-
+ 
   bool GetCheckInputFilesExist() const { return checkInputFilesExist; }
   void SetCheckInputFilesExist(bool v) { checkInputFilesExist = v; }
 

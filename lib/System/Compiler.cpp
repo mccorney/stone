@@ -6,25 +6,20 @@
 using namespace stone;
 
 Compiler::Compiler(Pipeline *pipeline)
-    : compileOpts(GetLangOptions()), pipeline(pipeline) {}
+    : Session(compileOpts), compileOpts(langOpts), pipeline(pipeline) {}
 
 bool Compiler::Build(llvm::ArrayRef<const char *> args) {
 
+  excludedFlagsBitmask = opts::NoCompileOption;
   auto argList = BuildArgList(args);
+  return true;
 }
 
-/// Parse the given list of strings into an InputArgList.
-std::unique_ptr<llvm::opt::InputArgList>
-Compiler::BuildArgList(llvm::ArrayRef<const char *> args) {
-
-  return nullptr;
-}
 void Compiler::PrintCycle() {}
 
 void Compiler::PrintHelp() {}
 
 int Compiler::Run() {
-
   // Perform a quick help check
   if (compileOpts.GetAction()->GetKind() == ActionKind::Help) {
     PrintHelp();

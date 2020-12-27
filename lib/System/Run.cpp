@@ -97,20 +97,14 @@ int Run(llvm::ArrayRef<const char *> args) {
 
   bool canonicalPrefixes = false;
 
-  Driver driver(executablePath, llvm::sys::getDefaultTargetTriple());
+  Driver driver(executablePath);
   stone::SetInstallDir(args, driver, canonicalPrefixes);
 
   // TODO: driver.SetTargetAndMode(TargetAndMode);
   if (driver.Build(args)) {
-
     return driver.Run();
   }
-  // auto toolChain = driver.BuildToolChain(*argList.get());
-
-  // auto compilation = driver.BuildCompilation(*toolChain.get(),
-  // *argList.get());
-  //
-  return 0;
+  return ret::ok;
 }
 
 } // namespace stone

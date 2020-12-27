@@ -18,11 +18,6 @@ public:
   CompileOptions compileOpts;
   std::unique_ptr<Analysis> analysis;
 
-protected:
-  /// Parse the given list of strings into an InputArgList.
-  std::unique_ptr<llvm::opt::InputArgList>
-  BuildArgList(llvm::ArrayRef<const char *> args) override;
-
 public:
   Compiler(Pipeline *pipeline = nullptr);
 

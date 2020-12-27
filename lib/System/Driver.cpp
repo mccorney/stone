@@ -29,54 +29,20 @@
 
 using namespace stone;
 
-Driver::Driver(llvm::StringRef stoneExecutable, llvm::StringRef targetTriple,
-               llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> vfs)
-    : driverOpts(GetLangOptions()), vfs(std::move(vfs)),
+Driver::Driver(llvm::StringRef stoneExecutable)
+    : Session(driverOpts), driverOpts(langOpts),
       stoneExecutablePath(stoneExecutablePath),
       /*sysRoot(DEFAULT_SYSROOT),*/
-      driverTitle("Stone Compiler"), targetTriple(targetTriple),
-      strSaver(bumpAlloc), checkInputFilesExist(true) {
+      driverTitle("Stone Compiler"), strSaver(bumpAlloc),
+      checkInputFilesExist(true) {
 
-  // Provide a sane fallback if no VFS is specified.
-  if (!this->vfs)
-    this->vfs = llvm::vfs::getRealFileSystem();
 }
 /// Parse the given list of strings into an InputArgList.
 bool Driver::Build(llvm::ArrayRef<const char *> args) {
 
+  excludedFlagsBitmask = opts::NoDriverOption;
   auto argList = BuildArgList(args);
   return true;
-}
-
-std::unique_ptr<llvm::opt::InputArgList>
-Driver::BuildArgList(llvm::ArrayRef<const char *> args) {
-
-  excludedFlagsBitmask = opts::NoDriverOption;
-  std::unique_ptr<llvm::opt::InputArgList> argList =
-      llvm::make_unique<llvm::opt::InputArgList>(
-          driverOpts.GetOptTable().ParseArgs(
-              args, missingArgIndex, missingArgCount, includedFlagsBitmask,
-              excludedFlagsBitmask));
-
-  assert(argList && "No input argument list.");
-
-  // Check for missing argument error.
-  if (missingArgCount) {
-    os << "D(SrcLoc(),"
-       << "msg::error_missing_arg_value,"
-       << "argList->getArgString(missingArgIndex),"
-       << "missingArgCount" << '\n';
-    return nullptr;
-  }
-
-  // Check for unknown arguments.
-  for (const llvm::opt::Arg *arg : argList->filtered(opts::UNKNOWN)) {
-    os << "D(SourceLoc(), "
-       << "msg::error_unknown_arg,"
-       << "arg->getAsString(*ArgList));" << '\n';
-  }
-
-  return argList;
 }
 
 std::unique_ptr<ToolChain>
