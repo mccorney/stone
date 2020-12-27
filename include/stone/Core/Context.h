@@ -7,6 +7,7 @@
 
 namespace stone {
 class Context {
+
 protected:
   LangOptions langOpts;
   DiagnosticOptions diagOpts;
@@ -19,10 +20,13 @@ public:
 public:
   llvm::raw_ostream &Out() { return os; }
   DiagnosticEngine &GetDiagEngine() { return diagEngine; }
-  const LangOptions &GetLangOptions() const { return langOpts; }
+  const DiagnosticEngine &GetDiagEngine() const { return diagEngine; }
+
   LangOptions &GetLangOptions() { return langOpts; }
+  const LangOptions &GetLangOptions() const { return langOpts; }
 
   DiagnosticOptions &GetDiagOptions() { return diagOpts; }
+  const DiagnosticOptions &GetDiagOptions() const { return diagOpts; }
 };
 
 } // namespace stone

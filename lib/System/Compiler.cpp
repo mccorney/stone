@@ -25,9 +25,8 @@ void Compiler::PrintHelp() {}
 
 int Compiler::Run() {
   // Perform a quick help check
-  if (compileOpts.GetAction()->GetKind() == ActionKind::Help) {
+  if (compileOpts.showHelp) {
     PrintHelp();
   }
-
   return 0;
 }

@@ -76,27 +76,24 @@ int Run(llvm::ArrayRef<const char *> args) {
     return ret::err;
   }
 
-  if (args.size() == 1) {
-    return stone::Help(HelpMode::Driver);
-  }
-
-  if (llvm::sys::Process::FixupStandardFileDescriptors())
+  if (llvm::sys::Process::FixupStandardFileDescriptors()) {
     return ret::err;
-
+  }
   llvm::InitializeAllTargets();
 
   std::string executablePath = GetExecutablePath(args[0]);
 
-  // auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
-  // -compile ?
-  auto arg0 = args[1];
-  if (arg0 == "-compile") {
-    // return stone::Compile(llvm::makeArrayRef(Args.data() +2,
-    // Args.data() + Args.size()), Arg0)
+  if (args.size() > 1) {
+    llvm::StringRef firstArg(args[1]);
+    if (firstArg == "-compile") {
+      return stone::Compile(
+          llvm::makeArrayRef(args.data() + 2, args.data() + args.size()),
+          args[0], (void *)(intptr_t)GetExecutablePath, nullptr);
+    }
   }
 
+  // auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
   bool canonicalPrefixes = false;
-
   Driver driver(executablePath);
   stone::SetInstallDir(args, driver, canonicalPrefixes);
 

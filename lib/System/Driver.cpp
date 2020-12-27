@@ -87,7 +87,8 @@ void Driver::PrintHelp() {}
 
 int Driver::Run() {
   // Perform a quick help check
-  if (driverOpts.GetAction()->GetKind() == ActionKind::Help) {
+  if (driverOpts.showHelp) {
     PrintHelp();
   }
+  return 0;
 }

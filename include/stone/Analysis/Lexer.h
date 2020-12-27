@@ -29,10 +29,9 @@ uint32_t ValidateUTF8CharAndAdvance(const char *&startOfByte, const char *end);
 
 class Lexer final {
 
-  FileID srcID;
-  DiagnosticEngine *de = nullptr;
+  const FileID srcID;
   SrcMgr &sm;
-  const LangOptions &lo;
+  const stone::Context &ctx;
 
   std::unique_ptr<LexerDiagnostics> diagnostics;
 
@@ -96,8 +95,7 @@ private:
   tk GetKindOfIdentifier(StringRef tokStr);
 
 public:
-  Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
-        DiagnosticEngine *de = nullptr);
+  Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx);
 
 public:
   void Lex(Token &result) {

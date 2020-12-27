@@ -351,9 +351,8 @@ static bool IsIdentifier(const signed char ch) {
   }
 }
 
-Lexer::Lexer(const FileID srcID, SrcMgr &sm, const LangOptions &lo,
-             DiagnosticEngine *de)
-    : srcID(srcID), sm(sm), lo(lo), de(de) {
+Lexer::Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx)
+    : srcID(srcID), sm(sm), ctx(ctx) {
 
   bool invalid = false;
   auto memBuffer = sm.getBuffer(srcID, SrcLoc(), &invalid /*true means error*/);
@@ -405,9 +404,8 @@ void Lexer::Init(unsigned startOffset, unsigned endOffset) {
          "The token should be at the beginning of the line, "
          "or we should be Lexing from the middle of the buffer");
 
-  if (de) {
-    // de->AddDiagnostic(std::move(lexerDiag));
-  }
+  // TODO: ctx.GetDiagEngine().AddDiagnostics(diagnostics.reset(new
+  // LexerDiagnostics()));
 }
 
 void Lexer::Lex() {

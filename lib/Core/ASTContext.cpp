@@ -18,6 +18,9 @@ ASTContext::ASTContext(const stone::Context &ctx,
 
   builtin.Init(*this);
 }
+
+ASTContext::~ASTContext() {}
+
 Identifier &ASTContext::GetIdentifier(llvm::StringRef name) {
   return identifiers.Get(name);
 }
