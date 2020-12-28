@@ -14,6 +14,7 @@
 #include "llvm/Support/type_traits.h"
 
 namespace stone {
+class InputFiles; 
 
 enum { ActionAlignment = 8 };
 
@@ -21,7 +22,8 @@ class alignas(ActionAlignment) Action {
   friend class ActionTable;
   ActionKind kind;
   llvm::StringMapEntry<Action *> *entry = nullptr;
-  unsigned chosen : 1;
+
+	InputFiles* inputs = nullptr; 
 
 public:
   Action(const Action &) = delete;
@@ -30,7 +32,7 @@ public:
   Action &operator=(Action &&) = delete;
 
 public:
-  Action() : kind(ActionKind::Parse) {}
+  Action() : kind(ActionKind::None) {}
   ActionKind GetKind() { return kind; }
 
   /// Return the beginning of the actual null-terminated string for this
@@ -40,10 +42,12 @@ public:
   /// Efficiently return the length of this identifier info.
   unsigned GetLength() const { return entry->getKeyLength(); }
 
-  /// Return the actual identifier string.
+  /// Return the actual name string.
   llvm::StringRef GetName() const {
     return llvm::StringRef(GetNameStart(), GetLength());
   }
+
+	InputFiles* GetInputFiles() { return inputs; }
 };
 
 class ActionTable;
@@ -105,7 +109,6 @@ public:
     auto &entry = *entries.insert(std::make_pair(name, nullptr)).first;
     Action *&action = entry.second;
     if (action) {
-      action->chosen = true;
       return *action;
     }
     // Lookups failed, make a new Action.

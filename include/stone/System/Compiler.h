@@ -13,6 +13,7 @@ namespace stone {
 
 class Pipeline;
 class Compiler final : public Session {
+
   Pipeline *pipeline = nullptr;
   SrcMgr sm;
   FileMgr fm;
@@ -41,6 +42,10 @@ public:
   const SearchPathOptions &GetSearchPathOptions() const {
     return compileOpts.searchPathOpts;
   }
+
+  CompileOptions &GetCompileOptions() { return compileOpts; }
+  const CompileOptions &GetCompileOptions() const { return compileOpts; }
+
   SrcMgr &GetSrcMgr() { return sm; }
 };
 

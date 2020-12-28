@@ -40,6 +40,9 @@ class ToolChain;
 
 class DriverProfile final {
 public:
+
+	enum class DriverKind {};
+
   enum class CompileMode {
     /// Multiple compile invocations and -main-file.
     Multiple,
@@ -152,7 +155,6 @@ private:
   void BuildSteps();
   void BuildProcs();
   void BuildQueue();
-  void BuildOpts(llvm::ArrayRef<const char *> args);
 
   /// This uses a std::unique_ptr instead of returning a toolchain by value
   /// because ToolChain has virtual methods.
@@ -210,7 +212,9 @@ public:
   }
   void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
 
+	const DriverProfile &GetProfile() const { return profile; }
   DriverProfile &GetProfile() { return profile; }
+
 };
 
 } // namespace stone

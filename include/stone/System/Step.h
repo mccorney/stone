@@ -28,7 +28,7 @@ class Step {
 protected:
   StepKind kind;
   const Action &source;
-  const llvm::opt::Arg *intput = nullptr;
+  //const llvm::opt::Arg *intput = nullptr;
 
 public:
   Step(StepKind kind, const Action &source);
