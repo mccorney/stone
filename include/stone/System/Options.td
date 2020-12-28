@@ -104,7 +104,7 @@ def TargetVariant : Separate<["-"], "target-variant">,
   HelpText<"Generate 'zippered' code for macCatalyst that can run on the specified"
            " variant target triple in addition to the main -target triple">;
 
-def TargetCPU : Separate<["-"], "target-cpu">, Flags<[CompileOption]>,
+def TargetCPU : Separate<["-"], "target-cpu">, Flags<[CompileOption, DriverOption]>,
 HelpText<"Generate code for a particular CPU variant">;
 
 // DEV OPTIONS 

@@ -7,6 +7,7 @@
 #include "stone/Core/DeclName.h"
 #include "stone/Core/Identifier.h"
 #include "stone/Core/LLVM.h"
+#include "stone/Core/Object.h"
 #include "stone/Core/SrcLoc.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -42,7 +43,7 @@ public:
   void Print() const override;
 };
 
-class alignas(8) Decl : public ASTNode {
+class alignas(8) Decl : public ASTNode /*TODO: Object */ {
   friend DeclStats;
   decl::Kind kind;
   SrcLoc loc;

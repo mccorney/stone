@@ -32,13 +32,8 @@ bool Action::IsAction(const LangOptions &langOpts) const {
 }
 */
 
-ActionTable::ActionTable(const LangOptions &langOpts) : langOpts(langOpts) {
-  AddActions(langOpts);
-}
-
 static void AddAction(ActionKind kind, llvm::StringRef name, unsigned flag,
                       const LangOptions &langOpts, ActionTable &actions) {
-
   auto status = GetActionStatus(langOpts, flag);
   if (status == ActionStatus::Disabled) {
     return;
@@ -47,6 +42,9 @@ static void AddAction(ActionKind kind, llvm::StringRef name, unsigned flag,
       name, status == ActionStatus::Future ? ActionKind::None : kind);
 
   // action.SetIsActionFuture(status == ActionStatus::Future);
+}
+ActionTable::ActionTable(const LangOptions &langOpts) : langOpts(langOpts) {
+  AddActions(langOpts);
 }
 void ActionTable::AddActions(const LangOptions &LangOpts) {
 

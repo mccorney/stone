@@ -10,9 +10,9 @@ Analysis::Analysis(const stone::Context &ctx, const SearchPathOptions &pathOpts,
   ac.reset(new ASTContext(ctx, pathOpts, sm));
 }
 
-ModuleDecl *Analysis::GetMainModule() const { 
-	assert(mainModule && "Null Main Module."); 
-	return mainModule; 
+ModuleDecl *Analysis::GetMainModule() const {
+  assert(mainModule && "Null Main Module.");
+  return mainModule;
 }
 
 void Analysis::SetMainModule(ModuleDecl *moduleDecl) {}

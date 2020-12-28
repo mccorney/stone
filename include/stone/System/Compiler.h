@@ -32,7 +32,7 @@ public:
   int Run() override;
   /// Parse the given list of strings into an InputArgList.
   void PrintCycle() override;
-  void PrintHelp() override;
+  void PrintHelp(bool showHidden) override;
 
 public:
   Analysis &GetAnalysis() { return *analysis.get(); }

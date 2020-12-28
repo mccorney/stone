@@ -16,6 +16,7 @@ protected:
 public:
   bool showHelp = false;
   bool showCycle = false;
+  // TODO: May move to Session
   ActionTable actions;
 
 public:
@@ -27,7 +28,7 @@ public:
     assert(action && "No action");
     return action;
   }
-  llvm::opt::OptTable &GetOptTable() const { return *optTable.get(); }
+  llvm::opt::OptTable &GetOpts() const { return *optTable.get(); }
   ActionTable &GetActionTable() { return actions; }
 };
 } // namespace stone

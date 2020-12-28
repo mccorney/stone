@@ -1,14 +1,14 @@
 
+any<T> interface Collection {
+}
 
-any<T> interface Collection<T> {
+any<T: Comparable> class Array<T> : Collection<T> {
 
 }
 
-any<T> class Array<T> : Collection<T> {
 
+interface Collection<T> {
 }
 
-any<T> fun Move() -> void {
 
-}
 

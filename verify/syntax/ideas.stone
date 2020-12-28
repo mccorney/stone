@@ -38,3 +38,46 @@ defer C0::Defer() {
 	free options; 
 }
 
+
+
+module Physics; 
+
+space Physics.Device {
+
+
+	interface Accelerator<T> {
+			Fire(const T* particle != null) -> bool;
+	}
+
+	class LinearAccelerator : Accelerator<LinearAccelerator> {
+		public string name = "some name";  
+	}
+
+	init fun LinearAccelerator::Init() {
+
+	}
+
+	defer fun LinearAccelerator::Defer() {
+
+	}
+
+	struct Particle {
+		public bool fired = false; 
+	}
+
+	fun LinearAcellerator::Fire(const Particle* particle) -> bool {
+		particle.fired = true; 
+		return true; 
+	}
+
+	fun Main() -> void {
+
+		auto p = new Particle();
+		auto a = new LinearAcceleartor(); 
+		a.Fire(a);
+
+		free p; 
+		free a;
+
+	}
+}

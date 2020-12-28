@@ -25,19 +25,19 @@ class InputArgList;
 } // namespace opt
 } // namespace llvm
 namespace stone {
-class System;
+class Driver;
 class ToolChain;
 
 class Compilation final {
 
   /// The System we were created by.
-  const System &system;
+  const Driver &driver;
 
   /// The default tool chain.
   const ToolChain &toolChain;
 
   /// The original (untranslated) input argument list.
-  llvm::opt::InputArgList *args;
+  llvm::opt::InputArgList *originalArgs;
 
   /// The driver translated arguments. Note that toolchains may perform their
   /// own argument translation.

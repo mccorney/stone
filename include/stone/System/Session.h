@@ -65,7 +65,7 @@ public:
   ///
   virtual void PrintCycle() = 0;
   ///
-  virtual void PrintHelp() = 0;
+  virtual void PrintHelp(bool showHidden) = 0;
 
   void SetTargetTriple(const llvm::Triple &triple);
 

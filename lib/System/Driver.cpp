@@ -28,10 +28,11 @@
 #include "llvm/Support/raw_ostream.h"
 
 using namespace stone;
+using namespace llvm::opt;
 
-Driver::Driver(llvm::StringRef stoneExecutable)
+Driver::Driver(llvm::StringRef stoneExecutable, std::string driverName)
     : Session(driverOpts), driverOpts(langOpts),
-      stoneExecutablePath(stoneExecutablePath),
+      stoneExecutablePath(stoneExecutablePath), driverName(driverName),
       /*sysRoot(DEFAULT_SYSROOT),*/
       driverTitle("Stone Compiler"), strSaver(bumpAlloc),
       checkInputFilesExist(true) {}
@@ -39,7 +40,11 @@ Driver::Driver(llvm::StringRef stoneExecutable)
 bool Driver::Build(llvm::ArrayRef<const char *> args) {
 
   excludedFlagsBitmask = opts::NoDriverOption;
-  auto argList = BuildArgList(args);
+  auto clOptions = BuildArgList(args);
+  //auto toolChain = BuildToolChain(*clOptions);
+
+  // auto compilation = BuildCompilation(*toolChain, *clOptions);
+
   return true;
 }
 
@@ -77,18 +82,64 @@ Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
   }
 }
 
+llvm::opt::DerivedArgList *
+Driver::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
+
+  DerivedArgList *dArgList = new DerivedArgList(args);
+
+  for (Arg *arg : args) {
+    dArgList->append(arg);
+  }
+  return dArgList;
+}
+
+bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {
+
+  if (args.hasArg(opts::Help)) {
+    PrintHelp(false);
+    return false;
+  }
+  return true;
+}
 std::unique_ptr<Compilation>
 Driver::BuildCompilation(const ToolChain &toolChain,
-                         const llvm::opt::InputArgList &argList) {}
+                         const llvm::opt::InputArgList &argList) {
+
+  llvm::PrettyStackTraceString CrashInfo("Compilation construction");
+
+  startTime = std::chrono::system_clock::now();
+
+  // TODO:
+  // workingDirectory = ComputeWorkingDirectory(argList.get());
+
+  std::unique_ptr<DerivedArgList> dArgList(TranslateInputArgs(argList));
+
+  // Perform toolchain specific args validation.
+  // toolChain.ValidateArguments(de, *dArgList, targetTriple);
+  //
+  if (de.HasError()) {
+    return nullptr;
+  }
+  if (!HandleImmediateArgs(*dArgList, toolChain)) {
+    return nullptr;
+  }
+}
 
 void Driver::PrintCycle() {}
 
-void Driver::PrintHelp() {}
+void Driver::PrintHelp(bool showHidden) {
+  excludedFlagsBitmask = opts::NoDriverOption;
+  // if (!showHidden)
+  //  excludedFlagsBitmask |= HelpHidden;
 
+  driverOpts.GetOpts().PrintHelp(Out(), driverName.c_str(), "Stone Compiler",
+                                 includedFlagsBitmask, excludedFlagsBitmask,
+                                 /*ShowAllAliases*/ false);
+}
 int Driver::Run() {
   // Perform a quick help check
   if (driverOpts.showHelp) {
-    PrintHelp();
+    // PrintHelp();
   }
   return 0;
 }

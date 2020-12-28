@@ -6,6 +6,7 @@
 #include "stone/System/Compilation.h"
 #include "stone/System/DriverOptions.h"
 #include "stone/System/Session.h"
+#include "stone/System/ToolChain.h"
 
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/VirtualFileSystem.h"
@@ -15,6 +16,7 @@
 #include <string>
 #include <vector>
 
+using namespace llvm::opt;
 namespace llvm {
 class Triple;
 namespace vfs {
@@ -122,6 +124,13 @@ private:
   /// Arguments originated from command line.
   std::unique_ptr<llvm::opt::InputArgList> clOpts;
 
+  /// Cache of all the ToolChains in use by the driver.
+  ///
+  /// This maps from the string representation of a triple to a ToolChain
+  /// created targeting that triple. The driver owns all the ToolChain objects
+  /// stored in it, and will clean them up when torn down.
+  mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
+
 private:
   void BuildTasks();
   void BuildProcs();
@@ -137,8 +146,15 @@ private:
   BuildCompilation(const ToolChain &toolChain,
                    const llvm::opt::InputArgList &argList);
 
+  /// TranslateInputArgs - Create a new derived argument list from the input
+  /// arguments, after applying the standard argument translations.
+  llvm::opt::DerivedArgList *
+  TranslateInputArgs(const llvm::opt::InputArgList &args) const;
+
+  bool HandleImmediateArgs(const ArgList &args, const ToolChain &tc);
+
 public:
-  Driver(llvm::StringRef executablePath);
+  Driver(llvm::StringRef executablePath, std::string driverName);
 
   /// Parse the given list of strings into an InputArgList.
   bool Build(llvm::ArrayRef<const char *> args) override;
@@ -148,7 +164,7 @@ public:
   void PrintCycle() override;
 
   ///
-  void PrintHelp() override;
+  void PrintHelp(bool showHidden) override;
 
   ///
   // void PrintTasks();

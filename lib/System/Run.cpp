@@ -94,7 +94,10 @@ int Run(llvm::ArrayRef<const char *> args) {
 
   // auto TargetAndMode = ToolChain::GetTargetAndModeFromProgramName(argv[0]);
   bool canonicalPrefixes = false;
-  Driver driver(executablePath);
+
+  llvm::StringRef driverName = llvm::sys::path::stem(args[0]);
+  Driver driver(executablePath, driverName);
+
   stone::SetInstallDir(args, driver, canonicalPrefixes);
 
   // TODO: driver.SetTargetAndMode(TargetAndMode);

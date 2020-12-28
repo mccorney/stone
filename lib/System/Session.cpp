@@ -13,9 +13,9 @@ Session::BuildArgList(llvm::ArrayRef<const char *> args) {
 
   std::unique_ptr<llvm::opt::InputArgList> argList =
       llvm::make_unique<llvm::opt::InputArgList>(
-          sessionOpts.GetOptTable().ParseArgs(
-              args, missingArgIndex, missingArgCount, includedFlagsBitmask,
-              excludedFlagsBitmask));
+          sessionOpts.GetOpts().ParseArgs(args, missingArgIndex,
+                                          missingArgCount, includedFlagsBitmask,
+                                          excludedFlagsBitmask));
 
   assert(argList && "No input argument list.");
 

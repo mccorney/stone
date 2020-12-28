@@ -16,7 +16,7 @@ class OptTable;
 namespace stone {
 namespace opts {
 
-enum OptionFlag {
+enum OptFlag {
   CompileOption = (1 << 4),
   NoCompileOption = (1 << 5),
   DriverOption = (1 << 6),

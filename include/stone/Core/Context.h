@@ -12,15 +12,15 @@ protected:
   LangOptions langOpts;
   DiagnosticOptions diagOpts;
   llvm::raw_ostream &os;
-  DiagnosticEngine diagEngine;
+  DiagnosticEngine de;
 
 public:
   Context();
 
 public:
   llvm::raw_ostream &Out() { return os; }
-  DiagnosticEngine &GetDiagEngine() { return diagEngine; }
-  const DiagnosticEngine &GetDiagEngine() const { return diagEngine; }
+  DiagnosticEngine &GetDiagEngine() { return de; }
+  const DiagnosticEngine &GetDiagEngine() const { return de; }
 
   LangOptions &GetLangOptions() { return langOpts; }
   const LangOptions &GetLangOptions() const { return langOpts; }

@@ -21,12 +21,12 @@ bool Compiler::Build(llvm::ArrayRef<const char *> args) {
 
 void Compiler::PrintCycle() {}
 
-void Compiler::PrintHelp() {}
+void Compiler::PrintHelp(bool showHidden) {}
 
 int Compiler::Run() {
   // Perform a quick help check
   if (compileOpts.showHelp) {
-    PrintHelp();
+    // PrintHelp();
   }
   return 0;
 }

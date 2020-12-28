@@ -139,6 +139,7 @@ DECL_KEYWORD(type, TOKON)
 DECL_KEYWORD(use, TOKON)
 DECL_KEYWORD(int, TOKON)
 DECL_KEYWORD(unsigned, TOKON)
+DECL_KEYWORD(object, TOKRSV)
 
 // Statement keywords.
 STMT_KEYWORD(defer, TOKON)

@@ -118,6 +118,8 @@ public:
   void AddDiagnostics(std::unique_ptr<Diagnostics> diagnostics);
 
   // void AddDiagnosticListener(std::unique_ptr<DiagnosticListener> diagnostic);
+  //
+  bool HasError();
 };
 
 class DiagnosticBuilder final {
