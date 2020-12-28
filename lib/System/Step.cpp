@@ -3,16 +3,24 @@
 
 using namespace stone;
 
-Step::Step(const Action &source) : source(source) {}
+Step::Step(StepKind kind, const Action &source) : kind(kind), source(source) {}
 
-SyncStep::SyncStep(const Action &source) : Step(source) {}
+SyncStep::SyncStep(StepKind kind, const Action &source) : Step(kind, source) {}
 
-AsyncStep::AsyncStep(const Action &source) : Step(source) {}
+AsyncStep::AsyncStep(StepKind kind, const Action &source)
+    : Step(kind, source) {}
 
-CompileStep::CompileStep(const Action &source) : AsyncStep(source) {}
+CompileStep::CompileStep(const Action &source)
+    : AsyncStep(StepKind::Compile, source) {}
 
-LinkStep::LinkStep(const Action &source) : AsyncStep(source) {}
+AssembleStep::AssembleStep(const Action &source)
+    : AsyncStep(StepKind::Assemble, source) {}
 
-AssembleStep::AssembleStep(const Action &source) : AsyncStep(source) {}
+BackendStep::BackendStep(const Action &source)
+    : AsyncStep(StepKind::Backend, source) {}
 
-BackendStep::BackendStep(const Action &source) : AsyncStep(source) {}
+StaticLinkStep::StaticLinkStep(const Action &source)
+    : AsyncStep(StepKind::StaticLink, source) {}
+
+DynamicLinkStep::DynamicLinkStep(const Action &source)
+    : AsyncStep(StepKind::DynamicLink, source) {}

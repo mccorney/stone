@@ -76,6 +76,9 @@ public:
 };
 
 class Driver final : public Session {
+
+  std::unique_ptr<Compilation> compilation;
+
 public:
   DriverOptions driverOpts;
 

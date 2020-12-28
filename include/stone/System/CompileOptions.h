@@ -11,6 +11,8 @@ class CompileOptions final : public SessionOptions {
 public:
   GenOptions genOpts;
   AnalysisOptions analyzeOpts;
+  SearchPathOptions searchPathOpts;
+  FileSystemOptions fsOpts;
 
 public:
   CompileOptions(LangOptions &langOpts) : SessionOptions(langOpts) {}

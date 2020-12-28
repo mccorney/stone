@@ -18,9 +18,10 @@ class Driver;
 //};
 
 class Process {
+  friend class Compilation;
+
   Step &trigger;
   Driver &driver;
-
   /// The input file list in case we need to emit a file list instead of a
   /// proper response file
   llvm::opt::ArgStringList inputFiles;
@@ -31,7 +32,7 @@ public:
 
 public:
   Process(Step &trigger, Driver &driver) : trigger(trigger), driver(driver) {}
-  ~Process();
+  virtual ~Process();
 
 public:
   Step &GetTrigger() { return trigger; }

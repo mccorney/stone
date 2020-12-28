@@ -16,12 +16,10 @@ class Compiler final : public Session {
   Pipeline *pipeline = nullptr;
   SrcMgr sm;
   FileMgr fm;
-  FileSystemOptions fsOpts;
   std::unique_ptr<Analysis> analysis;
 
 public:
   CompileOptions compileOpts;
-  SearchPathOptions searchPathOpts;
 
 public:
   Compiler(Pipeline *pipeline = nullptr);
@@ -37,9 +35,11 @@ public:
 public:
   Analysis &GetAnalysis() { return *analysis.get(); }
 
-  SearchPathOptions &GetSearchPathOptions() { return searchPathOpts; }
+  SearchPathOptions &GetSearchPathOptions() {
+    return compileOpts.searchPathOpts;
+  }
   const SearchPathOptions &GetSearchPathOptions() const {
-    return searchPathOpts;
+    return compileOpts.searchPathOpts;
   }
   SrcMgr &GetSrcMgr() { return sm; }
 };

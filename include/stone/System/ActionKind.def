@@ -14,7 +14,7 @@
 
 ACTION(None) 
 ACTION(Help) 
-
+COMPILE_ACTION(Input,       "",											ACTION_ENABLED)
 COMPILE_ACTION(Parse,       "-parse",								ACTION_ENABLED)
 COMPILE_ACTION(Check,	      "-check",								ACTION_ENABLED)
 COMPILE_ACTION(EmitIR,      "-emit-ir",							ACTION_ENABLED)

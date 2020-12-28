@@ -6,7 +6,7 @@ using namespace stone;
 
 Compiler::Compiler(Pipeline *pipeline)
     : Session(compileOpts), compileOpts(langOpts), pipeline(pipeline),
-      fm(fsOpts), sm(GetDiagEngine(), fm) {
+      fm(compileOpts.fsOpts), sm(GetDiagEngine(), fm) {
 
   analysis.reset(new Analysis(*this, GetSearchPathOptions(), GetSrcMgr()));
 }
