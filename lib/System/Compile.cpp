@@ -4,7 +4,6 @@
 #include "stone/Gen/Gen.h"
 #include "stone/SubSystem.h"
 #include "stone/System/Compiler.h"
-#include "stone/System/Help.h"
 
 using namespace stone;
 

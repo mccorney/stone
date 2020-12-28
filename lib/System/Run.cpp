@@ -5,7 +5,6 @@
 #include "stone/System/Compilation.h"
 #include "stone/System/Compile.h"
 #include "stone/System/Driver.h"
-#include "stone/System/Help.h"
 #include "stone/System/ToolChain.h"
 
 #include "llvm/ADT/SmallString.h"

@@ -1,7 +1,6 @@
 #include "stone/System/Compiler.h"
 #include "stone/Analysis/Analysis.h"
 #include "stone/Core/Ret.h"
-#include "stone/System/Help.h"
 
 using namespace stone;
 

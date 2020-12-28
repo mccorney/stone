@@ -38,7 +38,8 @@ class Process;
 class Compilation;
 class ToolChain;
 
-struct DriverOutput {
+class DriverProfile final {
+public:
   enum class CompileMode {
     /// Multiple compile invocations and -main-file.
     Multiple,
@@ -47,6 +48,9 @@ struct DriverOutput {
     /// Compile and execute the inputs immediately
     Immediate,
   };
+
+  enum class LinkingKind { None, Executable, DynamicLib, StaticLib };
+
   /// The number of threads for multi-threaded compilation.
   unsigned numThreads = 0;
 
@@ -59,18 +63,24 @@ struct DriverOutput {
   /// The path to the SDK against which to build.
   /// (If empty, this implies no SDK.)
   std::string sdkPath;
+
+  // Whether or not the driver should generate a module.
+  bool generateModule = false;
+
+  /// Default linking kind
+  LinkingKind linkingKind = LinkingKind::None;
+
+  LinkingKind GetLinkingKind() { return linkingKind; }
+
+  bool ShouldLink() { return linkingKind != LinkingKind::None; }
 };
 
-enum class DriverBehavior {
-
-};
-class DriverContext final {};
 class Driver final : public Session {
 public:
   DriverOptions driverOpts;
-  llvm::PriorityQueue<Process *> queue;
 
-public:
+  DriverProfile profile;
+
   /// The name the driver was invoked as.
   std::string driverName;
 
@@ -136,7 +146,7 @@ private:
   mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
 
 private:
-  void BuildTasks();
+  void BuildSteps();
   void BuildProcs();
   void BuildQueue();
   void BuildOpts(llvm::ArrayRef<const char *> args);
@@ -178,6 +188,7 @@ public:
 
   ///
   // void PrintProcs();
+  //
 
 public:
   const std::string &GetConfigFile() const { return cfgFile; }
@@ -195,6 +206,8 @@ public:
     return driverDir.c_str();
   }
   void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
+
+  DriverProfile &GetProfile() { return profile; }
 };
 
 } // namespace stone

@@ -35,13 +35,10 @@ set(stone_system_sources
 	DarwinToolChain.cpp
 	Driver.cpp
 	FileType.cpp
-	Help.cpp
-	Link.cpp
 	Options.cpp
-	Phase.cpp
 	Process.cpp
+	ProcessQueue.cpp
 	Run.cpp
-	Scheduler.cpp
 	Session.cpp
 	ToolChain.cpp
 	UnixToolChain.cpp

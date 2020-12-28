@@ -32,7 +32,7 @@ public:
   ///
   /// This method dispatches to the various \c constructInvocation methods,
   /// which may be overridden by platform-specific subclasses.
-  std::unique_ptr<Process> ConstructProcess(/*const JobAction &JA, Compilation &C,
+  std::unique_ptr<Process> CreateProc(/*const JobAction &JA, Compilation &C,
                                     SmallVectorImpl<const Job *> &&inputs,
                                     ArrayRef<const Action *> inputActions,
                                     std::unique_ptr<CommandOutput> output,

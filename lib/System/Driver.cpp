@@ -167,6 +167,12 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
     }
   }
 }
+
+static void BuildStep(Driver &driver) {}
+void Driver::BuildSteps() {}
+static void BuildProc(Driver &driver) {}
+void Driver::BuildProcs() {}
+
 std::unique_ptr<Compilation>
 Driver::BuildCompilation(const ToolChain &tc,
                          const llvm::opt::InputArgList &argList) {
@@ -212,7 +218,7 @@ Driver::BuildCompilation(const ToolChain &tc,
 
   driverOpts.showCycle = argList.hasArg(opts::ShowCycle);
 
-  std::unique_ptr<Compilation> compilation(new Compilation(*this));
+  std::unique_ptr<Compilation> compilation(new Compilation(*this, tc));
 }
 
 void Driver::PrintCycle() {}

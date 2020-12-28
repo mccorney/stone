@@ -1,10 +1,13 @@
 #ifndef STONE_SYSTEM_STEP_H
 #define STONE_SYSTEM_STEP_H
 
+#include "stone/Core/List.h"
 #include "llvm/ADT/SmallVector.h"
 
 namespace stone {
 class Action;
+
+enum class StepKind { Compile, Backend, Link, Assemble };
 
 class Step {
 protected:
@@ -12,6 +15,8 @@ protected:
 
 public:
   Step(const Action &source);
+  // virtual void Print() = 0;
+  // virtual void Trace() = 0;
 
 public:
   const Action &GetSource() const { return source; }
@@ -45,6 +50,11 @@ public:
 class LinkStep final : public AsyncStep {
 public:
   LinkStep(const Action &source);
+};
+
+class Steps final : public List<Step> {
+public:
+  void Print() const;
 };
 
 } // namespace stone
