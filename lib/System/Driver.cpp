@@ -41,9 +41,8 @@ bool Driver::Build(llvm::ArrayRef<const char *> args) {
 
   excludedFlagsBitmask = opts::NoDriverOption;
   auto clOptions = BuildArgList(args);
-  //auto toolChain = BuildToolChain(*clOptions);
-
-  // auto compilation = BuildCompilation(*toolChain, *clOptions);
+  auto toolChain = BuildToolChain(*clOptions);
+	auto compilation = BuildCompilation(*toolChain, *clOptions);
 
   return true;
 }
