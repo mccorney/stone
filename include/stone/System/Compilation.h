@@ -34,16 +34,17 @@ class Compilation final {
   const Driver &driver;
 
   /// The default tool chain.
-  const ToolChain &toolChain;
+  // const ToolChain &toolChain;
 
   /// The original (untranslated) input argument list.
-  llvm::opt::InputArgList *originalArgs;
+  // llvm::opt::InputArgList *originalArgs;
 
   /// The driver translated arguments. Note that toolchains may perform their
   /// own argument translation.
-  llvm::opt::DerivedArgList *translatedArgs;
+  // llvm::opt::DerivedArgList *translatedArgs;
 
 public:
+  Compilation(Driver &driver);
   int Execute();
 };
 } // namespace stone

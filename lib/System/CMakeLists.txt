@@ -30,7 +30,6 @@ set(stone_system_sources
 	Compile.cpp
 	Compilation.cpp
 	Compiler.cpp
-	CompileProcess.cpp
 	Compiler.cpp
 	CompileFile.cpp
 	DarwinToolChain.cpp
@@ -38,20 +37,20 @@ set(stone_system_sources
 	FileType.cpp
 	Help.cpp
 	Link.cpp
-	LinkProcess.cpp
 	Options.cpp
 	Phase.cpp
 	Process.cpp
 	Run.cpp
+	Scheduler.cpp
 	Session.cpp
 	ToolChain.cpp
 	UnixToolChain.cpp
 	WinToolChain.cpp
-	Task.cpp
+	Step.cpp
 
 	LINK_LIBS
-	StoneAnalysis
 	StoneGen
+	StoneAnalysis
 )
 add_stone_library(StoneSystem
 	${stone_system_sources}

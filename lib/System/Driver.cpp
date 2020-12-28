@@ -42,7 +42,7 @@ bool Driver::Build(llvm::ArrayRef<const char *> args) {
   excludedFlagsBitmask = opts::NoDriverOption;
   auto clOptions = BuildArgList(args);
   auto toolChain = BuildToolChain(*clOptions);
-	auto compilation = BuildCompilation(*toolChain, *clOptions);
+  auto compilation = BuildCompilation(*toolChain, *clOptions);
 
   return true;
 }
@@ -100,8 +100,75 @@ bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {
   }
   return true;
 }
+
+/// Check that the file referenced by \p Input exists. If it doesn't,
+/// issue a diagnostic and return false.
+static bool DoesInputExist(Driver &driver, const DerivedArgList &args,
+                           DiagnosticEngine &de, llvm::StringRef input) {
+
+  // TODO:
+  // if (!driver.GetCheckInputFilesExist())
+  //  return true;
+
+  // stdin always exists.
+  if (input == "-")
+    return true;
+
+  if (file::Exists(input))
+    return true;
+
+  driver.Out() << "de.D(SourceLoc(),"
+               << "diag::error_no_such_file_or_directory, Input);" << '\n';
+
+  return false;
+}
+// TODO: May move to session
+void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
+                         InputFiles &inputs) {
+
+  llvm::DenseMap<llvm::StringRef, llvm::StringRef> seenSourceFiles;
+
+  for (Arg *arg : args) {
+
+    if (arg->getOption().getKind() == Option::InputClass) {
+      llvm::StringRef argValue = arg->getValue();
+      file::FileType ft = file::FileType::INVALID;
+      // stdin must be handled specially.
+      if (argValue.equals("-")) {
+        // By default, treat stdin as Swift input.
+        ft = file::FileType::Stone;
+      } else {
+        // Otherwise lookup by extension.
+        ft = file::GetTypeByExt(llvm::sys::path::extension(argValue));
+
+        if (ft == file::FileType::INVALID) {
+          // By default, treat inputs with no extension, or with an
+          // extension that isn't recognized, as object files.
+          ft = file::FileType::Object;
+        }
+      }
+
+      if (DoesInputExist(*this, args, de, argValue)) {
+        inputs.push_back(std::make_pair(ft, arg));
+      }
+
+      if (ft == file::FileType::Stone) {
+        auto basename = llvm::sys::path::filename(argValue);
+        if (!seenSourceFiles.insert({basename, argValue}).second) {
+          Out() << "de.D(SourceLoc(),"
+                << "diag::error_two_files_same_name,"
+                << "basename, seenSourceFiles[basename], argValue);" << '\n';
+          Out() << " de.D(SourceLoc(), "
+                << "diag::note_explain_two_files_"
+                   "same_name);"
+                << '\n';
+        }
+      }
+    }
+  }
+}
 std::unique_ptr<Compilation>
-Driver::BuildCompilation(const ToolChain &toolChain,
+Driver::BuildCompilation(const ToolChain &tc,
                          const llvm::opt::InputArgList &argList) {
 
   llvm::PrettyStackTraceString CrashInfo("Compilation construction");
@@ -119,9 +186,33 @@ Driver::BuildCompilation(const ToolChain &toolChain,
   if (de.HasError()) {
     return nullptr;
   }
-  if (!HandleImmediateArgs(*dArgList, toolChain)) {
+  if (!HandleImmediateArgs(*dArgList, tc)) {
     return nullptr;
   }
+
+  // Construct the list of inputs.
+  InputFiles inputs;
+  BuildInputs(tc, *dArgList, inputs);
+
+  if (de.HasError())
+    return nullptr;
+
+  // TODO: ComputeCompileMod()
+  //
+  // About to move argument list, so capture some flags that will be needed
+  // later.
+  // const bool DriverPrintActions =
+  //    ArgList->hasArg(options::OPT_driver_print_actions);
+
+  // const bool DriverPrintDerivedOutputFileMap =
+  //    ArgList->hasArg(options::OPT_driver_print_derived_output_file_map);
+
+  // const bool ContinueBuildingAfterErrors =
+  //    computeContinueBuildingAfterErrors(BatchMode, ArgList.get());
+
+  driverOpts.showCycle = argList.hasArg(opts::ShowCycle);
+
+  std::unique_ptr<Compilation> compilation(new Compilation(*this));
 }
 
 void Driver::PrintCycle() {}

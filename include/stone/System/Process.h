@@ -2,15 +2,20 @@
 #define STONE_SYSTEM_PROCESS_H
 
 namespace stone {
-class Task;
+class Step;
 class Driver;
 
 class Process final {
-  Task &trigger;
+  Step &trigger;
   Driver &driver;
 
 public:
-  Process(Task &trigger, Driver &driver) : trigger(trigger), driver(driver) {}
+  Process(Step &trigger, Driver &driver) : trigger(trigger), driver(driver) {}
+
+public:
+  void AsyncRun();
+  void SyncRun();
+  Step &GetStep() { return trigger; }
 
 public:
   // llvm::SmallVector<Process *, 10> deps;

@@ -12,6 +12,7 @@ DiagnosticEngine::~DiagnosticEngine() {}
 
 // TODO
 bool DiagnosticEngine::HasError() { return false; }
+
 void DiagnosticEngine::AddDiagnostics(
     std::unique_ptr<Diagnostics> diagnostics) {
 

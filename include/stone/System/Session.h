@@ -2,6 +2,7 @@
 #define STONE_SYSTEM_SESSION_H
 
 #include "stone/Core/Context.h"
+#include "stone/System/FileType.h"
 #include "stone/System/SessionOptions.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -31,6 +32,12 @@ protected:
 
   /// Default target triple.
   std::string targetTriple;
+
+  /// An input argument from the command line and its inferred type.
+  using InputPair = std::pair<file::FileType, const llvm::opt::Arg *>;
+
+  /// Type used for a list of input arguments.
+  using InputFiles = llvm::SmallVector<InputPair, 16>;
 
 public:
   void SetFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs) {

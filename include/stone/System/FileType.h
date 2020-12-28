@@ -46,11 +46,11 @@ bool IsAfterLLVM(file::FileType FT);
 /// These need to be passed to the stone Compile
 bool IsPartOfCompilation(file::FileType FT);
 
-bool Exists(llvm::StringRef Name);
+bool Exists(llvm::StringRef name);
 
-llvm::StringRef GetExt(llvm::StringRef Name);
+llvm::StringRef GetExt(llvm::StringRef name);
 
-llvm::StringRef GetPath(llvm::StringRef Name);
+llvm::StringRef GetPath(llvm::StringRef name);
 
 template <typename Fn> void forAllTypes(const Fn &fn);
 

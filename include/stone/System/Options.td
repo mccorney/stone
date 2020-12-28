@@ -109,6 +109,10 @@ HelpText<"Generate code for a particular CPU variant">;
 
 // DEV OPTIONS 
 
+def SyncProc : Flag<["-"], "sync-proc">,
+Flags<[DebugOption]>,
+HelpText<"Run procs synchronously -- default is asynchronous">;
+
 def ShowAction : Flag<["-"], "show-action">,
 Flags<[DebugOption]>,
 HelpText<"Show every step in the lifecycle of the actions">;
@@ -123,7 +127,12 @@ HelpText<"Show time in the lifecycle of actions and jobs">;
 
 def ShowProcs : Flag<["-"], "show-procs">,
 Flags<[DebugOption]>,
-HelpText<"Show time in the lifecycle of actions and jobs">;
+HelpText<"Show procs">;
+
+def ShowCycle : Flag<["-"], "show-cycle">,
+Flags<[DebugOption]>,
+HelpText<"Show lifecycle of steps and procs">;
+
 
 def MainFile : Separate<["-"], "main-file">,
   HelpText<"Produce output for this file, not the whole module">;

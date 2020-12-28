@@ -5,6 +5,13 @@
 #include "llvm/ADT/SmallVector.h"
 
 namespace stone {
+
+enum class PhaseType {
+  Compile,
+  Backend,
+  Assemble,
+  Link,
+};
 class Phase final {
 public:
   llvm::SmallVector<Phase *, 10> deps;

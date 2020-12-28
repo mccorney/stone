@@ -61,6 +61,10 @@ struct DriverOutput {
   std::string sdkPath;
 };
 
+enum class DriverBehavior {
+
+};
+class DriverContext final {};
 class Driver final : public Session {
 public:
   DriverOptions driverOpts;
@@ -141,6 +145,9 @@ private:
   /// because ToolChain has virtual methods.
   std::unique_ptr<ToolChain>
   BuildToolChain(const llvm::opt::InputArgList &argList);
+
+  void BuildInputs(const ToolChain &tc, const DerivedArgList &args,
+                   InputFiles &inputs);
 
   std::unique_ptr<Compilation>
   BuildCompilation(const ToolChain &toolChain,
