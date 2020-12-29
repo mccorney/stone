@@ -11,8 +11,8 @@ Compiler::Compiler(Pipeline *pipeline)
   analysis.reset(new Analysis(*this, GetSearchPathOptions(), GetSrcMgr()));
 }
 
-void Compiler::ComputeMID(const llvm::opt::DerivedArgList &args) {
-  Session::ComputeMID(args);
+void Compiler::ComputeMode(const llvm::opt::DerivedArgList &args) {
+  Session::ComputeMode(args);
 }
 
 bool Compiler::Build(llvm::ArrayRef<const char *> args) {
@@ -23,7 +23,7 @@ bool Compiler::Build(llvm::ArrayRef<const char *> args) {
   std::unique_ptr<llvm::opt::DerivedArgList> dArgList(
       TranslateInputArgs(*argList));
   // Computer the compiler mode.
-  ComputeMID(*dArgList);
+  ComputeMode(*dArgList);
 
   return true;
 }

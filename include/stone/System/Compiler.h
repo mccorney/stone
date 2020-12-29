@@ -14,9 +14,9 @@ namespace stone {
 class Pipeline;
 class Compiler final : public Session {
 
-  Pipeline *pipeline = nullptr;
   SrcMgr sm;
   FileMgr fm;
+  Pipeline *pipeline = nullptr;
   std::unique_ptr<Analysis> analysis;
 
 public:
@@ -49,7 +49,7 @@ public:
   SrcMgr &GetSrcMgr() { return sm; }
 
 protected:
-  void ComputeMID(const llvm::opt::DerivedArgList &args) override;
+  void ComputeMode(const llvm::opt::DerivedArgList &args) override;
 
   /// TranslateInputArgs - Create a new derived argument list from the input
   /// arguments, after applying the standard argument translations.

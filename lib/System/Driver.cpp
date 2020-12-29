@@ -164,10 +164,10 @@ void Driver::BuildSteps() {}
 static void BuildProc(Driver &driver) {}
 void Driver::BuildProcs() {}
 
-void Driver::ComputeMID(const llvm::opt::DerivedArgList &args) {
-  Session::ComputeMID(args);
-  if (mid.GetID() == 0) {
-    mid.SetID(opts::EmitExecutable); /// Default mode
+void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
+  Session::ComputeMode(args);
+  if (mode.GetID() == 0) {
+    mode.SetID(opts::EmitExecutable); /// Default mode
   }
 }
 
@@ -183,7 +183,7 @@ Driver::BuildCompilation(const ToolChain &tc,
   std::unique_ptr<DerivedArgList> dArgList(TranslateInputArgs(argList));
 
   // Computer the compiler mode.
-  ComputeMID(*dArgList);
+  ComputeMode(*dArgList);
 
   // Perform toolchain specific args validation.
   // toolChain.ValidateArguments(de, *dArgList, targetTriple);

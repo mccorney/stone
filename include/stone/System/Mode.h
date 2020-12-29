@@ -3,21 +3,24 @@
 
 namespace stone {
 
-class ModeID final {
+class Mode final {
   friend class Session;
   friend class Compiler;
   friend class Driver;
   unsigned mid = 0;
+  llvm::StringRef name;
 
 public:
   bool IsValid() const { return mid != 0; }
   unsigned GetID() const { return mid; }
+  llvm::StringRef GetName() const { return name; }
 
 private:
-  ModeID(unsigned mid) : mid(mid) {}
+  Mode(unsigned mid) : mid(mid) {}
 
 private:
   void SetID(unsigned v) { mid = v; }
+  void SetName(llvm::StringRef n) { name = n; }
 };
 } // namespace stone
 #endif

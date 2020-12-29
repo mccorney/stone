@@ -5,7 +5,7 @@ using namespace stone;
 using namespace llvm::opt;
 
 Session::Session(SessionOptions &sessionOpts)
-    : sessionOpts(sessionOpts), mid(0),
+    : sessionOpts(sessionOpts), mode(0),
       targetTriple(llvm::sys::getDefaultTargetTriple()),
       fileSystem(llvm::vfs::getRealFileSystem()) {
 
@@ -51,32 +51,35 @@ void Session::SetTargetTriple(llvm::StringRef triple) {
   SetTargetTriple(llvm::Triple(triple));
 }
 
-void Session::ComputeMID(const llvm::opt::DerivedArgList &args) {
+void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
 
-  assert(mid.GetID() > 0 && "mode id already computed");
-  const llvm::opt::Arg *const midArg = args.getLastArg(opts::ModeGroup);
+  assert(mode.GetID() > 0 && "mode id already computed");
+  const llvm::opt::Arg *const modeArg = args.getLastArg(opts::ModeGroup);
 
-  switch (midArg->getOption().getID()) {
+  switch (modeArg->getOption().getID()) {
   case opts::Parse:
-    mid.SetID(opts::Parse);
+    mode.SetID(opts::Parse);
     break;
   case opts::Check:
-    mid.SetID(opts::Check);
+    mode.SetID(opts::Check);
     break;
   case opts::EmitIR:
-    mid.SetID(opts::EmitIR);
+    mode.SetID(opts::EmitIR);
     break;
   case opts::EmitBC:
-    mid.SetID(opts::EmitBC);
+    mode.SetID(opts::EmitBC);
     break;
   case opts::EmitObject:
-    mid.SetID(opts::EmitObject);
+    mode.SetID(opts::EmitObject);
     break;
   case opts::EmitAssembly:
-    mid.SetID(opts::EmitAssembly);
+    mode.SetID(opts::EmitAssembly);
     break;
   default:
     break;
+  }
+  if (mode.GetID() > 0) {
+    mode.SetName(modeArg->getAsString(args));
   }
 }
 llvm::opt::DerivedArgList *
@@ -89,7 +92,7 @@ Session::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
   return dArgList;
 }
 
-ModeID &Session::GetMID() {
-  assert(mid.IsValid() && "did not find a mid");
-  return mid;
+Mode &Session::GetMode() {
+  assert(mode.IsValid() && "did not find a mid");
+  return mode;
 }

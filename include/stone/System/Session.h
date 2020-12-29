@@ -25,7 +25,7 @@ class Session : public Context {
   llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fileSystem;
 
 protected:
-  ModeID mid;
+  Mode mode;
   /// Bit flags for OptTable
   unsigned includedFlagsBitmask = 0;
 
@@ -95,13 +95,13 @@ public:
   //
 protected:
   // Compute the mode id -- TODO: virtual
-  virtual void ComputeMID(const llvm::opt::DerivedArgList &args);
+  virtual void ComputeMode(const llvm::opt::DerivedArgList &args);
   /// TranslateInputArgs - Create a new derived argument list from the input
   /// arguments, after applying the standard argument translations.
   virtual llvm::opt::DerivedArgList *
   TranslateInputArgs(const llvm::opt::InputArgList &args) const;
 
-  ModeID &GetMID();
+  Mode &GetMode();
 };
 
 } // namespace stone
