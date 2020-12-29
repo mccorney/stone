@@ -6,6 +6,7 @@
 #include "llvm/ADT/PriorityQueue.h"
 
 namespace stone {
+namespace driver {
 class Process;
 class ProcessQueue final {
   llvm::PriorityQueue<Process *> queue;
@@ -14,6 +15,6 @@ public:
   ProcessQueue();
   ~ProcessQueue();
 };
-
+} // namespace driver
 } // namespace stone
 #endif

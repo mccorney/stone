@@ -33,8 +33,12 @@ class DerivedArgList;
 
 namespace stone {
 
-class Task;
+namespace driver {
+class Event;
 class Process;
+
+} // namespace driver
+
 class Compilation;
 class ToolChain;
 
@@ -151,7 +155,7 @@ private:
   mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
 
 private:
-  void BuildSteps();
+  void BuildEvents();
   void BuildProcs();
   void BuildQueue();
 

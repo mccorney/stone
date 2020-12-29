@@ -2,7 +2,7 @@
 #define STONE_SYSTEM_COMPILATION_H
 
 #include "stone/Core/LLVM.h"
-#include "stone/System/Action.h"
+#include "stone/System/Event.h"
 #include "stone/System/ProcessQueue.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -24,6 +24,9 @@ class DerivedArgList;
 class InputArgList;
 } // namespace opt
 } // namespace llvm
+
+using namespace stone::driver;
+
 namespace stone {
 class Driver;
 class ToolChain;
@@ -50,29 +53,31 @@ class Compilation final {
   /// only be removed if we crash.
   // ArgStringMap failureResultFiles;
 
-  Steps steps;
+  /// A list of all of the events
+  EventList events;
 
-  Processes procs;
+  /// A list of all the procs
+  ProcessList procs;
 
 public:
   Compilation(Driver &driver, const ToolChain &tc);
   ~Compilation();
 
 public:
-  /// Creates a new Action owned by this Compilation.
+  /// Creates a new Event owned by this Compilation.
   ///
-  /// The new Action is *not* added to the list returned by getActions().
-  template <typename T, typename... Args> T *CreateStep(Args &&...arg) {
-    auto step = new T(std::forward<Args>(arg)...);
-    steps.Add(std::unique_ptr<Step>(step));
-    return step;
+  /// The new Event is *not* added to the list returned by GetEvents().
+  template <typename T, typename... Args> T *CreateEvent(Args &&...arg) {
+    auto event = new T(std::forward<Args>(arg)...);
+    events.Add(std::unique_ptr<Event>(event));
+    return event;
   }
 
-  Steps &GetSteps() { return steps; }
-  const Steps &GetSteps() const { return steps; }
+  EventList &GetEvents() { return events; }
+  const EventList &GetEvents() const { return events; }
 
-  Processes &GetProcs() { return procs; }
-  const Processes &GetProcs() const { return procs; }
+  ProcessList &GetProcs() { return procs; }
+  const ProcessList &GetProcs() const { return procs; }
 
   void AddProc(std::unique_ptr<Process> proc) { procs.Add(std::move(proc)); }
 
@@ -108,7 +113,7 @@ public:
   ///
   /// \param fallBackProc - For non-zero results, this will be a vector of
   /// failing commands and their associated result code.
-  void ExecuteProcs(const Processes &procs,
+  void ExecuteProcs(const ProcessList &procs,
                     llvm::SmallVectorImpl<std::pair<int, const Process *>>
                         &fallBackProcs) const;
 

@@ -20,7 +20,7 @@ private:
 
 private:
   void SetID(unsigned v) { mid = v; }
-  void SetName(llvm::StringRef n) { name = n; }
+  void SetName(llvm::StringRef v) { name = v; }
 };
 } // namespace stone
 #endif

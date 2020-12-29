@@ -158,8 +158,8 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
   }
 }
 
-static void BuildStep(Driver &driver) {}
-void Driver::BuildSteps() {}
+static void BuildEvent(Driver &driver) {}
+void Driver::BuildEvents() {}
 
 static void BuildProc(Driver &driver) {}
 void Driver::BuildProcs() {}
