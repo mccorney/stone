@@ -167,11 +167,6 @@ private:
   BuildCompilation(const ToolChain &toolChain,
                    const llvm::opt::InputArgList &argList);
 
-  /// TranslateInputArgs - Create a new derived argument list from the input
-  /// arguments, after applying the standard argument translations.
-  llvm::opt::DerivedArgList *
-  TranslateInputArgs(const llvm::opt::InputArgList &args) const;
-
   bool HandleImmediateArgs(const ArgList &args, const ToolChain &tc);
 
 public:
@@ -213,6 +208,14 @@ public:
 
   const DriverProfile &GetProfile() const { return profile; }
   DriverProfile &GetProfile() { return profile; }
+
+protected:
+  void ComputeMID(const llvm::opt::DerivedArgList &args) override;
+
+  /// TranslateInputArgs - Create a new derived argument list from the input
+  /// arguments, after applying the standard argument translations.
+  // llvm::opt::DerivedArgList *
+  // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
 
 } // namespace stone

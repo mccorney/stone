@@ -11,10 +11,19 @@ Compiler::Compiler(Pipeline *pipeline)
   analysis.reset(new Analysis(*this, GetSearchPathOptions(), GetSrcMgr()));
 }
 
+void Compiler::ComputeMID(const llvm::opt::DerivedArgList &args) {
+  Session::ComputeMID(args);
+}
+
 bool Compiler::Build(llvm::ArrayRef<const char *> args) {
 
   excludedFlagsBitmask = opts::NoCompileOption;
   auto argList = BuildArgList(args);
+
+  std::unique_ptr<llvm::opt::DerivedArgList> dArgList(
+      TranslateInputArgs(*argList));
+  // Computer the compiler mode.
+  ComputeMID(*dArgList);
 
   return true;
 }

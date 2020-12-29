@@ -3,26 +3,10 @@
 
 namespace stone {
 
-/*
-enum class ModeID {
-  None,
-  Parse,
-  Check,
-  EmitModuleOnly, ///< Emit module only
-  MergeModules,   ///< Merge modules only
-  EmitIR,
-  EmitBC,
-  EmitExecutable,
-  EmitObject,
-  EmitLibrary,
-  EmitAssembly,
-  PrintVersion, ///< Print version information.
-  PrintFeature, ///< Print supported feature of this compiler
-};
-*/
-
 class ModeID final {
   friend class Session;
+  friend class Compiler;
+  friend class Driver;
   unsigned mid = 0;
 
 public:

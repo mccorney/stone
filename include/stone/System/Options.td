@@ -19,7 +19,7 @@ def NoDriverOption : OptionFlag;
 // The option should not be accepted by the build.
 def DebugOption : OptionFlag;
 
-def ModeGroup : OptionGroup<"<action options>">, HelpText<"ACTIONS">;
+def ModeGroup : OptionGroup<"<mode options>">, HelpText<"MODES">;
 class ModeOpt : Group<ModeGroup>;
 
 

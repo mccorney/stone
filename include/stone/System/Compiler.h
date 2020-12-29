@@ -47,6 +47,14 @@ public:
   const CompileOptions &GetCompileOptions() const { return compileOpts; }
 
   SrcMgr &GetSrcMgr() { return sm; }
+
+protected:
+  void ComputeMID(const llvm::opt::DerivedArgList &args) override;
+
+  /// TranslateInputArgs - Create a new derived argument list from the input
+  /// arguments, after applying the standard argument translations.
+  // llvm::opt::DerivedArgList *
+  // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
 
 } // namespace stone

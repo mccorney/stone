@@ -2,11 +2,15 @@
 #include "llvm/Support/FileSystem.h"
 
 using namespace stone;
+using namespace llvm::opt;
 
 Session::Session(SessionOptions &sessionOpts)
     : sessionOpts(sessionOpts), mid(0),
       targetTriple(llvm::sys::getDefaultTargetTriple()),
-      fileSystem(llvm::vfs::getRealFileSystem()) {}
+      fileSystem(llvm::vfs::getRealFileSystem()) {
+
+  startTime = std::chrono::system_clock::now();
+}
 
 Session::~Session() {}
 
@@ -64,19 +68,25 @@ void Session::ComputeMID(const llvm::opt::DerivedArgList &args) {
     break;
   case opts::EmitBC:
     mid.SetID(opts::EmitBC);
-		break;
-  case opts::EmitExecutable:
-    mid.SetID(opts::EmitExecutable);
     break;
   case opts::EmitObject:
     mid.SetID(opts::EmitObject);
     break;
   case opts::EmitAssembly:
     mid.SetID(opts::EmitAssembly);
-		break;
+    break;
   default:
-    mid.SetID(opts::EmitExecutable);
+    break;
   }
+}
+llvm::opt::DerivedArgList *
+Session::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
+
+  DerivedArgList *dArgList = new DerivedArgList(args);
+  for (Arg *arg : args) {
+    dArgList->append(arg);
+  }
+  return dArgList;
 }
 
 ModeID &Session::GetMID() {

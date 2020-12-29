@@ -82,17 +82,6 @@ Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
   }
 }
 
-llvm::opt::DerivedArgList *
-Driver::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
-
-  DerivedArgList *dArgList = new DerivedArgList(args);
-
-  for (Arg *arg : args) {
-    dArgList->append(arg);
-  }
-  return dArgList;
-}
-
 bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {
 
   if (args.hasArg(opts::Help)) {
@@ -175,18 +164,26 @@ void Driver::BuildSteps() {}
 static void BuildProc(Driver &driver) {}
 void Driver::BuildProcs() {}
 
+void Driver::ComputeMID(const llvm::opt::DerivedArgList &args) {
+  Session::ComputeMID(args);
+  if (mid.GetID() == 0) {
+    mid.SetID(opts::EmitExecutable); /// Default mode
+  }
+}
+
 std::unique_ptr<Compilation>
 Driver::BuildCompilation(const ToolChain &tc,
                          const llvm::opt::InputArgList &argList) {
 
   llvm::PrettyStackTraceString CrashInfo("Compilation construction");
 
-  startTime = std::chrono::system_clock::now();
-
   // TODO:
   // workingDirectory = ComputeWorkingDirectory(argList.get());
 
   std::unique_ptr<DerivedArgList> dArgList(TranslateInputArgs(argList));
+
+  // Computer the compiler mode.
+  ComputeMID(*dArgList);
 
   // Perform toolchain specific args validation.
   // toolChain.ValidateArguments(de, *dArgList, targetTriple);
@@ -205,14 +202,12 @@ Driver::BuildCompilation(const ToolChain &tc,
   if (de.HasError())
     return nullptr;
 
-  ComputeMID(*dArgList);
-
   // TODO: ComputeCompileMod()
   //
   // About to move argument list, so capture some flags that will be needed
   // later.
-  // const bool DriverPrintActions =
-  //    ArgList->hasArg(options::OPT_driver_print_actions);
+  // const bool driverPrintActions =
+  //    ArgList->hasArg(opts::DriverPrintActions);
 
   // const bool DriverPrintDerivedOutputFileMap =
   //    ArgList->hasArg(options::OPT_driver_print_derived_output_file_map);
