@@ -92,7 +92,10 @@ public:
   llvm::StringRef GetTargetTriple() const { return langOpts.target.str(); }
 
   // virtual llvm::StringRef GetName() = 0;
-  //
+  void Finish();
+  void PrintDiagnostics();
+  void PrintStatistics();
+
 protected:
   // Compute the mode id -- TODO: virtual
   virtual void ComputeMode(const llvm::opt::DerivedArgList &args);
@@ -102,6 +105,10 @@ protected:
   TranslateInputArgs(const llvm::opt::InputArgList &args) const;
 
   Mode &GetMode();
+
+  bool IsModeOutput();
+
+  void Purge();
 };
 
 } // namespace stone

@@ -101,7 +101,11 @@ int Run(llvm::ArrayRef<const char *> args) {
 
   // TODO: driver.SetTargetAndMode(TargetAndMode);
   if (driver.Build(args)) {
-    return driver.Run();
+    driver.Run();
+    driver.Finish();
+    if (driver.GetDiagEngine().HasError()) {
+      return ret::err;
+    }
   }
   return ret::ok;
 }

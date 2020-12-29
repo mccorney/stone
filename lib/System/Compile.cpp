@@ -11,8 +11,11 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, Pipeline *pipeline) {
 
   Compiler compiler(pipeline);
+  // TODO: cleanup
   if (compiler.Build(args)) {
-    if (compiler.Run()) {
+    compiler.Run();
+    compiler.Finish();
+    if (compiler.GetDiagEngine().HasError()) {
       return ret::err;
     }
   }

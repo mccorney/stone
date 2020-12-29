@@ -2,7 +2,7 @@
 any<T> interface Collection {
 }
 
-any<T: Comparable> class Array<T> : Collection<T> {
+any<T: Comparable> struct Array<T> : Collection<T> {
 
 }
 

@@ -108,7 +108,8 @@ static bool DoesInputExist(Driver &driver, const DerivedArgList &args,
     return true;
 
   driver.Out() << "de.D(SourceLoc(),"
-               << "diag::error_no_such_file_or_directory, Input);" << '\n';
+               << "diag::error_no_such_file_or_directory, Input);" << input
+               << '\n';
 
   return false;
 }

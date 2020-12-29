@@ -53,33 +53,52 @@ void Session::SetTargetTriple(llvm::StringRef triple) {
 
 void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
 
-  assert(mode.GetID() > 0 && "mode id already computed");
+  assert(mode.GetID() == 0 && "mode id already computed");
   const llvm::opt::Arg *const modeArg = args.getLastArg(opts::ModeGroup);
 
-  switch (modeArg->getOption().getID()) {
-  case opts::Parse:
-    mode.SetID(opts::Parse);
-    break;
-  case opts::Check:
-    mode.SetID(opts::Check);
-    break;
-  case opts::EmitIR:
-    mode.SetID(opts::EmitIR);
-    break;
-  case opts::EmitBC:
-    mode.SetID(opts::EmitBC);
-    break;
-  case opts::EmitObject:
-    mode.SetID(opts::EmitObject);
-    break;
-  case opts::EmitAssembly:
-    mode.SetID(opts::EmitAssembly);
-    break;
-  default:
-    break;
+  // TODO: may have to claim
+  if (modeArg) {
+    switch (modeArg->getOption().getID()) {
+    case opts::Parse:
+      mode.SetID(opts::Parse);
+      break;
+    case opts::Check:
+      mode.SetID(opts::Check);
+      break;
+    case opts::EmitIR:
+      mode.SetID(opts::EmitIR);
+      break;
+    case opts::EmitBC:
+      mode.SetID(opts::EmitBC);
+      break;
+    case opts::EmitObject:
+      mode.SetID(opts::EmitObject);
+      break;
+    case opts::EmitAssembly:
+      mode.SetID(opts::EmitAssembly);
+      break;
+    case opts::EmitLibrary:
+      mode.SetID(opts::EmitLibrary);
+      break;
+    default:
+      break;
+    }
   }
   if (mode.GetID() > 0) {
     mode.SetName(modeArg->getAsString(args));
+  }
+}
+bool Session::IsModeOutput() {
+
+  switch (mode.GetID()) {
+  case opts::EmitIR:
+  case opts::EmitBC:
+  case opts::EmitObject:
+  case opts::EmitAssembly:
+  case opts::EmitLibrary:
+    return true;
+  default:
+    return false;
   }
 }
 llvm::opt::DerivedArgList *
@@ -96,3 +115,12 @@ Mode &Session::GetMode() {
   assert(mode.IsValid() && "did not find a mid");
   return mode;
 }
+
+void Session::Purge() {}
+void Session::Finish() {
+  Purge();
+  PrintDiagnostics();
+  PrintStatistics();
+}
+void Session::PrintDiagnostics() {}
+void Session::PrintStatistics() {}

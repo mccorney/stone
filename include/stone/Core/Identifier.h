@@ -25,7 +25,7 @@ namespace stone {
 class DeclName;
 class DeclNameTable;
 class Identifier;
-struct LangOptions;
+class LangOptions;
 class SrcLoc;
 
 /// A simple pair of identifier info and location.

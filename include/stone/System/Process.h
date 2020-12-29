@@ -21,18 +21,20 @@ namespace driver {
 
 class Process {
   friend class Compilation;
-  Event &trigger;
+
   Driver &driver;
+  CompilationEvent &trigger;
   /// The input file list in case we need to emit a file list instead of a
   /// proper response file
   llvm::opt::ArgStringList inputFiles;
 
 public:
-  Process(Event &trigger, Driver &driver) : trigger(trigger), driver(driver) {}
+  Process(CompilationEvent &trigger, Driver &driver)
+      : trigger(trigger), driver(driver) {}
   virtual ~Process();
 
 public:
-  Event &GetTrigger() { return trigger; }
+  CompilationEvent &GetTrigger() { return trigger; }
 
   virtual void Print(llvm::raw_ostream &os, const char *terminator, bool quote,
                      Crash *crash = nullptr) const;

@@ -4,6 +4,7 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 
 using namespace stone;
@@ -106,7 +107,11 @@ bool file::IsPartOfCompilation(file::FileType FK) {
   llvm_unreachable("All switch cases are covered");
 }
 
-bool file::Exists(llvm::StringRef Name) { return false; }
+bool file::Exists(llvm::StringRef name) {
+  if (llvm::sys::fs::exists(name)) {
+    return true;
+  }
+}
 
 llvm::StringRef file::GetExt(llvm::StringRef Name) {
   return llvm::sys::path::extension(Name);

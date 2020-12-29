@@ -41,9 +41,9 @@ def Check : Flag<["-"], "check">,
 HelpText<"Parse and type-check input file(s)">, ModeOpt,
 Flags<[CompileOption]>;
 
-//	def EmitLibrary : Flag<["-"], "emit-library">,
-//  HelpText<"Emit a linked library">, ModeOpt,
-//  Flags<[NoInteractiveOption]>;
+def EmitLibrary : Flag<["-"], "emit-library">,
+HelpText<"Emit a linked library">, ModeOpt,
+Flags<[CompileOption]>;
 
 def EmitObject : Flag<["-"], "emit-object">,
 HelpText<"Emit object file(s) (-C)">, ModeOpt,

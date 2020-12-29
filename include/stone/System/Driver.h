@@ -5,6 +5,7 @@
 #include "stone/System/Action.h"
 #include "stone/System/Compilation.h"
 #include "stone/System/DriverOptions.h"
+#include "stone/System/DriverProfile.h"
 #include "stone/System/Session.h"
 #include "stone/System/ToolChain.h"
 
@@ -41,45 +42,6 @@ class Process;
 
 class Compilation;
 class ToolChain;
-
-class DriverProfile final {
-public:
-  enum class DriverKind {};
-
-  enum class CompileMode {
-    /// Multiple compile invocations and -main-file.
-    Multiple,
-    /// A compilation using a single compile invocation without -main-file.
-    Single,
-    /// Compile and execute the inputs immediately
-    Immediate,
-  };
-
-  enum class LinkingKind { None, Executable, DynamicLib, StaticLib };
-
-  /// The number of threads for multi-threaded compilation.
-  unsigned numThreads = 0;
-
-  /// Returns true if multi-threading is enabled.
-  bool IsMultiThreading() const { return numThreads > 0; }
-
-  /// The name of the module which we are building.
-  std::string moduleName;
-
-  /// The path to the SDK against which to build.
-  /// (If empty, this implies no SDK.)
-  std::string sdkPath;
-
-  // Whether or not the driver should generate a module.
-  bool generateModule = false;
-
-  /// Default linking kind
-  LinkingKind linkingKind = LinkingKind::None;
-
-  LinkingKind GetLinkingKind() { return linkingKind; }
-
-  bool ShouldLink() { return linkingKind != LinkingKind::None; }
-};
 
 class Driver final : public Session {
 

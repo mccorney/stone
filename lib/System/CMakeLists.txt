@@ -34,6 +34,7 @@ set(stone_system_sources
 	CompileFile.cpp
 	DarwinToolChain.cpp
 	Driver.cpp
+	Event.cpp
 	FileType.cpp
 	Options.cpp
 	Process.cpp
