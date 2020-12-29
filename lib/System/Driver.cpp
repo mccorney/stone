@@ -160,7 +160,20 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
 }
 
 static void BuildEvent(Driver &driver) {}
-void Driver::BuildEvents() {}
+
+void Driver::BuildEvents() {
+  llvm::PrettyStackTraceString CrashInfo("Building compilation events");
+
+  if (buildProfile.compileEncap.compileType ==
+          CompileEncapsulation::CompileType::MultipleInvocation) {
+
+  } else if (buildProfile.compileEncap.compileType ==
+                 CompileEncapsulation::CompileType::SingleInvocation) {
+
+  } else {
+  }
+
+}
 
 static void BuildProc(Driver &driver) {}
 void Driver::BuildProcs() {}

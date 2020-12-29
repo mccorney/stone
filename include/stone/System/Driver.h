@@ -3,6 +3,7 @@
 
 #include "stone/Core/Mem.h"
 #include "stone/System/Action.h"
+#include "stone/System/BuildProfile.h"
 #include "stone/System/Compilation.h"
 #include "stone/System/DriverOptions.h"
 #include "stone/System/DriverProfile.h"
@@ -116,6 +117,8 @@ private:
   /// stored in it, and will clean them up when torn down.
   mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
 
+  BuildProfile buildProfile;
+
 private:
   void BuildEvents();
   void BuildProcs();
@@ -172,8 +175,11 @@ public:
   }
   void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
 
-  const DriverProfile &GetProfile() const { return profile; }
-  DriverProfile &GetProfile() { return profile; }
+  // const DriverProfile &GetProfile() const { return profile; }
+  // DriverProfile &GetDriverProfile() { return profile; }
+
+  const BuildProfile &GetBuildProfile() const { return buildProfile; }
+  BuildProfile &GetBuildProfile() { return buildProfile; }
 
 protected:
   void ComputeMode(const llvm::opt::DerivedArgList &args) override;

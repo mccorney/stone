@@ -10,12 +10,14 @@ public:
   };
   enum class CompileType {
     /// Multiple compile invocations and -main-file.
-    Multiple,
+    MultipleInvocation,
     /// A compilation using a single compile invocation without -main-file.
-    Single,
+    SingleInvocation,
     /// Compile and execute the inputs immediately
-    Immediate,
+    ImmediateInvocation,
   };
+
+  CompileType compileType = CompileType::MultipleInvocation;
 
   enum class LinkType { None, Executable, DynamicLib, StaticLib };
 

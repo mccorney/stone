@@ -1,5 +1,8 @@
 #include "stone/System/Event.h"
 
+using namespace stone;
+using namespace stone::driver;
+
 const char *Event::GetName(Event::Kind k) {
   switch (k) {
   case Event::Kind::Input:
