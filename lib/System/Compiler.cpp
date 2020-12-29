@@ -15,6 +15,7 @@ bool Compiler::Build(llvm::ArrayRef<const char *> args) {
 
   excludedFlagsBitmask = opts::NoCompileOption;
   auto argList = BuildArgList(args);
+
   return true;
 }
 

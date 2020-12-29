@@ -40,8 +40,7 @@ class ToolChain;
 
 class DriverProfile final {
 public:
-
-	enum class DriverKind {};
+  enum class DriverKind {};
 
   enum class CompileMode {
     /// Multiple compile invocations and -main-file.
@@ -212,9 +211,8 @@ public:
   }
   void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
 
-	const DriverProfile &GetProfile() const { return profile; }
+  const DriverProfile &GetProfile() const { return profile; }
   DriverProfile &GetProfile() { return profile; }
-
 };
 
 } // namespace stone

@@ -24,7 +24,7 @@ enum OptFlag {
   DebugOption = (1 << 8),
 };
 
-enum ID {
+enum ID : unsigned {
   INVALID = 0, // This is not an option ID.
 #define OPTION(PREFIX, NAME, ID, KIND, GROUP, ALIAS, ALIASARGS, FLAGS, PARAM,  \
                HELPTEXT, METAVAR, VALUES)                                      \

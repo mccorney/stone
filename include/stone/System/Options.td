@@ -19,8 +19,8 @@ def NoDriverOption : OptionFlag;
 // The option should not be accepted by the build.
 def DebugOption : OptionFlag;
 
-def ActionGroup : OptionGroup<"<action options>">, HelpText<"ACTIONS">;
-class ActionOpt : Group<ActionGroup>;
+def ModeGroup : OptionGroup<"<action options>">, HelpText<"ACTIONS">;
+class ModeOpt : Group<ModeGroup>;
 
 
 def InternalGroup : OptionGroup<"<Stone internal options>">;
@@ -34,46 +34,52 @@ Flags<[HelpHidden]>;
 //COMPILE ACTIONS
 
 def Parse: Flag<["-"], "parse">,
-HelpText<"Parse input file(s)">, ActionOpt,
+HelpText<"Parse input file(s)">, ModeOpt,
 Flags<[CompileOption]>;
 
-def TypeCheck : Flag<["-"], "type-check">,
-HelpText<"Parse and type-check input file(s)">, ActionOpt,
+def Check : Flag<["-"], "check">,
+HelpText<"Parse and type-check input file(s)">, ModeOpt,
 Flags<[CompileOption]>;
 
 //	def EmitLibrary : Flag<["-"], "emit-library">,
-//  HelpText<"Emit a linked library">, ActionOpt,
+//  HelpText<"Emit a linked library">, ModeOpt,
 //  Flags<[NoInteractiveOption]>;
 
-def EmitObj : Flag<["-"], "emit-obj">,
-HelpText<"Emit object file(s) (-C)">, ActionOpt,
+def EmitObject : Flag<["-"], "emit-object">,
+HelpText<"Emit object file(s) (-C)">, ModeOpt,
 Flags<[CompileOption]>;
 
-def C : Flag<["-"], "C">, Alias<EmitObj>,
-Flags<[CompileOption]>, ActionOpt;
 
-def EmitASM : Flag<["-"], "emit-asm">,
-HelpText<"Emit assembly file(s) (-S)">, ActionOpt,
+def EmitExecutable : Flag<["-"], "emit-executable">,
+HelpText<"Emit object file(s) (-C)">, ModeOpt,
+Flags<[DriverOption]>;
+
+
+def C : Flag<["-"], "C">, Alias<EmitObject>,
+Flags<[CompileOption]>, ModeOpt;
+
+def EmitAssembly : Flag<["-"], "emit-assembly">,
+HelpText<"Emit assembly file(s) (-S)">, ModeOpt,
 Flags<[CompileOption]>;
 
-def S: Flag<["-"], "S">, Alias<EmitASM>,
-Flags<[CompileOption]>, ActionOpt;
+def S: Flag<["-"], "S">, Alias<EmitAssembly>,
+Flags<[CompileOption]>, ModeOpt;
 
 def EmitBC : Flag<["-"], "emit-bc">,
-HelpText<"Emit LLVM BC file(s)">, ActionOpt,
+HelpText<"Emit LLVM BC file(s)">, ModeOpt,
 Flags<[CompileOption]>;
 
 def EmitIR : Flag<["-"], "emit-ir">,
-HelpText<"Emit LLVM IR file(s)">, ActionOpt,
+HelpText<"Emit LLVM IR file(s)">, ModeOpt,
 Flags<[CompileOption]>;
 
 def DumpAST : Flag<["-"], "dump-ast">,
-HelpText<"Parse and type-check input file(s) and dump AST(s)">, ActionOpt,
+HelpText<"Parse and type-check input file(s) and dump AST(s)">, ModeOpt,
 Flags<[CompileOption]>;
 
 def Help : Flag<["-", "--"], "help">, 
 Flags<[CompileOption, DriverOption]>,
-HelpText<"Display available options">, ActionOpt;
+HelpText<"Display available options">, ModeOpt;
 
 def h : Flag<["-"], "h">, Alias<Help>;
 
@@ -84,14 +90,14 @@ HelpText<"Display available options, including hidden options">;
 
 def Version : Flag<["-", "--"], "version">,
 Flags<[DriverOption]>,
-HelpText<"Print version information and exit">, ActionOpt;
+HelpText<"Print version information and exit">, ModeOpt;
 
 def v : Flag<["-"], "v">, 
 Flags<[DriverOption]>,
 HelpText<"Show commands to run and use verbose output">;
 
 def Link : Flag<["-"], "link">,
-HelpText<"Specifies a library which should be linked against">, ActionOpt,
+HelpText<"Specifies a library which should be linked against">, ModeOpt,
 Flags<[DriverOption]>;
 
 //GENERAL OPTIONS 
@@ -113,7 +119,7 @@ def SyncProc : Flag<["-"], "sync-proc">,
 Flags<[DebugOption]>,
 HelpText<"Run procs synchronously -- default is asynchronous">;
 
-def ShowAction : Flag<["-"], "show-action">,
+def ShowMode : Flag<["-"], "show-action">,
 Flags<[DebugOption]>,
 HelpText<"Show every step in the lifecycle of the actions">;
 

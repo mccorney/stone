@@ -37,13 +37,6 @@ class Compilation final {
   /// The default tool chain.
   const ToolChain &tc;
 
-  /// The original (untranslated) input argument list.
-  // llvm::opt::InputArgList *originalArgs;
-
-  /// The driver translated arguments. Note that toolchains may perform their
-  /// own argument translation.
-  // llvm::opt::DerivedArgList *translatedArgs;
-
   /// Temporary files which should be removed on exit.
   llvm::opt::ArgStringList tempFiles;
 

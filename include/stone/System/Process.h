@@ -20,6 +20,8 @@ class Driver;
 class Process {
   friend class Compilation;
 
+  // CompilationEvent& trigger;
+
   Step &trigger;
   Driver &driver;
   /// The input file list in case we need to emit a file list instead of a
@@ -57,6 +59,9 @@ public:
     inputFiles = std::move(files);
   }
 };
+
+class SyncProcess : public Process {};
+class AsyncProcess : public Process {};
 
 class Processes final : public List<Process> {
 public:

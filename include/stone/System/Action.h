@@ -14,7 +14,7 @@
 #include "llvm/Support/type_traits.h"
 
 namespace stone {
-class InputFiles; 
+class InputFiles;
 
 enum { ActionAlignment = 8 };
 
@@ -23,7 +23,7 @@ class alignas(ActionAlignment) Action {
   ActionKind kind;
   llvm::StringMapEntry<Action *> *entry = nullptr;
 
-	InputFiles* inputs = nullptr; 
+  InputFiles *inputs = nullptr;
 
 public:
   Action(const Action &) = delete;
@@ -47,7 +47,7 @@ public:
     return llvm::StringRef(GetNameStart(), GetLength());
   }
 
-	InputFiles* GetInputFiles() { return inputs; }
+  InputFiles *GetInputFiles() { return inputs; }
 };
 
 class ActionTable;

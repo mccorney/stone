@@ -3,10 +3,10 @@
 
 #include "stone/Core/Context.h"
 #include "stone/System/FileType.h"
+#include "stone/System/Mode.h"
 #include "stone/System/SessionOptions.h"
 
 #include "llvm/ADT/ArrayRef.h"
-
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/PriorityQueue.h"
 #include "llvm/ADT/StringMap.h"
@@ -20,12 +20,17 @@ namespace stone {
 
 class Session : public Context {
 
+  /// The mode id for this session
   SessionOptions &sessionOpts;
   llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fileSystem;
+
+  ModeID mid;
 
 protected:
   /// Bit flags for OptTable
   unsigned includedFlagsBitmask = 0;
+
+  /// This bit flag will ensure the correct mode for the session
   unsigned excludedFlagsBitmask = 0;
   unsigned missingArgIndex;
   unsigned missingArgCount;
@@ -38,6 +43,13 @@ protected:
 
   /// Type used for a list of input arguments.
   using InputFiles = llvm::SmallVector<InputPair, 16>;
+
+  /// The original (untranslated) input argument list.
+  // llvm::opt::InputArgList *originalArgs;
+
+  /// The driver translated arguments. Note that toolchains may perform their
+  /// own argument translation.
+  // llvm::opt::DerivedArgList *translatedArgs;
 
 public:
   void SetFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs) {
@@ -81,6 +93,12 @@ public:
   llvm::StringRef GetTargetTriple() const { return langOpts.target.str(); }
 
   // virtual llvm::StringRef GetName() = 0;
+  //
+protected:
+  // Compute the mode id -- TODO: virtual
+  void ComputeMID(const llvm::opt::DerivedArgList &args);
+
+  ModeID &GetMID();
 };
 
 } // namespace stone
