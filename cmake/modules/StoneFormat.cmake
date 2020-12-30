@@ -1,22 +1,26 @@
 set(stone_include_files
+	${STONE_SOURCE_DIR}/include/stone/Compile/*.h
+	${STONE_SOURCE_DIR}/include/stone/Compile/*.def
 	${STONE_SOURCE_DIR}/include/stone/Core/*.h
-	${STONE_SOURCE_DIR}/include/stone/Analysis/*.h
-	${STONE_SOURCE_DIR}/include/stone/Analysis/*.def
-	${STONE_SOURCE_DIR}/include/stone/System/*.h
-	${STONE_SOURCE_DIR}/include/stone/Gen/*.h
+	${STONE_SOURCE_DIR}/include/stone/Driver/*.h
+	${STONE_SOURCE_DIR}/include/stone/Session/*.h
 	${STONE_SOURCE_DIR}/include/stone/*.h
 
 )
 set(stone_lib_files
+	${STONE_SOURCE_DIR}/lib/Compile/*.cpp
 	${STONE_SOURCE_DIR}/lib/Core/*.cpp
-	${STONE_SOURCE_DIR}/lib/Core/test/*.cpp
-	${STONE_SOURCE_DIR}/lib/Analysis/*.cpp
-	${STONE_SOURCE_DIR}/lib/Analysis/test/*.cpp
-	${STONE_SOURCE_DIR}/lib/System/*.cpp
-	${STONE_SOURCE_DIR}/lib/System/test/*.cpp
-	${STONE_SOURCE_DIR}/lib/Gen/*.cpp
-	${STONE_SOURCE_DIR}/lib/Gen/test/*.cpp
+	${STONE_SOURCE_DIR}/lib/Driver/*.cpp
+	${STONE_SOURCE_DIR}/lib/Session/*.cpp
+	#${STONE_SOURCE_DIR}/tests/units/Compile/*.cpp
+	#${STONE_SOURCE_DIR}/tests/units/Core/*.cpp
+	#${STONE_SOURCE_DIR}/tests/units/Driver/*.cpp
+
 )
+set(stone_tools_files
+	${STONE_SOURCE_DIR}/tools/stone/*.cpp
+)
+
 set(stone_def_files
 	${STONE_SOURCE_DIR}/include/stone/*.def
 )
@@ -30,6 +34,8 @@ if(CLANG_FORMAT)
 		${stone_lib_files}
 		${stone_include_files}
 		${stone_def_files}
+		${stone_tools_files}
+
 
 	)
 endif()

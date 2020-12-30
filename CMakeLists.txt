@@ -38,5 +38,5 @@ option(STONE_BUILD_TOOLS
 add_subdirectory(include)
 add_subdirectory(lib)
 add_subdirectory(tools)
-#add_subdirectory(verify)
+#add_subdirectory(tests)
 
