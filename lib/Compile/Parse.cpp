@@ -2,6 +2,6 @@
 #include "stone/Compile/Analysis.h"
 #include "stone/Compile/Parser.h"
 #include "stone/Core/Ret.h"
-#include "stone/SubSystem.h"
+#include "stone/Public.h"
 
-int stone::Parse(Analysis &analysis, Pipeline *pipeline) { return ret::ok; }
+int stone::Parse(Analysis &analysis, CompilePipeline *pipeline) { return ret::ok; }

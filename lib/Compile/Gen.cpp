@@ -5,14 +5,14 @@
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 #include "stone/Core/Ret.h"
-#include "stone/SubSystem.h"
+#include "stone/Public.h"
 
 #include "llvm/IR/Module.h"
 
 using namespace stone;
 
 int stone::Gen(stone::ModuleDecl *moduleDecl, const stone::Context &ctx,
-               const GenOptions &genOpts, Pipeline *pipeline) {
+               const GenOptions &genOpts, CompilePipeline *pipeline) {
 
   assert(moduleDecl && "No Module");
 

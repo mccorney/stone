@@ -2,8 +2,8 @@
 #define STONE_COMPILE_CHECK_H
 
 namespace stone {
-class Pipeline;
+class CompilePipeline;
 class Analysis;
-int Check(Analysis &analysis, Pipeline *pipeline = nullptr);
+int Check(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 } // namespace stone
 #endif

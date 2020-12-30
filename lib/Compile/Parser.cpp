@@ -3,7 +3,7 @@
 
 using namespace stone;
 
-Parser::Parser(Analysis &analysis, Pipeline *pipeline)
+Parser::Parser(Analysis &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}
 
 //===----------------------------------------------------------------------===//

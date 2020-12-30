@@ -16,11 +16,11 @@ class TargetMachine;
 } // namespace llvm
 
 namespace stone {
-class Pipeline;
+class CompilePipeline;
 
 class Transformer final {
 public:
-  llvm::Module *ToIR(stone::Module &langModule, Pipeline *pipeline = nullptr);
+  llvm::Module *ToIR(stone::Module &langModule, CompilePipeline *pipeline = nullptr);
 };
 
 } // namespace stone

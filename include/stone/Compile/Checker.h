@@ -13,7 +13,7 @@
 
 namespace stone {
 class Checker;
-class Pipeline;
+class CompilePipeline;
 
 class CheckerStats final : public Stats {
   const Checker &checker;
@@ -27,10 +27,10 @@ class Checker final {
   friend CheckerStats;
   Analysis &analysis;
   CheckerStats stats;
-  Pipeline *pipeline;
+  CompilePipeline *pipeline;
 
 public:
-  Checker(Analysis &analysis, Pipeline *pipeline = nullptr);
+  Checker(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 
 public:
   void CheckDecl();

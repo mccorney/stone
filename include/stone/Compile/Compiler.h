@@ -10,19 +10,19 @@
 
 namespace stone {
 
-class Pipeline;
+class CompilePipeline;
 class Compiler final : public Session {
 
   SrcMgr sm;
   FileMgr fm;
-  Pipeline *pipeline = nullptr;
+  CompilePipeline *pipeline = nullptr;
   std::unique_ptr<Analysis> analysis;
 
 public:
   CompileOptions compileOpts;
 
 public:
-  Compiler(Pipeline *pipeline = nullptr);
+  Compiler(CompilePipeline *pipeline = nullptr);
 
   /// Parse the given list of strings into an InputArgList.
   bool Build(llvm::ArrayRef<const char *> args) override;

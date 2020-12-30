@@ -3,7 +3,7 @@
 
 using namespace stone;
 
-Checker::Checker(Analysis &analysis, Pipeline *pipeline)
+Checker::Checker(Analysis &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}
 
 // Decl

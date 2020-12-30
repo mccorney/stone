@@ -3,12 +3,12 @@
 #include "stone/Compile/Compiler.h"
 #include "stone/Compile/Gen.h"
 #include "stone/Core/Ret.h"
-#include "stone/SubSystem.h"
+#include "stone/Public.h"
 
 using namespace stone;
 
 int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
-                   void *mainAddr, Pipeline *pipeline) {
+                   void *mainAddr, CompilePipeline *pipeline) {
 
   Compiler compiler(pipeline);
   // TODO: cleanup

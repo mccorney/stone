@@ -14,14 +14,14 @@ class TargetMachine;
 } // namespace llvm
 
 namespace stone {
-class Pipeline;
+class CompilePipeline;
 class ASTContext;
 struct GenOptions;
 
 class Backend final {
 public:
   int ToNative(ASTContext &astCtx, llvm::Module *llvmModule,
-               const GenOptions &genOpts, Pipeline *pipeline = nullptr);
+               const GenOptions &genOpts, CompilePipeline *pipeline = nullptr);
   bool ToObject();
   bool ToAssembly();
 };

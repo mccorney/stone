@@ -4,7 +4,7 @@
 
 using namespace stone;
 
-Compiler::Compiler(Pipeline *pipeline)
+Compiler::Compiler(CompilePipeline *pipeline)
     : Session(compileOpts), compileOpts(langOpts), pipeline(pipeline),
       fm(compileOpts.fsOpts), sm(GetDiagEngine(), fm) {
 

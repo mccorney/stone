@@ -3,14 +3,14 @@
 
 namespace stone {
 class ASTContext;
-class Pipeline;
+class CompilePipeline;
 class GenOptions;
 class ModuleDecl;
 class Context;
 
 // May want to pass Module instead
 int Gen(stone::ModuleDecl *moduleDecl, const stone::Context &ctx,
-        const GenOptions &genOpts, Pipeline *pipeline = nullptr);
+        const GenOptions &genOpts, CompilePipeline *pipeline = nullptr);
 } // namespace stone
 
 #endif

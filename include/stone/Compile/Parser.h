@@ -13,7 +13,7 @@
 
 namespace stone {
 class Parser;
-class Pipeline;
+class CompilePipeline;
 
 class ParserStats final : public Stats {
   const Parser &parser;
@@ -29,10 +29,10 @@ class Parser final {
   friend ParserStats;
   Analysis &analysis;
   ParserStats stats;
-  Pipeline *pipeline;
+  CompilePipeline *pipeline;
 
 public:
-  Parser(Analysis &analysis, Pipeline *pipeline = nullptr);
+  Parser(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 
 public:
   // Decl
