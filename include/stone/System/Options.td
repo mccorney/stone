@@ -135,7 +135,7 @@ def ShowProcs : Flag<["-"], "show-procs">,
 Flags<[DebugOption]>,
 HelpText<"Show procs">;
 
-def ShowCycle : Flag<["-"], "show-cycle">,
+def ShowLifecycle : Flag<["-"], "show-lifecycle">,
 Flags<[DebugOption]>,
 HelpText<"Show lifecycle of steps and procs">;
 

@@ -229,7 +229,7 @@ Driver::BuildCompilation(const ToolChain &tc,
   // const bool ContinueBuildingAfterErrors =
   //    computeContinueBuildingAfterErrors(BatchMode, ArgList.get());
 
-  driverOpts.showCycle = argList.hasArg(opts::ShowCycle);
+  driverOpts.showLifecycle = argList.hasArg(opts::ShowLifecycle);
 
   std::unique_ptr<Compilation> compilation(new Compilation(*this, tc));
 }
