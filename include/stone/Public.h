@@ -2,8 +2,7 @@
 #define STONE_PUBLIC_H
 
 namespace stone {
-
-class CompileCompilePipeline final {
+class CompilePipeline final {
 public:
 };
 } // namespace stone

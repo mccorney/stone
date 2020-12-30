@@ -4,4 +4,6 @@
 #include "stone/Core/Ret.h"
 #include "stone/Public.h"
 
-int stone::Parse(Analysis &analysis, CompilePipeline *pipeline) { return ret::ok; }
+int stone::Parse(Analysis &analysis, CompilePipeline *pipeline) {
+  return ret::ok;
+}

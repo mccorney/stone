@@ -5,7 +5,6 @@
 #include "stone/Compile/Token.h"
 #include "stone/Compile/Trivia.h"
 #include "stone/Core/Context.h"
-
 #include "stone/Core/SrcLoc.h"
 
 namespace stone {
@@ -15,7 +14,7 @@ class SrcMgr;
 class Token;
 class LangOptions;
 class Token;
-class Diag;
+class CompilePipeline;
 
 enum class TriviaRetentionMode {
   Without,
@@ -95,7 +94,8 @@ private:
   tk GetKindOfIdentifier(StringRef tokStr);
 
 public:
-  Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx);
+  Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx,
+        CompilePipeline *pipeline = nullptr);
 
 public:
   void Lex(Token &result) {

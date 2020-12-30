@@ -20,7 +20,8 @@ class CompilePipeline;
 
 class Transformer final {
 public:
-  llvm::Module *ToIR(stone::Module &langModule, CompilePipeline *pipeline = nullptr);
+  llvm::Module *ToIR(stone::Module &langModule,
+                     CompilePipeline *pipeline = nullptr);
 };
 
 } // namespace stone

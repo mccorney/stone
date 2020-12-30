@@ -160,7 +160,6 @@ STMT_KEYWORD(default, TOKON)
 STMT_KEYWORD(where, TOKON)
 STMT_KEYWORD(pin, TOKON)
 
-
 // Expression keywords.
 EXPR_KEYWORD(as, TOKON)
 EXPR_KEYWORD(false, TOKON)
