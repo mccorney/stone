@@ -1,7 +1,6 @@
 #ifndef STONE_SESSION_EXECUTABLEPATH_H
 #define STONE_SESSION_EXECUTABLEPATH_H
 
-
 #include "llvm/Support/FileSystem.h"
 
 namespace stone {

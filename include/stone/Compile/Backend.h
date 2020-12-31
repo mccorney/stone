@@ -3,6 +3,7 @@
 
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/LLVM.h"
+#include "llvm/Target/TargetMachine.h"
 
 namespace llvm {
 class raw_pwrite_stream;
@@ -16,6 +17,9 @@ class TargetMachine;
 namespace stone {
 class ASTContext;
 class GenOptions;
+
+std::unique_ptr<llvm::TargetMachine> CreateTargetMachine(const GenOptions &Opts,
+                                                         ASTContext &astCtx);
 
 bool GenObject(llvm::Module *llvmModule, const GenOptions &genOpts,
                ASTContext &astCtx, llvm::StringRef outputFilename);

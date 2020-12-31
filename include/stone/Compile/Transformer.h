@@ -19,11 +19,14 @@ namespace stone {
 
 class Transformer final {
 public:
-	Transformer(); 
+  Transformer();
+
 public:
   void GenStmt();
+
 public:
   void GenDecl();
+
 public:
   void GenExpr();
 };

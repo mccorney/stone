@@ -30,9 +30,10 @@ int Check(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 llvm::Module *GenIR(stone::ModuleDecl *moduleDecl, const stone::Context &ctx,
                     const GenOptions &genOpts,
                     llvm::StringRef outputModulename);
+
 /// TODO:
 void OptimizeIR(llvm::Module *llvmModule, const GenOptions &genOpts,
-                ASTContext &astCtx);
+                llvm::TargetMachine *targetMachine);
 
 } // namespace stone
 #endif
