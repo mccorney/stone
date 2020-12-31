@@ -1,14 +1,21 @@
-#include "stone/Compile/Transformer.h"
-#include "stone/Core/Module.h"
-#include "stone/Core/Ret.h"
-
 #include "stone/Public.h"
 #include "llvm/IR/Module.h"
+#include "stone/Core/Module.h"
+#include "stone/Core/Ret.h"
+#include "stone/Compile/Transformer.h"
 
 using namespace stone;
 
-llvm::Module *Transformer::ToIR(stone::Module &langModule,
-                                CompilePipeline *pipeline) {
 
-  return nullptr;
+
+void Transformer::GenDecl() {
+
 }
+
+void Transformer::GenStmt() {
+
+}
+void Transformer::GenExpr() {
+
+}
+
