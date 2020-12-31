@@ -1,7 +1,7 @@
-#include "stone/Compile/Backend.h"
-#include "stone/Compile/GenOptions.h"
 #include "stone/Core/Ret.h"
 #include "stone/Public.h"
+#include "stone/Compile/Backend.h"
+#include "stone/Compile/GenOptions.h"
 
 using namespace stone;
 
