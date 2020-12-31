@@ -46,20 +46,20 @@ class ToolChain {
   constexpr static const char *const StoneExecutableName = "stone";
 
 public:
-  using ToolChainPaths = llvm::SmallVector<std::string, 16>;
+  using Paths = llvm::SmallVector<std::string, 16>;
 
 protected:
   ToolChain(const Driver &driver, const llvm::Triple &triple);
 
 private:
   /// The list of toolchain specific path prefixes to search for libraries.
-  ToolChainPaths libraryPaths;
+  Paths libraryPaths;
 
   /// The list of toolchain specific path prefixes to search for files.
-  ToolChainPaths filePaths;
+  Paths filePaths;
 
   /// The list of toolchain specific path prefixes to search for programs.
-  ToolChainPaths programPaths;
+  Paths programPaths;
 
 public:
   virtual ~ToolChain() = default;
@@ -84,14 +84,14 @@ public:
   std::unique_ptr<GCCTool> GetGCCTool();
   std::unique_ptr<StoneTool> GetStoneTool();
 
-  ToolChainPaths &GetLibraryPaths() { return libraryPaths; }
-  const ToolChainPaths &GetLibraryPaths() const { return libraryPaths; }
+  Paths &GetLibraryPaths() { return libraryPaths; }
+  const Paths &GetLibraryPaths() const { return libraryPaths; }
 
-  ToolChainPaths &GetFilePaths() { return filePaths; }
-  const ToolChainPaths &GetFilePaths() const { return filePaths; }
+  Paths &GetFilePaths() { return filePaths; }
+  const Paths &GetFilePaths() const { return filePaths; }
 
-  ToolChainPaths &GetProgramPaths() { return programPaths; }
-  const ToolChainPaths &GetProgramPaths() const { return programPaths; }
+  Paths &GetProgramPaths() { return programPaths; }
+  const Paths &GetProgramPaths() const { return programPaths; }
 
   /// Pick a tool to use to handle the compilation event \p event.
   ///
