@@ -8,6 +8,8 @@ set(stone_core_sources
 	ASTContext.cpp
 	ASTConsumer.cpp
 	ASTScope.cpp
+	ASTVisitor.cpp
+	ASTWalker.cpp
 	Builtin.cpp
 	BumpTable.cpp
 	Char.cpp
@@ -30,10 +32,8 @@ set(stone_core_sources
 	TextDiagnosticListener.cpp
 	TokenKind.cpp
 	Type.cpp
-	Visitor.cpp
 	Version.cpp
 	VirtualTable.cpp
-	Walker.cpp
 
 )
 add_stone_library(StoneCore

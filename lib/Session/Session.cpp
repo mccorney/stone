@@ -125,3 +125,24 @@ void Session::Finish() {
 }
 void Session::PrintDiagnostics() {}
 void Session::PrintStatistics() {}
+
+// TODO:
+ModeType Mode::GetType() {
+  /*
+          switch (mode.GetID()) {
+    case opts::EmitIR:
+                  return MdodeType::EmitIR;
+    case opts::EmitBC:
+                  return ModeType:EmitBC;
+    case opts::EmitObject:
+                  return ModeType::EmitObject;
+    case opts::EmitAssembly:
+                  return ModeType::EmitAssembly;
+    case opts::EmitLibrary:
+                  return ModeType::EmitLibrary;
+    default:
+      return ModeType::None;
+    }
+          */
+  return ModeType::None;
+}

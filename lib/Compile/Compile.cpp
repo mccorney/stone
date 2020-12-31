@@ -5,6 +5,7 @@
 #include "stone/Compile/Frontend.h"
 #include "stone/Core/Ret.h"
 #include "stone/Public.h"
+#include "stone/Session/Options.h"
 
 using namespace stone;
 
@@ -20,6 +21,20 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
       return ret::err;
     }
   }
+  /*
+          switch(compiler.GetMode().GetID()){
+                  case opts::Parse:{
+                          break;
+                  }
+                  case opts::Check: {
+                          break;
+                  }
+                  default:
+                          break;
+          }
+
+  */
+
   // We are not passing the compiler directly, we are pass stone::Context
   auto llvmModule =
       stone::GenIR(compiler.GetAnalysis().GetMainModule(), compiler,

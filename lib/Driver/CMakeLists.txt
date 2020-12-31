@@ -28,6 +28,7 @@ set( LLVM_LINK_COMPONENTS
 set(stone_driver_sources
 
 	Compilation.cpp
+	CompilationTool.cpp
 	DarwinToolChain.cpp
 	Driver.cpp
 	Event.cpp

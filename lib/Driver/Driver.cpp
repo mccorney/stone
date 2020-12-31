@@ -66,14 +66,17 @@ Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
     }
     return llvm::make_unique<DarwinToolChain>(*this, target, targetVariant);
   }
-  case llvm::Triple::Linux:
-    return llvm::make_unique<LinuxToolChain>(*this, target);
-  case llvm::Triple::FreeBSD:
-    return llvm::make_unique<FreeBSDToolChain>(*this, target);
-  case llvm::Triple::OpenBSD:
-    return llvm::make_unique<OpenBSDToolChain>(*this, target);
-  case llvm::Triple::Win32:
-    return llvm::make_unique<WinToolChain>(*this, target);
+    /*
+      case llvm::Triple::Linux:
+        return llvm::make_unique<LinuxToolChain>(*this, target);
+      case llvm::Triple::FreeBSD:
+        return llvm::make_unique<FreeBSDToolChain>(*this, target);
+      case llvm::Triple::OpenBSD:
+        return llvm::make_unique<OpenBSDToolChain>(*this, target);
+      case llvm::Triple::Win32:
+        return llvm::make_unique<WinToolChain>(*this, target);
+    */
+
   default:
     os << "D(SourceLoc(),"
        << "msg::error_unknown_target,"
@@ -182,7 +185,7 @@ void Driver::BuildProcs() {}
 void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
   Session::ComputeMode(args);
   if (mode.GetID() == 0) {
-    mode.SetID(opts::EmitExecutable); /// Default mode
+    mode.SetID(opts::EmitExecutable); /// Default mode -- TODO: SetModeType
   }
 }
 

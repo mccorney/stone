@@ -96,6 +96,9 @@ public:
   void PrintDiagnostics();
   void PrintStatistics();
 
+  Mode &GetMode();
+  bool IsModeOutput();
+
 protected:
   // Compute the mode id -- TODO: virtual
   virtual void ComputeMode(const llvm::opt::DerivedArgList &args);
@@ -103,10 +106,6 @@ protected:
   /// arguments, after applying the standard argument translations.
   virtual llvm::opt::DerivedArgList *
   TranslateInputArgs(const llvm::opt::InputArgList &args) const;
-
-  Mode &GetMode();
-
-  bool IsModeOutput();
 
   void Purge();
 };

@@ -2,6 +2,7 @@
 
 using namespace stone;
 
+/*
 UnixToolChain::UnixToolChain(const Driver &driver, const llvm::Triple &triple)
     : ToolChain(driver, triple) {}
 
@@ -15,3 +16,6 @@ FreeBSDToolChain::FreeBSDToolChain(const Driver &driver,
 OpenBSDToolChain::OpenBSDToolChain(const Driver &driver,
                                    const llvm::Triple &triple)
     : UnixToolChain(driver, triple) {}
+
+
+*/
