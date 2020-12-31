@@ -1,7 +1,8 @@
 #include "stone/Compile/Compile.h"
 #include "stone/Compile/Analysis.h"
+#include "stone/Compile/Backend.h"
 #include "stone/Compile/Compiler.h"
-#include "stone/Compile/Gen.h"
+#include "stone/Compile/Frontend.h"
 #include "stone/Core/Ret.h"
 #include "stone/Public.h"
 
@@ -20,8 +21,13 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
     }
   }
   // We are not passing the compiler directly, we are pass stone::Context
-  return stone::Gen(compiler.GetAnalysis().GetMainModule(), compiler,
-                    compiler.compileOpts.genOpts, pipeline);
+  auto llvmModule =
+      stone::GenIR(compiler.GetAnalysis().GetMainModule(), compiler,
+                   compiler.compileOpts.genOpts, /*TODO*/ {});
+
+  bool status =
+      stone::GenObject(llvmModule, compiler.compileOpts.genOpts,
+                       compiler.GetAnalysis().GetASTContext(), /*TODO*/ {});
 
   return ret::ok;
 }

@@ -1,5 +1,6 @@
 #include "stone/Compile/Compiler.h"
 #include "stone/Compile/Analysis.h"
+#include "stone/Compile/Frontend.h"
 #include "stone/Core/Ret.h"
 
 using namespace stone;

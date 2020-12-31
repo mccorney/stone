@@ -7,7 +7,7 @@ set(stone_compile_sources
 	Compile.cpp
 	CompileFile.cpp
 	Compiler.cpp
-	Gen.cpp
+	GenIR.cpp
 	Lexer.cpp
 	Parse.cpp
 	Parser.cpp
