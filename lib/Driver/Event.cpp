@@ -7,15 +7,15 @@ const char *Event::GetName(Event::Kind k) {
   case Event::Kind::Input:
     return "input";
   case Event::Kind::Compile:
-    return "compiler";
+    return "compile";
   case Event::Kind::Backend:
     return "backend";
   case Event::Kind::Assemble:
-    return "assembler";
+    return "assemble";
   case Event::Kind::DynamicLink:
-    return "dynamic-linker";
+    return "dynamic-link";
   case Event::Kind::StaticLink:
-    return "static-linker";
+    return "static-link";
   }
   llvm_unreachable("invalid class");
 }
