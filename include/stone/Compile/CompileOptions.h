@@ -18,7 +18,7 @@ public:
   FileSystemOptions fsOpts;
 
 public:
-  CompileOptions(LangOptions &langOpts) : SessionOptions(langOpts) {}
+  CompileOptions() {}
 };
 
 } // namespace stone

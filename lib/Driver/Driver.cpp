@@ -31,8 +31,8 @@ using namespace stone;
 using namespace llvm::opt;
 
 Driver::Driver(llvm::StringRef stoneExecutable, std::string driverName)
-    : Session(driverOpts), driverOpts(langOpts),
-      stoneExecutablePath(stoneExecutablePath), driverName(driverName),
+    : Session(driverOpts), stoneExecutablePath(stoneExecutablePath),
+      driverName(driverName),
       /*sysRoot(DEFAULT_SYSROOT),*/
       driverTitle("Stone Compiler"), strSaver(bumpAlloc),
       checkInputFilesExist(true) {}

@@ -6,7 +6,7 @@
 namespace stone {
 class DriverOptions final : public SessionOptions {
 public:
-  DriverOptions(LangOptions &langOpts) : SessionOptions(langOpts) {}
+  DriverOptions() {}
 
 public:
 };
