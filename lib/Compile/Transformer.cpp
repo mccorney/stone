@@ -6,7 +6,9 @@
 
 using namespace stone;
 
+Transformer::Transformer() {
 
+}
 
 void Transformer::GenDecl() {
 

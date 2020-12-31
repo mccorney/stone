@@ -1,5 +1,4 @@
 #include "stone/Driver/Run.h"
-#include "stone/Core/Fmt.h"
 #include "stone/Core/LLVM.h"
 #include "stone/Core/Ret.h"
 #include "stone/Driver/Compilation.h"

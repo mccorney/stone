@@ -3,6 +3,7 @@
 #include "stone/Public.h"
 #include "stone/Compile/Frontend.h"
 #include "stone/Compile/GenOptions.h"
+#include "stone/Compile/Transformer.h"
 #include "stone/Core/ASTContext.h"
 
 #include "llvm/IR/Module.h"
@@ -14,5 +15,9 @@ llvm::Module *stone::GenIR(stone::ModuleDecl *moduleDecl,
                            llvm::StringRef outputModulename) {
 
   assert(moduleDecl && "No Module");
+
+	Transformer transformer; 
+
+
   return nullptr;
 }
