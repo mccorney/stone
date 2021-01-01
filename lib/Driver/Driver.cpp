@@ -161,6 +161,12 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
   }
 }
 
+std::unique_ptr<DriverOutputInstance> Driver::BuildOutputInstance(
+    const ToolChain &toolChain, const llvm::opt::DerivedArgList &args,
+    const bool batchMode, const InputFiles &inputs) const {
+  return nullptr;
+}
+
 static void BuildEvent(Driver &driver) {}
 
 void Driver::BuildEvents() {
