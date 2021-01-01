@@ -1,7 +1,52 @@
 #include "stone/Driver/ToolChain.h"
-#include "stone/Driver/CompilationTool.h"
 
 using namespace stone;
+
+Tool::Tool(llvm::StringRef fullName, llvm::StringRef shortName,
+           const ToolChain &toolChain)
+    : fullName(fullName), shortName(shortName), toolChain(toolChain) {
+  canEmitIR = false;
+}
+
+Tool::~Tool() {}
+
+ClangTool::ClangTool(llvm::StringRef fullName, llvm::StringRef shortName,
+                     const ToolChain &toolChain)
+    : Tool(fullName, shortName, toolChain) {
+  canEmitIR = true;
+}
+
+ClangTool::~ClangTool() {}
+
+StoneTool::StoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
+                     const ToolChain &toolChain)
+    : Tool(fullName, shortName, toolChain) {
+  canEmitIR = true;
+}
+StoneTool::~StoneTool() {}
+
+GCCTool::GCCTool(llvm::StringRef fullName, llvm::StringRef shortName,
+                 const ToolChain &toolChain)
+    : Tool(fullName, shortName, toolChain) {}
+GCCTool::~GCCTool() {}
+
+DynamicLinkTool::DynamicLinkTool(llvm::StringRef fullName,
+                                 llvm::StringRef shortName,
+                                 const ToolChain &toolChain)
+    : Tool(fullName, shortName, toolChain) {}
+DynamicLinkTool::~DynamicLinkTool() {}
+
+StaticLinkTool::StaticLinkTool(llvm::StringRef fullName,
+                               llvm::StringRef shortName,
+                               const ToolChain &toolChain)
+    : Tool(fullName, shortName, toolChain) {}
+
+StaticLinkTool::~StaticLinkTool() {}
+
+AssembleTool::AssembleTool(llvm::StringRef fullName, llvm::StringRef shortName,
+                           const ToolChain &toolChain)
+    : Tool(fullName, shortName, toolChain) {}
+AssembleTool::~AssembleTool() {}
 
 ToolChain::ToolChain(const Driver &driver, const llvm::Triple &triple)
     : driver(driver), triple(triple) {}
@@ -14,15 +59,14 @@ std::unique_ptr<Process> ToolChain::CreateProc(/*const JobAction &JA, Compilatio
   return nullptr;
 }
 
-CompilationTool *ToolChain::BuildAssembleTool() const { return nullptr; }
-CompilationTool *ToolChain::BuildLinkTool() const { return nullptr; }
-CompilationTool *ToolChain::BuildStaticLibTool() const { return nullptr; }
-CompilationTool *ToolChain::BuildDynamicLibTool() const { return nullptr; }
+Tool *ToolChain::BuildAssembleTool() const { nullptr; }
+Tool *ToolChain::BuildDynamicLinkTool() const { nullptr; }
+Tool *ToolChain::BuildStaticLinkTool() const { nullptr; }
+Tool *ToolChain::BuildGCCTool() const { nullptr; }
+Tool *ToolChain::BuildStoneTool() const { nullptr; }
+Tool *ToolChain::GetTool(ModeType modeType) const { nullptr; }
 
-CompilationTool *ToolChain::GetCompilationTool(ModeType modeType) const {
-  return nullptr;
-}
-CompilationTool *ToolChain::PickTool(const CompilationEvent &event) const {
+Tool *ToolChain::PickTool(const CompilationEvent &event) const {
 
   switch (event.GetKind()) {
   case Event::Kind::DynamicLink:

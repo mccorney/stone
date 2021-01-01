@@ -68,13 +68,13 @@ Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
   }
     /*
       case llvm::Triple::Linux:
-        return llvm::make_unique<LinuxToolChain>(*this, target);
+        return llvm::make_unique<stone::Linux>(*this, target);
       case llvm::Triple::FreeBSD:
-        return llvm::make_unique<FreeBSDToolChain>(*this, target);
+        return llvm::make_unique<stone::FreeBSD>(*this, target);
       case llvm::Triple::OpenBSD:
-        return llvm::make_unique<OpenBSDToolChain>(*this, target);
+        return llvm::make_unique<stone::OpenBSD>(*this, target);
       case llvm::Triple::Win32:
-        return llvm::make_unique<WinToolChain>(*this, target);
+        return llvm::make_unique<stone::Win>(*this, target);
     */
 
   default:

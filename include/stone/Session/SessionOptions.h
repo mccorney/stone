@@ -7,7 +7,7 @@
 namespace stone {
 
 class SessionOptions {
-	std::unique_ptr<llvm::opt::OptTable> optTable;
+  std::unique_ptr<llvm::opt::OptTable> optTable;
 
 public:
   bool showHelp = false;
@@ -18,7 +18,7 @@ public:
 
 public:
   llvm::opt::OptTable &GetOpts() const { return *optTable.get(); }
-  };
+};
 } // namespace stone
 
 #endif

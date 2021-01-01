@@ -3,7 +3,6 @@
 
 #include "stone/Core/LLVM.h"
 #include "stone/Core/Mem.h"
-#include "stone/Driver/CompilationTool.h"
 #include "stone/Driver/Process.h"
 #include "stone/Session/FileType.h"
 #include "stone/Session/Mode.h"
@@ -36,7 +35,87 @@ namespace vfs {
 class FileSystem;
 } // namespace vfs
 } // namespace llvm
+
 namespace stone {
+
+class ToolChain;
+
+class Tool {
+  /// The tool name (for debugging).
+  llvm::StringRef fullName;
+  /// The human readable name for the tool, for use in diagnostics.
+  llvm::StringRef shortName;
+  /// The tool chain this tool is a part of.
+  const ToolChain &toolChain;
+
+public:
+  /// Whether the tool is still on the system
+  bool isOnSystem;
+  /// Whether the tools is obsolete
+  bool isObsolete;
+
+protected:
+  /// The tool is able to emit ir
+  bool canEmitIR;
+  /// The tool has a builtin assemble
+  bool hasBuiltinAssembler;
+  /// The tool as a builtin linker
+  bool hasBuiltinLinker;
+
+public:
+  Tool(llvm::StringRef fullName, llvm::StringRef shortName,
+       const ToolChain &toolChain);
+
+public:
+  virtual ~Tool();
+
+public:
+  bool IsOnSystem() { return isOnSystem; }
+  bool IsObsolete() { return isObsolete; }
+  const ToolChain &GetToolChain() const { return toolChain; }
+};
+
+class ClangTool : public Tool {
+public:
+  ClangTool(llvm::StringRef fullName, llvm::StringRef shortName,
+            const ToolChain &toolChain);
+  ~ClangTool();
+};
+
+class StoneTool final : public Tool {
+public:
+  StoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
+            const ToolChain &toolChain);
+  ~StoneTool();
+};
+
+class GCCTool final : public Tool {
+public:
+  GCCTool(llvm::StringRef fullName, llvm::StringRef shortName,
+          const ToolChain &toolChain);
+  ~GCCTool();
+};
+
+class DynamicLinkTool final : public Tool {
+public:
+  DynamicLinkTool(llvm::StringRef fullName, llvm::StringRef shortName,
+                  const ToolChain &toolChain);
+  ~DynamicLinkTool();
+};
+
+class StaticLinkTool final : public Tool {
+public:
+  StaticLinkTool(llvm::StringRef fullName, llvm::StringRef shortName,
+                 const ToolChain &toolChain);
+  ~StaticLinkTool();
+};
+
+class AssembleTool final : public Tool {
+public:
+  AssembleTool(llvm::StringRef fullName, llvm::StringRef shortName,
+               const ToolChain &toolChain);
+  ~AssembleTool();
+};
 
 class ToolChain {
   const Driver &driver;
@@ -61,6 +140,15 @@ private:
   /// The list of toolchain specific path prefixes to search for programs.
   Paths programPaths;
 
+protected:
+  /// Tools that stone supports and looks for
+  std::unique_ptr<ClangTool> clangTool;
+  std::unique_ptr<DynamicLinkTool> staticLinkTool;
+  std::unique_ptr<StaticLinkTool> dynamicLinkTool;
+  std::unique_ptr<AssembleTool> assembleTool;
+  std::unique_ptr<GCCTool> gccTool;
+  std::unique_ptr<StoneTool> stoneTool;
+
 public:
   virtual ~ToolChain() = default;
 
@@ -78,12 +166,6 @@ public:
                                     std::unique_ptr<CommandOutput> output,
                                     const OutputInfo &OI*/) const;
 
-  std::unique_ptr<ClangTool> GetClangTool();
-  std::unique_ptr<LinkTool> GetLinkTool();
-  std::unique_ptr<AssembleTool> GetAssembleTool();
-  std::unique_ptr<GCCTool> GetGCCTool();
-  std::unique_ptr<StoneTool> GetStoneTool();
-
   Paths &GetLibraryPaths() { return libraryPaths; }
   const Paths &GetLibraryPaths() const { return libraryPaths; }
 
@@ -97,23 +179,18 @@ public:
   ///
   /// This can be overridden when a particular ToolChain needs to use
   /// a compiler other than Clang.
-  virtual CompilationTool *PickTool(const CompilationEvent &event) const;
+  virtual Tool *PickTool(const CompilationEvent &event) const;
 
 public:
-  virtual CompilationTool *BuildAssembleTool() const;
-  virtual CompilationTool *BuildLinkTool() const;
-  virtual CompilationTool *BuildStaticLibTool() const;
-  virtual CompilationTool *BuildDynamicLibTool() const;
-  virtual CompilationTool *GetCompilationTool(ModeType modeType) const;
-};
+  virtual Tool *BuildClangTool() const = 0;
+  virtual Tool *BuildAssembleTool() const;
+  virtual Tool *BuildDynamicLinkTool() const;
+  virtual Tool *BuildStaticLinkTool() const;
+  virtual Tool *BuildGCCTool() const;
+  virtual Tool *BuildStoneTool() const;
 
-/*
-class UnixToolChain : public ToolChain {
-public:
-  UnixToolChain(const Driver &driver, const llvm::Triple &triple);
-  ~UnixToolChain() = default;
+  virtual Tool *GetTool(ModeType modeType) const;
 };
-*/
 
 class DarwinToolChain final : public ToolChain {
   const llvm::Optional<llvm::Triple> &targetVariant;
@@ -124,12 +201,22 @@ public:
   ~DarwinToolChain() = default;
 
 public:
-  CompilationTool *BuildAssembleTool() const override;
-  CompilationTool *BuildLinkTool() const override;
-  CompilationTool *BuildStaticLibTool() const override;
-  CompilationTool *BuildDynamicLibTool() const override;
-  CompilationTool *GetCompilationTool(ModeType modeType) const override;
+  Tool *BuildClangTool() const override;
+  Tool *BuildAssembleTool() const override;
+  Tool *BuildDynamicLinkTool() const override;
+  Tool *BuildStaticLinkTool() const override;
+  Tool *BuildGCCTool() const override;
+  Tool *BuildStoneTool() const override;
+  Tool *GetTool(ModeType modeType) const override;
 };
+
+/*
+class UnixToolChain : public ToolChain {
+public:
+  UnixToolChain(const Driver &driver, const llvm::Triple &triple);
+  ~UnixToolChain() = default;
+};
+*/
 
 /*
 class LinuxToolChain final : public UnixToolChain {
@@ -138,11 +225,11 @@ public:
   ~LinuxToolChain() = default;
 
 public:
-  CompilationTool *BuildAssembleTool() override const;
-  CompilationTool *BuildLinkTool() override const;
-  CompilationTool *BuildStaticLibTool() override const;
-  CompilationTool *BuildDynamicLibTool() override const;
-  CompilationTool *GetCompilationTool(ModeType modeType) override const;
+  Tool *BuildAssembleTool() override const;
+  Tool *BuildLinkTool() override const;
+  Tool *BuildStaticLibTool() override const;
+  Tool *BuildDynamicLibTool() override const;
+  Tool *GetTool(ModeType modeType) override const;
 };
 
 class FreeBSDToolChain final : public UnixToolChain {
@@ -151,11 +238,11 @@ public:
   ~FreeBSDToolChain() = default;
 
 public:
-  CompilationTool *BuildAssembleTool() override const;
-  CompilationTool *BuildLinkTool() override const;
-  CompilationTool *BuildStaticLibTool() override const;
-  CompilationTool *BuildDynamicLibTool() override const;
-  CompilationTool *GetCompilationTool(ModeType modeType) override const;
+  Tool *BuildAssembleTool() override const;
+  Tool *BuildLinkTool() override const;
+  Tool *BuildStaticLibTool() override const;
+  Tool *BuildDynamicLibTool() override const;
+  Tool *GetTool(ModeType modeType) override const;
 };
 class OpenBSDToolChain final : public UnixToolChain {
 public:
@@ -163,11 +250,11 @@ public:
   ~OpenBSDToolChain() = default;
 
 public:
-  CompilationTool *BuildAssembleTool() override const;
-  CompilationTool *BuildLinkTool() override const;
-  CompilationTool *BuildStaticLibTool() override const;
-  CompilationTool *BuildDynamicLibTool() override const;
-  CompilationTool *GetCompilationTool(ModeType modeType) override const;
+  Tool *BuildAssembleTool() override const;
+  Tool *BuildLinkTool() override const;
+  Tool *BuildStaticLibTool() override const;
+  Tool *BuildDynamicLibTool() override const;
+  Tool *GetTool(ModeType modeType) override const;
 };
 
 class WinToolChain : public ToolChain {
@@ -176,11 +263,11 @@ public:
   ~WinToolChain() = default;
 
 public:
-  CompilationTool *BuildAssembleTool() override const;
-  CompilationTool *BuildLinkTool() override const;
-  CompilationTool *BuildStaticLibTool() override const;
-  CompilationTool *BuildDynamicLibTool() override const;
-  CompilationTool *GetCompilationTool(ModeType modeType) override const;
+  Tool *BuildAssembleTool() override const;
+  Tool *BuildLinkTool() override const;
+  Tool *BuildStaticLibTool() override const;
+  Tool *BuildDynamicLibTool() override const;
+  Tool *GetTool(ModeType modeType) override const;
 };
 */
 
