@@ -2,7 +2,7 @@
 #define STONE_DRIVER_EVENT_H
 
 #include "stone/Core/List.h"
-#include "stone/Driver/DriverProfile.h"
+#include "stone/Driver/LinkType.h"
 #include "stone/Session/FileType.h"
 
 #include "llvm/ADT/DenseMapInfo.h"
@@ -159,21 +159,20 @@ public:
 };
 
 class DynamicLinkEvent final : public CompilationEvent {
-  DriverProfile::LinkType linkType;
+  LinkType linkType;
   bool shouldPerformLTO;
 
 public:
-  DynamicLinkEvent(llvm::ArrayRef<const Event *> inputs,
-                   DriverProfile::LinkType linkType, bool shouldPerformLTO)
+  DynamicLinkEvent(llvm::ArrayRef<const Event *> inputs, LinkType linkType,
+                   bool shouldPerformLTO)
       : CompilationEvent(Event::Kind::DynamicLink, inputs,
                          file::FileType::Image, {}),
         linkType(linkType), shouldPerformLTO(shouldPerformLTO) {
 
-    assert(linkType != DriverProfile::LinkType::None &&
-           linkType != DriverProfile::LinkType::StaticLib);
+    assert(linkType != LinkType::None && linkType != LinkType::StaticLibrary);
   }
 
-  DriverProfile::LinkType GetLinkType() const { return linkType; }
+  LinkType GetLinkType() const { return linkType; }
   bool ShouldPerformLTO() const { return shouldPerformLTO; }
 
   static bool classof(const Event *e) {
@@ -182,15 +181,14 @@ public:
 };
 
 class StaticLinkEvent : public CompilationEvent {
-  DriverProfile::LinkType linkType;
+  LinkType linkType;
 
 public:
-  StaticLinkEvent(ArrayRef<const Event *> inputs,
-                  DriverProfile::LinkType linkType)
+  StaticLinkEvent(ArrayRef<const Event *> inputs, LinkType linkType)
       : CompilationEvent(Event::Kind::StaticLink, inputs, file::FileType::Image,
                          {}),
         linkType(linkType) {
-    assert(linkType == DriverProfile::LinkType::StaticLib);
+    assert(linkType == LinkType::StaticLibrary);
   }
   static bool classof(const Event *e) {
     return e->GetKind() == Event::Kind::StaticLink;

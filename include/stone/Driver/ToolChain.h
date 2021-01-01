@@ -184,7 +184,7 @@ public:
 public:
   virtual Tool *BuildClangTool() const = 0;
   virtual Tool *BuildAssembleTool() const = 0;
-  virtual Tool *BuildDynamicLinkTool() const =0;
+  virtual Tool *BuildDynamicLinkTool() const = 0;
   virtual Tool *BuildStaticLinkTool() const = 0;
   virtual Tool *BuildGCCTool() const = 0;
   virtual Tool *BuildStoneTool() const = 0;

@@ -112,10 +112,10 @@ bool file::Exists(llvm::StringRef name) {
   }
 }
 
-llvm::StringRef file::GetExt(llvm::StringRef Name) {
-  return llvm::sys::path::extension(Name);
+llvm::StringRef file::GetExt(llvm::StringRef name) {
+  return llvm::sys::path::extension(name);
 }
 
-llvm::StringRef file::GetPath(llvm::StringRef Name) {
-  return llvm::sys::path::filename(Name);
+llvm::StringRef file::GetPath(llvm::StringRef name) {
+  return llvm::sys::path::filename(name);
 }

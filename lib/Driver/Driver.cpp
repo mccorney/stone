@@ -40,10 +40,9 @@ Driver::Driver(llvm::StringRef stoneExecutable, std::string driverName)
 bool Driver::Build(llvm::ArrayRef<const char *> args) {
 
   excludedFlagsBitmask = opts::NoDriverOption;
-  auto clOptions = BuildArgList(args);
-  auto toolChain = BuildToolChain(*clOptions);
-
-  compilation = BuildCompilation(*toolChain, *clOptions);
+  originalArgs = BuildArgList(args);
+  toolChain = BuildToolChain(*originalArgs);
+  compilation = BuildCompilation(*toolChain, *originalArgs);
 
   return true;
 }
@@ -133,7 +132,7 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
         ft = file::FileType::Stone;
       } else {
         // Otherwise lookup by extension.
-        ft = file::GetTypeByExt(llvm::sys::path::extension(argValue));
+        ft = file::GetTypeByExt(file::GetExt(argValue));
 
         if (ft == file::FileType::INVALID) {
           // By default, treat inputs with no extension, or with an
@@ -167,16 +166,13 @@ static void BuildEvent(Driver &driver) {}
 void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
-  /*
-    if (buildProfile.compileEncap.compileType ==
-            CompileEncapsulation::CompileType::MultipleInvocation) {
+  if (GetOutputInstance().compileType ==
+      DriverOutputInstance::CompileType::MultipleInvocation) {
 
-    } else if (buildProfile.compileEncap.compileType ==
-                   CompileEncapsulation::CompileType::SingleInvocation) {
-
-    } else {
-    }
-  */
+  } else if (GetOutputInstance().compileType ==
+             DriverOutputInstance::CompileType::SingleInvocation) {
+  } else {
+  }
 }
 
 static void BuildProc(Driver &driver) {}

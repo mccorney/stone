@@ -4,7 +4,6 @@
 #include "stone/Core/Mem.h"
 #include "stone/Driver/Compilation.h"
 #include "stone/Driver/DriverOptions.h"
-#include "stone/Driver/DriverProfile.h"
 #include "stone/Driver/ToolChain.h"
 #include "stone/Session/Session.h"
 
@@ -42,16 +41,81 @@ class Process;
 class Compilation;
 class ToolChain;
 
-// TODO: ArchProfile
+/*
+class DriverInputInstance final {
+  friend Driver;
+  InputFiles inputs;
+
+public:
+  InputFiles &GetInputs() { return inputs; }
+};
+*/
+class DriverOutputInstance final {
+public:
+  enum class CompileType {
+    None,
+    /// Multiple compile invocations and -main-file.
+    MultipleInvocation,
+    /// A compilation using a single compile invocation without -main-file.
+    SingleInvocation,
+    /// Compile and execute the inputs immediately
+    ImmediateInvocation,
+  };
+
+  enum class LTOKind { None, Full, Thin, Unknown };
+
+  LTOKind ltoVariant = LTOKind::None;
+
+  /// The number of threads for multi-threaded compilation.
+  unsigned numThreads = 0;
+
+  /// Returns true if multi-threading is enabled.
+  bool IsMultiThreading() const { return numThreads > 0; }
+
+  /// The name of the module which we are building.
+  std::string moduleName;
+
+  /// The path to the SDK against which to build.
+  /// (If empty, this implies no SDK.)
+  std::string sdkPath;
+
+  // Whether or not the driver should generate a module.
+  bool generateModule = false;
+  /// Default compile type
+  CompileType compileType = CompileType::None;
+
+  /// Default linking kind
+  LinkType linkType = LinkType::None;
+
+  bool ShouldLink() { return linkType != LinkType::None; }
+
+public:
+};
+
+class DriverCache final {
+public:
+  /// A map for caching Procs for a given Event/ToolChain pair
+  llvm::DenseMap<std::pair<const Event *, const ToolChain *>, Process *>
+      procChacheMap;
+  /// Cache of all the ToolChains in use by the driver.
+  ///
+  /// This maps from the string representation of a triple to a ToolChain
+  /// created targeting that triple. The driver owns all the ToolChain objects
+  /// stored in it, and will clean them up when torn down.
+  mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
+};
 
 class Driver final : public Session {
 
+  DriverCache cache;
+  std::unique_ptr<ToolChain> toolChain;
   std::unique_ptr<Compilation> compilation;
+  // std::unique_ptr<DriverInputInstance> inputInstance;
+  std::unique_ptr<DriverOutputInstance> outputInstance;
 
 public:
+  /// The options for the driver
   DriverOptions driverOpts;
-
-  DriverProfile profile;
 
   /// The name the driver was invoked as.
   std::string driverName;
@@ -107,18 +171,6 @@ private:
   /// Arguments originated from configuration file.
   std::unique_ptr<llvm::opt::InputArgList> cfgOpts;
 
-  /// Arguments originated from command line.
-  std::unique_ptr<llvm::opt::InputArgList> clOpts;
-
-  /// Cache of all the ToolChains in use by the driver.
-  ///
-  /// This maps from the string representation of a triple to a ToolChain
-  /// created targeting that triple. The driver owns all the ToolChain objects
-  /// stored in it, and will clean them up when torn down.
-  mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
-
-  // BuildProfile buildProfile;
-
 private:
   void BuildEvents();
   void BuildProcs();
@@ -132,6 +184,24 @@ private:
   void BuildInputs(const ToolChain &tc, const DerivedArgList &args,
                    InputFiles &inputs);
 
+  // std::unique_ptr<DriverInputInstance>
+  // BuildInputInstance(const ToolChain &tc, const DerivedArgList &args,
+  //                   InputFiles &inputs);
+
+  /// Construct the OutputInfo for the driver from the given arguments.
+  ///
+  /// \param TC The current tool chain.
+  /// \param Args The input arguments.
+  /// \param BatchMode Whether the driver has been explicitly or implicitly
+  /// instructed to use batch mode.
+  /// \param Inputs The inputs to the driver.
+  /// \param[out] OI The OutputInfo in which to store the resulting output
+  /// information.
+  std::unique_ptr<DriverOutputInstance>
+  BuildOutputInstance(const ToolChain &toolChain,
+                      const llvm::opt::DerivedArgList &args,
+                      const bool batchMode, const InputFiles &inputs) const;
+
   std::unique_ptr<Compilation>
   BuildCompilation(const ToolChain &toolChain,
                    const llvm::opt::InputArgList &argList);
@@ -143,20 +213,9 @@ public:
 
   /// Parse the given list of strings into an InputArgList.
   bool Build(llvm::ArrayRef<const char *> args) override;
-
   int Run() override;
-  ///
   void PrintLifecycle() override;
-
-  ///
   void PrintHelp(bool showHidden) override;
-
-  ///
-  // void PrintTasks();
-
-  ///
-  // void PrintProcs();
-  //
 
 public:
   const std::string &GetConfigFile() const { return cfgFile; }
@@ -175,11 +234,21 @@ public:
   }
   void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
 
-  // const DriverProfile &GetProfile() const { return profile; }
-  // DriverProfile &GetDriverProfile() { return profile; }
+  const ToolChain &GetToolChain() const { return *toolChain.get(); }
+  ToolChain &GetToolChain() { return *toolChain.get(); }
 
-  // const BuildProfile &GetBuildProfile() const { return buildProfile; }
-  // BuildProfile &GetBuildProfile() { return buildProfile; }
+  // const DriverInputInstance &GetInputInstance() const {
+  //  return *inputInstance.get();
+  // }
+  // DriverInputInstance &GetInputInstance() { return *inputInstance.get(); }
+
+  const DriverOutputInstance &GetOutputInstance() const {
+    return *outputInstance.get();
+  }
+  DriverOutputInstance &GetOutputInstance() { return *outputInstance.get(); }
+
+  const DriverCache &GetCache() const { return cache; }
+  DriverCache &GetCache() { return cache; }
 
 protected:
   void ComputeMode(const llvm::opt::DerivedArgList &args) override;

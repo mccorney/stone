@@ -28,7 +28,6 @@ protected:
   Mode mode;
   /// Bit flags for OptTable
   unsigned includedFlagsBitmask = 0;
-
   /// This bit flag will ensure the correct mode for the session
   unsigned excludedFlagsBitmask = 0;
   unsigned missingArgIndex;
@@ -37,20 +36,20 @@ protected:
   /// Default target triple.
   std::string targetTriple;
 
+  /// The original (untranslated) input argument list.
+  std::unique_ptr<llvm::opt::InputArgList> originalArgs;
+
+  /// The driver translated arguments. Note that toolchains may perform their
+  /// own argument translation.
+  std::unique_ptr<llvm::opt::DerivedArgList> translatedArgs;
+
+public:
   /// An input argument from the command line and its inferred type.
   using InputPair = std::pair<file::FileType, const llvm::opt::Arg *>;
 
   /// Type used for a list of input arguments.
   using InputFiles = llvm::SmallVector<InputPair, 16>;
 
-  /// The original (untranslated) input argument list.
-  // llvm::opt::InputArgList *originalArgs;
-
-  /// The driver translated arguments. Note that toolchains may perform their
-  /// own argument translation.
-  // llvm::opt::DerivedArgList *translatedArgs;
-
-public:
   void SetFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs) {
     fileSystem = fs;
   }
@@ -98,6 +97,15 @@ public:
 
   Mode &GetMode();
   bool IsModeOutput();
+
+  /// The original (untranslated) input argument list.
+  llvm::opt::InputArgList &GetoriginalArgs() { return *originalArgs.get(); }
+
+  /// The driver translated arguments. Note that toolchains may perform their
+  /// own argument translation.
+  llvm::opt::DerivedArgList &GettranslatedArgs() {
+    return *translatedArgs.get();
+  }
 
 protected:
   // Compute the mode id -- TODO: virtual

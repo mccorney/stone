@@ -11,6 +11,10 @@
 namespace stone {
 
 class CompilePipeline;
+
+class CompileInputInstance {};
+class CompileOutputInstance {};
+
 class Compiler final : public Session {
 
   SrcMgr sm;
