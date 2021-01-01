@@ -160,9 +160,9 @@ public:
   ///
   /// This method dispatches to the various \c constructInvocation methods,
   /// which may be overridden by platform-specific subclasses.
-  std::unique_ptr<Process> CreateProc(/*const JobAction &JA, Compilation &C,
-                                    SmallVectorImpl<const Job *> &&inputs,
-                                    ArrayRef<const Action *> inputActions,
+  std::unique_ptr<Process> CreateProc(/*const CompilationEvent &event, Compilation &compilation,
+                                    llvm::SmallVectorImpl<const Process *> &&procs,
+                                    ArrayRef<const Event *> events,
                                     std::unique_ptr<CommandOutput> output,
                                     const OutputInfo &OI*/) const;
 
@@ -183,13 +183,12 @@ public:
 
 public:
   virtual Tool *BuildClangTool() const = 0;
-  virtual Tool *BuildAssembleTool() const;
-  virtual Tool *BuildDynamicLinkTool() const;
-  virtual Tool *BuildStaticLinkTool() const;
-  virtual Tool *BuildGCCTool() const;
-  virtual Tool *BuildStoneTool() const;
-
-  virtual Tool *GetTool(ModeType modeType) const;
+  virtual Tool *BuildAssembleTool() const = 0;
+  virtual Tool *BuildDynamicLinkTool() const =0;
+  virtual Tool *BuildStaticLinkTool() const = 0;
+  virtual Tool *BuildGCCTool() const = 0;
+  virtual Tool *BuildStoneTool() const = 0;
+  virtual Tool *GetTool(ModeType modeType) const = 0;
 };
 
 class DarwinToolChain final : public ToolChain {
@@ -207,6 +206,7 @@ public:
   Tool *BuildStaticLinkTool() const override;
   Tool *BuildGCCTool() const override;
   Tool *BuildStoneTool() const override;
+
   Tool *GetTool(ModeType modeType) const override;
 };
 

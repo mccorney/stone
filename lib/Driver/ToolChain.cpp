@@ -59,13 +59,6 @@ std::unique_ptr<Process> ToolChain::CreateProc(/*const JobAction &JA, Compilatio
   return nullptr;
 }
 
-Tool *ToolChain::BuildAssembleTool() const { nullptr; }
-Tool *ToolChain::BuildDynamicLinkTool() const { nullptr; }
-Tool *ToolChain::BuildStaticLinkTool() const { nullptr; }
-Tool *ToolChain::BuildGCCTool() const { nullptr; }
-Tool *ToolChain::BuildStoneTool() const { nullptr; }
-Tool *ToolChain::GetTool(ModeType modeType) const { nullptr; }
-
 Tool *ToolChain::PickTool(const CompilationEvent &event) const {
 
   switch (event.GetKind()) {
