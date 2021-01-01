@@ -161,10 +161,10 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
   }
 }
 
-std::unique_ptr<DriverOutputInstance> Driver::BuildOutputInstance(
-    const ToolChain &toolChain, const llvm::opt::DerivedArgList &args,
-    const bool batchMode, const InputFiles &inputs) const {
-  return nullptr;
+void Driver::BuildOutputs(const ToolChain &toolChain,
+                          const llvm::opt::DerivedArgList &args,
+                          const bool batchMode, const InputFiles &inputs,
+                          DriverOutputs &outputs) const {
 }
 
 static void BuildEvent(Driver &driver) {}
@@ -172,11 +172,11 @@ static void BuildEvent(Driver &driver) {}
 void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
-  if (GetOutputInstance().compileType ==
-      DriverOutputInstance::CompileType::MultipleInvocation) {
+  if (driverOutputs.compileType ==
+      DriverOutputs::CompileType::MultipleInvocation) {
 
-  } else if (GetOutputInstance().compileType ==
-             DriverOutputInstance::CompileType::SingleInvocation) {
+  } else if (driverOutputs.compileType ==
+             DriverOutputs::CompileType::SingleInvocation) {
   } else {
   }
 }

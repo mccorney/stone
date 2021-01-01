@@ -31,7 +31,6 @@ class DerivedArgList;
 } // namespace llvm
 
 namespace stone {
-
 namespace driver {
 class Event;
 class Process;
@@ -42,7 +41,7 @@ class Compilation;
 class ToolChain;
 
 /*
-class DriverInputInstance final {
+class DriverInputs final {
   friend Driver;
   InputFiles inputs;
 
@@ -50,7 +49,7 @@ public:
   InputFiles &GetInputs() { return inputs; }
 };
 */
-class DriverOutputInstance final {
+class DriverOutputs final {
 public:
   enum class CompileType {
     None,
@@ -89,6 +88,9 @@ public:
 
   bool ShouldLink() { return linkType != LinkType::None; }
 
+  /// The output type which should be used for the compiler
+  file::FileType compilerOutputFileType = file::FileType::INVALID;
+
 public:
 };
 
@@ -110,8 +112,8 @@ class Driver final : public Session {
   DriverCache cache;
   std::unique_ptr<ToolChain> toolChain;
   std::unique_ptr<Compilation> compilation;
-  // std::unique_ptr<DriverInputInstance> inputInstance;
-  std::unique_ptr<DriverOutputInstance> outputInstance;
+  // DriverInputs driverInputs;
+  DriverOutputs driverOutputs;
 
 public:
   /// The options for the driver
@@ -197,10 +199,11 @@ private:
   /// \param Inputs The inputs to the driver.
   /// \param[out] OI The OutputInfo in which to store the resulting output
   /// information.
-  std::unique_ptr<DriverOutputInstance>
-  BuildOutputInstance(const ToolChain &toolChain,
-                      const llvm::opt::DerivedArgList &args,
-                      const bool batchMode, const InputFiles &inputs) const;
+
+  void BuildOutputs(const ToolChain &toolChain,
+                    const llvm::opt::DerivedArgList &args, const bool batchMode,
+                    const InputFiles &inputs /*TODO: DriverInputs*/,
+                    DriverOutputs &outputs) const;
 
   std::unique_ptr<Compilation>
   BuildCompilation(const ToolChain &toolChain,
@@ -242,10 +245,8 @@ public:
   // }
   // DriverInputInstance &GetInputInstance() { return *inputInstance.get(); }
 
-  const DriverOutputInstance &GetOutputInstance() const {
-    return *outputInstance.get();
-  }
-  DriverOutputInstance &GetOutputInstance() { return *outputInstance.get(); }
+  const DriverOutputs &GetOutputs() const { return driverOutputs; }
+  DriverOutputs &GetOutputs() { return driverOutputs; }
 
   const DriverCache &GetCache() const { return cache; }
   DriverCache &GetCache() { return cache; }
