@@ -12,8 +12,10 @@
 #include <memory>
 
 namespace Stone {
-class Checker;
 class CompilePipeline;
+
+namespace Frontend {
+class Checker;
 
 class CheckerStats final : public Stats {
   const Checker &checker;
@@ -41,6 +43,6 @@ public:
 public:
   void CheckExpr();
 };
-
+} // namespace Frontend
 } // namespace Stone
 #endif

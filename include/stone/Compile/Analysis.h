@@ -11,6 +11,7 @@
 using namespace Stone::Syntax;
 
 namespace Stone {
+namespace Frontend {
 
 class Analysis final {
 private:
@@ -44,5 +45,6 @@ public:
 
   // StatEngine &GetStats() { return *stats.get(); }
 };
+} // namespace Frontend
 } // namespace Stone
 #endif

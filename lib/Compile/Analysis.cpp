@@ -2,6 +2,8 @@
 #include "stone/Core/Mem.h"
 
 using namespace Stone;
+using namespace Stone::Syntax;
+using namespace Stone::Frontend;
 
 Analysis::Analysis(const Stone::Context &ctx, const CompileOptions &compileOpts,
                    SrcMgr &sm)

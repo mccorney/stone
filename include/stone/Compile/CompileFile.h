@@ -5,8 +5,10 @@
 #include "llvm/ADT/ArrayRef.h"
 
 namespace Stone {
+namespace Frontend {
 class CompileFile final : public SrcFile {
 public:
 };
+} // namespace Frontend
 } // namespace Stone
 #endif

@@ -9,6 +9,8 @@
 
 using namespace Stone;
 using namespace Stone::Syntax;
+using namespace Stone::Frontend;
+using namespace Stone::Backend;
 
 int Stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, CompilePipeline *pipeline) {
@@ -38,12 +40,12 @@ int Stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
 
   // We are not passing the compiler directly, we are pass Stone::Context
   auto llvmModule =
-      Stone::GenIR(compiler.GetAnalysis().GetMainModule(), compiler,
-                   compiler.compileOpts.genOpts, /*TODO*/ {});
+      Stone::Frontend::GenIR(compiler.GetAnalysis().GetMainModule(), compiler,
+                             compiler.compileOpts.genOpts, /*TODO*/ {});
 
-  bool status =
-      Stone::GenObject(llvmModule, compiler.compileOpts.genOpts,
-                       compiler.GetAnalysis().GetASTContext(), /*TODO*/ {});
+  bool status = Stone::Backend::GenObject(
+      llvmModule, compiler.compileOpts.genOpts,
+      compiler.GetAnalysis().GetASTContext(), /*TODO*/ {});
 
   return ret::ok;
 }

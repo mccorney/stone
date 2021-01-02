@@ -12,18 +12,18 @@ class TargetOptions;
 class TargetMachine;
 } // namespace llvm
 
-
-
 namespace Stone {
 class CompilePipeline;
 class GenOptions;
 class Context;
-class Analysis;
 
 namespace Syntax {
 class ModuleDecl;
 class ASTContext;
 } // namespace Syntax
+
+namespace Frontend {
+class Analysis;
 
 /// Parse a source file
 int Parse(Analysis &analysis, CompilePipeline *pipeline = nullptr);
@@ -39,6 +39,6 @@ llvm::Module *GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
 /// TODO:
 void OptimizeIR(llvm::Module *llvmModule, const GenOptions &genOpts,
                 llvm::TargetMachine *targetMachine);
-
+} // namespace Frontend
 } // namespace Stone
 #endif

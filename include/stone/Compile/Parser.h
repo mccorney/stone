@@ -12,9 +12,10 @@
 #include <memory>
 
 namespace Stone {
-class Parser;
-class CompilePipeline;
 
+class CompilePipeline;
+namespace Frontend {
+class Parser;
 class ParserStats final : public Stats {
   const Parser &parser;
 
@@ -51,6 +52,6 @@ public:
   // Expr
   void ParseExpr();
 };
-
+} // namespace Frontend
 } // namespace Stone
 #endif

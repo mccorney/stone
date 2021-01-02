@@ -2,6 +2,7 @@
 #include "stone/Core/Ret.h"
 
 using namespace Stone;
+using namespace Stone::Frontend;
 
 Checker::Checker(Analysis &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}

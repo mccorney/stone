@@ -9,7 +9,7 @@
 #include "stone/Session/SessionOptions.h"
 
 namespace Stone {
-
+namespace Frontend {
 class CompileOptions final : public SessionOptions {
 public:
   GenOptions genOpts;
@@ -20,6 +20,6 @@ public:
 public:
   CompileOptions() {}
 };
-
+} // namespace Frontend
 } // namespace Stone
 #endif

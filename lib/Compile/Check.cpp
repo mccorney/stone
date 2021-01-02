@@ -4,6 +4,8 @@
 #include "stone/Core/Ret.h"
 #include "stone/Public.h"
 
-int Stone::Check(Analysis &analysis, CompilePipeline *pipeline) {
+using namespace Stone::Frontend;
+
+int Stone::Frontend::Check(Analysis &analysis, CompilePipeline *pipeline) {
   return ret::ok;
 }

@@ -6,11 +6,9 @@ namespace Syntax {
 class ASTContext;
 
 class Builtin final {
-
   enum BuiltinID {
     None,
   };
-
   Builtin(const Builtin &) = delete;
   void operator=(const Builtin &) = delete;
 

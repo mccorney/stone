@@ -13,7 +13,7 @@ using namespace Stone::Syntax;
 namespace Stone {
 
 class CompilePipeline;
-
+namespace Frontend {
 class CompileInputs {};
 class CompileOutputs {};
 
@@ -59,6 +59,6 @@ protected:
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
-
+} // namespace Frontend
 } // namespace Stone
 #endif

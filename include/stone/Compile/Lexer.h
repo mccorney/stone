@@ -13,8 +13,10 @@ class SrcID;
 class SrcMgr;
 class Token;
 class LangOptions;
-class Token;
 class CompilePipeline;
+
+namespace Frontend {
+class Token;
 
 enum class TriviaRetentionMode {
   Without,
@@ -116,6 +118,6 @@ public:
 
   FileID GetSrcID() { return srcID; }
 };
-
+} // namespace Frontend
 } // namespace Stone
 #endif

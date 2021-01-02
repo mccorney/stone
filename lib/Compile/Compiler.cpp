@@ -4,6 +4,7 @@
 #include "stone/Core/Ret.h"
 
 using namespace Stone;
+using namespace Stone::Frontend;
 
 Compiler::Compiler(CompilePipeline *pipeline)
     : Session(compileOpts), pipeline(pipeline), fm(compileOpts.fsOpts),

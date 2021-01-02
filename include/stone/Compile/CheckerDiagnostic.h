@@ -6,9 +6,11 @@
 #include <memory>
 
 namespace Stone {
+namespace Frontend {
 class CheckerDiagnostics final : public Diagnostics {
 public:
 };
+} // namespace Frontend
 } // namespace Stone
 
 #endif
