@@ -1,8 +1,8 @@
 #ifndef STONE_CORE_TARGET_OPTIONS_H
 #define STONE_CORE_TARGET_OPTIONS_H
 
-namespace stone {
+namespace Stone {
 struct TargetOptions final {};
-} // namespace stone
+} // namespace Stone
 
 #endif

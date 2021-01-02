@@ -1,7 +1,7 @@
 #ifndef STONE_CORE_DECLKIND_H
 #define STONE_CORE_DECLKIND_H
 
-namespace stone {
+namespace Stone {
 namespace decl {
 enum Kind {
 #define DECL(Id, Parent) Id,
@@ -11,6 +11,6 @@ enum Kind {
 #include "stone/Core/DeclKind.def"
 };
 } // namespace decl
-} // namespace stone
+} // namespace Stone
 
 #endif

@@ -8,7 +8,7 @@
 
 #include <functional>
 
-namespace stone {
+namespace Stone {
 namespace file {
 enum FileType : uint8_t {
 #define FILE_TYPE(NAME, TYPE, TEMP_SUFFIX, FLAGS) TYPE,
@@ -57,11 +57,11 @@ template <typename Fn> void forAllTypes(const Fn &fn);
 
 } // namespace file
 
-} // namespace stone
+} // namespace Stone
 
 namespace llvm {
-template <> struct DenseMapInfo<stone::file::FileType> {
-  using FT = stone::file::FileType;
+template <> struct DenseMapInfo<Stone::file::FileType> {
+  using FT = Stone::file::FileType;
   static inline FT getEmptyKey() { return FT::INVALID; }
   static inline FT getTombstoneKey() {
     return static_cast<FT>(FT::INVALID + 1);
@@ -71,12 +71,12 @@ template <> struct DenseMapInfo<stone::file::FileType> {
 };
 } // namespace llvm
 
-template <typename Fn> void stone::file::forAllTypes(const Fn &fn) {
+template <typename Fn> void Stone::file::forAllTypes(const Fn &fn) {
   static_assert(
-      std::is_constructible<std::function<void(stone::file::FileType)>,
+      std::is_constructible<std::function<void(Stone::file::FileType)>,
                             Fn>::value,
       "must have the signature 'void(file::FileType)'");
-  for (uint8_t i = 0; i < static_cast<uint8_t>(stone::file::FileType::INVALID);
+  for (uint8_t i = 0; i < static_cast<uint8_t>(Stone::file::FileType::INVALID);
        ++i)
     fn(static_cast<file::FileType>(i));
 }

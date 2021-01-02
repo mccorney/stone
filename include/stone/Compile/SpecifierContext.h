@@ -7,7 +7,7 @@
 
 #include <memory>
 
-namespace stone {
+namespace Stone {
 
 enum AccessLevel {
   /// Available to outside of the module and all levels within the module
@@ -24,5 +24,5 @@ class DeclSpecifier {};
 
 class SpecifierContext final {};
 
-} // namespace stone
+} // namespace Stone
 #endif

@@ -1,7 +1,7 @@
 #ifndef STONE_SESSION_MODE_H
 #define STONE_SESSION_MODE_H
 
-namespace stone {
+namespace Stone {
 
 enum class ModeType { None, Parse, Check };
 class Mode final {
@@ -21,5 +21,5 @@ public:
 private:
   Mode(unsigned mid) : mid(mid) {}
 };
-} // namespace stone
+} // namespace Stone
 #endif

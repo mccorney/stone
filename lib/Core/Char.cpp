@@ -1,10 +1,10 @@
 #include "stone/Core/Char.h"
 
-using namespace stone::ch;
+using namespace Stone::ch;
 
 // Statically initialize CharInfo table based on ASCII character set
 // Reference: FreeBSD 7.2 /usr/share/misc/ascii
-const uint16_t stone::ch::CharTable[256] = {
+const uint16_t Stone::ch::CharTable[256] = {
     // 0 NUL         1 SOH         2 STX         3 ETX
     // 4 EOT         5 ENQ         6 ACK         7 BEL
     0, 0, 0, 0, 0, 0, 0, 0,

@@ -5,10 +5,10 @@
 
 #include <memory>
 
-namespace stone {
+namespace Stone {
 class ParserDiagnostics final : public Diagnostics {
 public:
 };
-} // namespace stone
+} // namespace Stone
 
 #endif

@@ -27,7 +27,7 @@
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/raw_ostream.h"
 
-using namespace stone;
+using namespace Stone;
 using namespace llvm::opt;
 
 Driver::Driver(llvm::StringRef stoneExecutable, std::string driverName)
@@ -67,13 +67,13 @@ Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
   }
     /*
       case llvm::Triple::Linux:
-        return llvm::make_unique<stone::Linux>(*this, target);
+        return llvm::make_unique<Stone::Linux>(*this, target);
       case llvm::Triple::FreeBSD:
-        return llvm::make_unique<stone::FreeBSD>(*this, target);
+        return llvm::make_unique<Stone::FreeBSD>(*this, target);
       case llvm::Triple::OpenBSD:
-        return llvm::make_unique<stone::OpenBSD>(*this, target);
+        return llvm::make_unique<Stone::OpenBSD>(*this, target);
       case llvm::Triple::Win32:
-        return llvm::make_unique<stone::Win>(*this, target);
+        return llvm::make_unique<Stone::Win>(*this, target);
     */
 
   default:
@@ -164,8 +164,7 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
 void Driver::BuildOutputs(const ToolChain &toolChain,
                           const llvm::opt::DerivedArgList &args,
                           const bool batchMode, const InputFiles &inputs,
-                          DriverOutputs &outputs) const {
-}
+                          DriverOutputs &outputs) const {}
 
 static void BuildEvent(Driver &driver) {}
 

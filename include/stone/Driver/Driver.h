@@ -30,7 +30,7 @@ class DerivedArgList;
 } // namespace opt
 } // namespace llvm
 
-namespace stone {
+namespace Stone {
 namespace driver {
 class Event;
 class Process;
@@ -260,5 +260,5 @@ protected:
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

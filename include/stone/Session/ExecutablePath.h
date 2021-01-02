@@ -3,10 +3,10 @@
 
 #include "llvm/Support/FileSystem.h"
 
-namespace stone {
+namespace Stone {
 inline std::string GetExecutablePath(const char *arg0) {
-  void *mainPath = (void *)(intptr_t)stone::GetExecutablePath;
+  void *mainPath = (void *)(intptr_t)Stone::GetExecutablePath;
   return llvm::sys::fs::getMainExecutable(arg0, mainPath);
 }
-} // namespace stone
+} // namespace Stone
 #endif

@@ -1,10 +1,10 @@
 #ifndef STONE_COMPILE_ANALYSISOPTIONS_H
 #define STONE_COMPILE_ANALYSISOPTIONS_H
 
-namespace stone {
+namespace Stone {
 class AnalysisOptions final {
 public:
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

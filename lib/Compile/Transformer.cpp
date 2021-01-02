@@ -4,7 +4,7 @@
 #include "stone/Public.h"
 #include "llvm/IR/Module.h"
 
-using namespace stone;
+using namespace Stone;
 
 Transformer::Transformer() {}
 

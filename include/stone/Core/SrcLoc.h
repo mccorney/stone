@@ -16,7 +16,7 @@ template <typename T> struct DenseMapInfo;
 
 } // namespace llvm
 
-namespace stone {
+namespace Stone {
 
 class SrcMgr;
 
@@ -410,34 +410,34 @@ public:
   }
 };
 
-} // namespace stone
+} // namespace Stone
 
 namespace llvm {
 
 /// Define DenseMapInfo so that FileID's can be used as keys in DenseMap and
 /// DenseSets.
-template <> struct DenseMapInfo<stone::FileID> {
-  static stone::FileID getEmptyKey() { return {}; }
+template <> struct DenseMapInfo<Stone::FileID> {
+  static Stone::FileID getEmptyKey() { return {}; }
 
-  static stone::FileID getTombstoneKey() {
-    return stone::FileID::getSentinel();
+  static Stone::FileID getTombstoneKey() {
+    return Stone::FileID::getSentinel();
   }
 
-  static unsigned getHashValue(stone::FileID S) { return S.getHashValue(); }
+  static unsigned getHashValue(Stone::FileID S) { return S.getHashValue(); }
 
-  static bool isEqual(stone::FileID LHS, stone::FileID RHS) {
+  static bool isEqual(Stone::FileID LHS, Stone::FileID RHS) {
     return LHS == RHS;
   }
 };
 
 // Teach SmallPtrSet how to handle SrcLoc.
-template <> struct PointerLikeTypeTraits<stone::SrcLoc> {
+template <> struct PointerLikeTypeTraits<Stone::SrcLoc> {
   enum { NumLowBitsAvailable = 0 };
 
-  static void *getAsVoidPointer(stone::SrcLoc L) { return L.getPtrEncoding(); }
+  static void *getAsVoidPointer(Stone::SrcLoc L) { return L.getPtrEncoding(); }
 
-  static stone::SrcLoc getFromVoidPointer(void *P) {
-    return stone::SrcLoc::getFromRawEncoding((unsigned)(uintptr_t)P);
+  static Stone::SrcLoc getFromVoidPointer(void *P) {
+    return Stone::SrcLoc::getFromRawEncoding((unsigned)(uintptr_t)P);
   }
 };
 

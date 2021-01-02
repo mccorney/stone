@@ -28,7 +28,7 @@
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/raw_ostream.h"
 
-using namespace stone;
+using namespace Stone;
 using namespace llvm::opt;
 
 Compilation::Compilation(Driver &driver, const ToolChain &tc)

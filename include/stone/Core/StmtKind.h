@@ -1,10 +1,10 @@
 #ifndef STONE_CORE_STMTKIND_H
 #define STONE_CORE_STMTKIND_H
 
-namespace stone {
+namespace Stone {
 namespace stmt {
 enum Kind { None };
 } // namespace stmt
-} // namespace stone
+} // namespace Stone
 
 #endif

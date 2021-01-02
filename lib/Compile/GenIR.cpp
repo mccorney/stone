@@ -8,10 +8,11 @@
 
 #include "llvm/IR/Module.h"
 
-using namespace stone;
+using namespace Stone;
+using namespace Stone::Syntax;
 
-llvm::Module *stone::GenIR(stone::ModuleDecl *moduleDecl,
-                           const stone::Context &ctx, const GenOptions &genOpts,
+llvm::Module *Stone::GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
+                           const Stone::Context &ctx, const GenOptions &genOpts,
                            llvm::StringRef outputModulename) {
 
   assert(moduleDecl && "No Module");

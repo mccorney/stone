@@ -24,7 +24,7 @@ class Arg;
 }
 } // namespace llvm
 
-namespace stone {
+namespace Stone {
 class Event {
   unsigned kind : 4;
   unsigned ty : 28;
@@ -211,5 +211,5 @@ public:
   void Print() const;
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

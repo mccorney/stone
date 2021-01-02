@@ -1,7 +1,7 @@
 #include "stone/Session/Session.h"
 #include "llvm/Support/FileSystem.h"
 
-using namespace stone;
+using namespace Stone;
 using namespace llvm::opt;
 
 Session::Session(SessionOptions &sessionOpts)

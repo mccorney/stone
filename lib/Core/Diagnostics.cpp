@@ -2,7 +2,7 @@
 
 #include <memory>
 
-using namespace stone;
+using namespace Stone;
 
 DiagnosticEngine::DiagnosticEngine(const DiagnosticOptions &diagOpts,
                                    DiagnosticListener *listener,

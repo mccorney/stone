@@ -36,7 +36,7 @@ class FileSystem;
 } // namespace vfs
 } // namespace llvm
 
-namespace stone {
+namespace Stone {
 
 class ToolChain;
 
@@ -271,5 +271,5 @@ public:
 };
 */
 
-} // namespace stone
+} // namespace Stone
 #endif

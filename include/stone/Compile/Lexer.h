@@ -7,7 +7,7 @@
 #include "stone/Core/Context.h"
 #include "stone/Core/SrcLoc.h"
 
-namespace stone {
+namespace Stone {
 
 class SrcID;
 class SrcMgr;
@@ -30,7 +30,7 @@ class Lexer final {
 
   const FileID srcID;
   SrcMgr &sm;
-  const stone::Context &ctx;
+  const Stone::Context &ctx;
 
   std::unique_ptr<LexerDiagnostics> diagnostics;
 
@@ -94,7 +94,7 @@ private:
   tk GetKindOfIdentifier(StringRef tokStr);
 
 public:
-  Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx,
+  Lexer(const FileID srcID, SrcMgr &sm, const Stone::Context &ctx,
         CompilePipeline *pipeline = nullptr);
 
 public:
@@ -117,5 +117,5 @@ public:
   FileID GetSrcID() { return srcID; }
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

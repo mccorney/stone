@@ -1,9 +1,9 @@
 #include "stone/Compile/Analysis.h"
 #include "stone/Core/Mem.h"
 
-using namespace stone;
+using namespace Stone;
 
-Analysis::Analysis(const stone::Context &ctx, const CompileOptions &compileOpts,
+Analysis::Analysis(const Stone::Context &ctx, const CompileOptions &compileOpts,
                    SrcMgr &sm)
     : ctx(ctx), compileOpts(compileOpts), sm(sm) {
 

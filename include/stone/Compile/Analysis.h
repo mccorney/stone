@@ -8,7 +8,9 @@
 
 #include <memory>
 
-namespace stone {
+using namespace Stone::Syntax;
+
+namespace Stone {
 
 class Analysis final {
 private:
@@ -16,12 +18,12 @@ private:
   const CompileOptions &compileOpts;
 
   std::unique_ptr<ASTContext> ac;
-  const stone::Context &ctx;
+  const Stone::Context &ctx;
 
   mutable ModuleDecl *mainModule = nullptr;
   // StatEngine se;
 public:
-  Analysis(const stone::Context &ctx, const CompileOptions &compileOpts,
+  Analysis(const Stone::Context &ctx, const CompileOptions &compileOpts,
            SrcMgr &sm);
 
   Analysis(const Analysis &) = delete;
@@ -31,7 +33,7 @@ public:
 
 public:
   ASTContext &GetASTContext() { return *ac.get(); }
-  // stone::ModuleDecl &GetModule() { return *md.get(); }
+  // Stone::Syntax::ModuleDecl &GetModule() { return *md.get(); }
   //
   /// Retrieve the main module containing the files being compiled.
   ModuleDecl *GetMainModule() const;
@@ -42,5 +44,5 @@ public:
 
   // StatEngine &GetStats() { return *stats.get(); }
 };
-} // namespace stone
+} // namespace Stone
 #endif

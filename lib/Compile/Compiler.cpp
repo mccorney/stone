@@ -3,7 +3,7 @@
 #include "stone/Compile/Frontend.h"
 #include "stone/Core/Ret.h"
 
-using namespace stone;
+using namespace Stone;
 
 Compiler::Compiler(CompilePipeline *pipeline)
     : Session(compileOpts), pipeline(pipeline), fm(compileOpts.fsOpts),

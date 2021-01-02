@@ -23,7 +23,7 @@
 #include <string>
 #include <utility>
 
-using namespace stone;
+using namespace Stone;
 
 //===----------------------------------------------------------------------===//
 // PrettyStackTraceLoc

@@ -28,7 +28,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace stone {
+namespace Stone {
+namespace Syntax {
 
 class Decl;
 class BraceStmt;
@@ -213,6 +214,6 @@ public:
 class DestructorDecl : public FunctionDecl {
 public:
 };
-
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 #endif

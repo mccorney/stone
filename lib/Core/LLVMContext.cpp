@@ -3,4 +3,4 @@
 
 static llvm::ManagedStatic<llvm::LLVMContext> llvmCtx;
 
-llvm::LLVMContext &stone::GetLLVMContext() { return *llvmCtx; }
+llvm::LLVMContext &Stone::GetLLVMContext() { return *llvmCtx; }

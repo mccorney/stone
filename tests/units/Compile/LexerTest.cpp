@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-using namespace stone;
+using namespace Stone;
 
 class LexerTest : public ::testing::Test {
 protected:

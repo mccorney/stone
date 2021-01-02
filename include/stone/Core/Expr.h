@@ -21,7 +21,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace stone {
+namespace Stone {
+namespace Syntax {
 
 class Expr : public ValueStmt {
   expr::Kind kind;
@@ -35,5 +36,6 @@ public:
 
 public:
 };
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 #endif

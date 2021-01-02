@@ -41,8 +41,8 @@
 #include <utility>
 #include <vector>
 
-using namespace stone;
-using namespace stone::src;
+using namespace Stone;
+using namespace Stone::src;
 using llvm::MemoryBuffer;
 
 //===----------------------------------------------------------------------===//
@@ -2255,7 +2255,7 @@ SrcMgrForFile::SrcMgrForFile(StringRef FileName, StringRef Content) {
     SourceMgr = llvm::make_unique<SrcMgr>(*Diagnostics, *fileMgr);
 
     FileID ID = SourceMgr->CreateFileID(fileMgr->getFile(FileName),
-                                        SrcLoc(), stone::src::C_User);
+                                        SrcLoc(), Stone::src::C_User);
     assert(ID.isValid());
     SourceMgr->SetMainFileID(ID);
           */

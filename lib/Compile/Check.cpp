@@ -4,6 +4,6 @@
 #include "stone/Core/Ret.h"
 #include "stone/Public.h"
 
-int stone::Check(Analysis &analysis, CompilePipeline *pipeline) {
+int Stone::Check(Analysis &analysis, CompilePipeline *pipeline) {
   return ret::ok;
 }

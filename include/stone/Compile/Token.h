@@ -6,7 +6,7 @@
 
 #include "llvm/ADT/StringRef.h"
 
-namespace stone {
+namespace Stone {
 
 class Token final {
   /// kind - The actual flavor of token this is.
@@ -214,11 +214,11 @@ public:
   }
 };
 
-} // namespace stone
+} // namespace Stone
 
 namespace llvm {
 template <typename T> struct isPodLike;
-template <> struct isPodLike<stone::Token> { static const bool value = true; };
+template <> struct isPodLike<Stone::Token> { static const bool value = true; };
 } // end namespace llvm
 
 #endif

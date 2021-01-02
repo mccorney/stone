@@ -11,7 +11,7 @@
 
 #include <cstddef>
 
-using namespace stone;
+using namespace Stone;
 
 class SrcMgrTest : public ::testing::Test {
 protected:

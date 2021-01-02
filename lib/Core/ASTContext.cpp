@@ -9,9 +9,10 @@
 #include <algorithm>
 #include <memory>
 
-using namespace stone;
+using namespace Stone;
+using namespace Stone::Syntax;
 
-ASTContext::ASTContext(const stone::Context &ctx,
+ASTContext::ASTContext(const Stone::Context &ctx,
                        const SearchPathOptions &spOpts, SrcMgr &sm)
     : ctx(ctx), searchPathOpts(spOpts), sm(sm),
       identifiers(ctx.GetLangOptions()), stats(*this) {

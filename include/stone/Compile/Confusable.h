@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-namespace stone {
+namespace Stone {
 
 namespace confusable {
 /// Given a UTF-8 codepoint, determines whether it appears on the Unicode
@@ -11,6 +11,6 @@ namespace confusable {
 /// and either returns either the expected ASCII character or 0.
 char ConvertConfusableCharacterToASCII(uint32_t codepoint);
 } // namespace confusable
-} // namespace stone
+} // namespace Stone
 
 #endif

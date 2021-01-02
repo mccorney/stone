@@ -1,7 +1,7 @@
 #ifndef STONE_SESSION_BUILDSYSTEM_H
 #define STONE_SESSION_BUILDSYSTEM_H
 
-namespace stone {
+namespace Stone {
 class BuildSystem final {};
-} // namespace stone
+} // namespace Stone
 #endif

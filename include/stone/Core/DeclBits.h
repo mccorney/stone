@@ -9,7 +9,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace stone {
+namespace Stone {
+namespace Syntax {
+
 class NominalTypeDecl;
 class DeclContext;
 class FunctionDecl;
@@ -160,7 +162,7 @@ class FunctionDeclBits final {
 
 /// Number of non-inherited bits in FunctionDeclBitfields.
 enum { NumFunctionDeclBits = 27 };
-
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 
 #endif

@@ -16,7 +16,7 @@
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/VirtualFileSystem.h"
 
-namespace stone {
+namespace Stone {
 
 class Session : public Context {
 
@@ -118,5 +118,5 @@ protected:
   void Purge();
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

@@ -7,9 +7,10 @@
 #include "stone/Public.h"
 #include "stone/Session/Options.h"
 
-using namespace stone;
+using namespace Stone;
+using namespace Stone::Syntax;
 
-int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
+int Stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, CompilePipeline *pipeline) {
 
   Compiler compiler(pipeline);
@@ -35,13 +36,13 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
 
   */
 
-  // We are not passing the compiler directly, we are pass stone::Context
+  // We are not passing the compiler directly, we are pass Stone::Context
   auto llvmModule =
-      stone::GenIR(compiler.GetAnalysis().GetMainModule(), compiler,
+      Stone::GenIR(compiler.GetAnalysis().GetMainModule(), compiler,
                    compiler.compileOpts.genOpts, /*TODO*/ {});
 
   bool status =
-      stone::GenObject(llvmModule, compiler.compileOpts.genOpts,
+      Stone::GenObject(llvmModule, compiler.compileOpts.genOpts,
                        compiler.GetAnalysis().GetASTContext(), /*TODO*/ {});
 
   return ret::ok;

@@ -1,9 +1,9 @@
 #ifndef STONE_PUBLIC_H
 #define STONE_PUBLIC_H
 
-namespace stone {
+namespace Stone {
 class CompilePipeline final {
 public:
 };
-} // namespace stone
+} // namespace Stone
 #endif

@@ -58,7 +58,7 @@
 #include <utility>
 #include <vector>
 
-namespace stone {
+namespace Stone {
 
 class SrcLineTable;
 class SrcMgr;
@@ -242,7 +242,7 @@ static_assert(alignof(ContentCache) >= 8,
 /// FileInfos contain a "ContentCache *", with the contents of the file.
 ///
 class FileInfo {
-  friend class stone::SrcMgr;
+  friend class Stone::SrcMgr;
   /// The location of the \#include that brought in this file.
   ///
   /// This is an invalid SLOC for the main file (top of the \#include chain).
@@ -1834,6 +1834,6 @@ private:
   std::unique_ptr<SrcMgr> SourceMgr;
 };
 
-} // namespace stone
+} // namespace Stone
 
 #endif // LLVM_CLANG_BASIC_SOURCEMANAGER_H

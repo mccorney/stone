@@ -22,8 +22,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace stone {
-
+namespace Stone {
+namespace Syntax {
 class Stmt : public ASTNode {
   stmt::Kind kind;
 
@@ -39,6 +39,6 @@ public:
 };
 
 class ValueStmt : public Stmt {};
-
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 #endif

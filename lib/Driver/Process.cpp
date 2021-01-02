@@ -1,6 +1,6 @@
 #include "stone/Driver/Process.h"
 
-using namespace stone;
+using namespace Stone;
 
 Process::~Process() {}
 

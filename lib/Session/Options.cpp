@@ -4,7 +4,7 @@
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
 
-using namespace stone::opts;
+using namespace Stone::opts;
 using namespace llvm::opt;
 
 #define PREFIX(NAME, VALUE) static const char *const NAME[] = VALUE;
@@ -27,6 +27,6 @@ public:
 };
 } // end anonymous namespace
 
-std::unique_ptr<OptTable> stone::CreateOptTable() {
+std::unique_ptr<OptTable> Stone::CreateOptTable() {
   return std::unique_ptr<OptTable>(new StoneOptTable());
 }

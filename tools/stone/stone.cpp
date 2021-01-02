@@ -12,7 +12,7 @@
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/TargetSelect.h"
 
-using namespace stone;
+using namespace Stone;
 
 int main(int argc, const char **args) {
 
@@ -38,15 +38,15 @@ int main(int argc, const char **args) {
   if (expandedArgs.size() > 1) {
     llvm::StringRef firstArg(expandedArgs[1]);
     if (firstArg == "-compile") {
-      return stone::Compile(
+      return Stone::Compile(
           llvm::makeArrayRef(expandedArgs.data() + 2,
                              expandedArgs.data() + expandedArgs.size()),
-          expandedArgs[0], (void *)(intptr_t)stone::GetExecutablePath, nullptr);
+          expandedArgs[0], (void *)(intptr_t)Stone::GetExecutablePath, nullptr);
     }
   }
 
-  return stone::Run(
+  return Stone::Run(
       llvm::makeArrayRef(expandedArgs.data() + 1,
                          expandedArgs.data() + expandedArgs.size()),
-      expandedArgs[0], (void *)(intptr_t)stone::GetExecutablePath);
+      expandedArgs[0], (void *)(intptr_t)Stone::GetExecutablePath);
 }

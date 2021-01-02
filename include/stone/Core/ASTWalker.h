@@ -1,9 +1,11 @@
 #ifndef STONE_CORE_ASTWALKER_H
 #define STONE_CORE_ASTWALKER_H
 
-namespace stone {
+namespace Stone {
+namespace Syntax {
 class ASTWalker {
 public:
 };
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 #endif

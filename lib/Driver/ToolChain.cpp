@@ -1,6 +1,6 @@
 #include "stone/Driver/ToolChain.h"
 
-using namespace stone;
+using namespace Stone;
 
 Tool::Tool(llvm::StringRef fullName, llvm::StringRef shortName,
            const ToolChain &toolChain)

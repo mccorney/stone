@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-namespace stone {
+namespace Stone {
 
 class LangOptions final {
 public:
@@ -34,6 +34,6 @@ public:
   llvm::Optional<llvm::Triple> targetVariant;
 };
 
-} // namespace stone
+} // namespace Stone
 
 #endif

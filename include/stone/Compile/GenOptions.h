@@ -1,8 +1,8 @@
 #ifndef STONE_COMPILE_GENOPTIONS_H
 #define STONE_COMPILE_GENOPTIONS_H
 
-namespace stone {
+namespace Stone {
 class GenOptions final {};
-} // namespace stone
+} // namespace Stone
 
 #endif

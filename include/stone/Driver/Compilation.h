@@ -25,7 +25,7 @@ class InputArgList;
 } // namespace opt
 } // namespace llvm
 
-namespace stone {
+namespace Stone {
 class Driver;
 class ToolChain;
 
@@ -99,7 +99,7 @@ public:
   bool PurgeFiles(const llvm::opt::ArgStringList &files,
                   bool issueErrors = false) const;
 
-  // bool ExecuteProcs(std::unique_ptr<stone::ProcessQueue> &&queue);
+  // bool ExecuteProcs(std::unique_ptr<Stone::ProcessQueue> &&queue);
   /// ExecuteProc - Execute an actual command.
   ///
   /// \param fallBackProc - For non-zero results, this will be set to the
@@ -118,5 +118,5 @@ public:
   ToolChain const &GetToolChain() const { return tc; }
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

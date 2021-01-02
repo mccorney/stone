@@ -1,11 +1,11 @@
 #ifndef STONE_CORE_LANGCTX_H
 #define STONE_CORE_LANGCTX_H
 
-namespace stone {
+namespace Stone {
 
 class LangContext {
   // Target info
 };
-} // namespace stone
+} // namespace Stone
 
 #endif

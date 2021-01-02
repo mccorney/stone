@@ -2,7 +2,7 @@
 #define STONE_CORE_VERSION_H
 #include <string>
 
-namespace stone {
+namespace Stone {
 /// Retrieves the repository path (e.g., Subversion path) that
 /// identifies the particular Stone branch, tag, or trunk from which this
 /// Stone was built.
@@ -21,6 +21,6 @@ std::string GetFullRepoVersion();
 /// and the vendor tag.
 std::string GetFullVersion();
 
-} // namespace stone
+} // namespace Stone
 
 #endif

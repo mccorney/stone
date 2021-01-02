@@ -1,6 +1,6 @@
 #include "stone/Driver/ProcessQueue.h"
 
-using namespace stone;
+using namespace Stone;
 
 ProcessQueue::ProcessQueue() {}
 

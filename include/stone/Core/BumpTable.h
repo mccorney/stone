@@ -16,8 +16,7 @@
 #include <string>
 #include <utility>
 
-namespace stone {
-
+namespace Stone {
 template <typename T> class BumpTable {
   llvm::StringMap<T *, llvm::BumpPtrAllocator> entries;
 
@@ -37,6 +36,6 @@ public:
     return *second;
   }
 };
-} // namespace stone
+} // namespace Stone
 
 #endif

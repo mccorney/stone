@@ -3,10 +3,10 @@
 
 #include "stone/Core/Decl.h"
 
-namespace stone {
-
+namespace Stone {
+namespace Syntax {
 class ModuleDecl : public DeclContext, NamingDecl {};
-
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 
 #endif

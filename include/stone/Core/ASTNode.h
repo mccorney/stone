@@ -1,9 +1,11 @@
 #ifndef STONE_CORE_ASTNODE_H
 #define STONE_CORE_ASTNODE_H
 
-namespace stone {
+namespace Stone {
+namespace Syntax {
 class ASTNode {
 public:
 };
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 #endif

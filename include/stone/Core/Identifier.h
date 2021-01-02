@@ -20,14 +20,14 @@
 #include <string>
 #include <utility>
 
-namespace stone {
+namespace Stone {
+class LangOptions;
+class SrcLoc;
+namespace Syntax {
 
 class DeclName;
 class DeclNameTable;
 class Identifier;
-class LangOptions;
-class SrcLoc;
-
 /// A simple pair of identifier info and location.
 using IdentifierLocPair = std::pair<Identifier *, SrcLoc>;
 
@@ -482,8 +482,8 @@ namespace detail {
 /// DeclNameExtra is tightly coupled to DeclName and any change
 /// here is very likely to require changes in DeclName(Table).
 class alignas(IdentifierAlignment) SpecialDeclName {
-  friend class stone::DeclName;
-  friend class stone::DeclNameTable;
+  friend class Stone::Syntax::DeclName;
+  friend class Stone::Syntax::DeclNameTable;
 
 protected:
   /// The kind of "extra" information stored in the DeclName. See
@@ -512,27 +512,29 @@ protected:
 };
 
 } // namespace detail
-
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 
 namespace llvm {
 // Provide PointerLikeTypeTraits for Identifier pointers, which
 // are not guaranteed to be 8-byte aligned.
-template <> struct PointerLikeTypeTraits<stone::Identifier *> {
-  static void *getAsVoidPointer(stone::Identifier *P) { return P; }
+template <> struct PointerLikeTypeTraits<Stone::Syntax::Identifier *> {
+  static void *getAsVoidPointer(Stone::Syntax::Identifier *P) { return P; }
 
-  static stone::Identifier *getFromVoidPointer(void *P) {
-    return static_cast<stone::Identifier *>(P);
+  static Stone::Syntax::Identifier *getFromVoidPointer(void *P) {
+    return static_cast<Stone::Syntax::Identifier *>(P);
   }
 
   enum { NumLowBitsAvailable = 1 };
 };
 
-template <> struct PointerLikeTypeTraits<const stone::Identifier *> {
-  static const void *getAsVoidPointer(const stone::Identifier *P) { return P; }
+template <> struct PointerLikeTypeTraits<const Stone::Syntax::Identifier *> {
+  static const void *getAsVoidPointer(const Stone::Syntax::Identifier *P) {
+    return P;
+  }
 
-  static const stone::Identifier *getFromVoidPointer(const void *P) {
-    return static_cast<const stone::Identifier *>(P);
+  static const Stone::Syntax::Identifier *getFromVoidPointer(const void *P) {
+    return static_cast<const Stone::Syntax::Identifier *>(P);
   }
 
   enum { NumLowBitsAvailable = 1 };

@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-namespace stone {
+namespace Stone {
 
 class DiagnosticEngine;
 class DiagnosticBuilder;
@@ -168,5 +168,5 @@ public:
                                     const unsigned messageID);
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

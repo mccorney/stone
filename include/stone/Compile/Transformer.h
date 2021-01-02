@@ -15,7 +15,7 @@ class TargetOptions;
 class TargetMachine;
 } // namespace llvm
 
-namespace stone {
+namespace Stone {
 
 class Transformer final {
 public:
@@ -30,5 +30,5 @@ public:
 public:
   void GenExpr();
 };
-} // namespace stone
+} // namespace Stone
 #endif

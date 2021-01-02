@@ -8,7 +8,7 @@
 
 #include "stone/Session/SessionOptions.h"
 
-namespace stone {
+namespace Stone {
 
 class CompileOptions final : public SessionOptions {
 public:
@@ -21,5 +21,5 @@ public:
   CompileOptions() {}
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

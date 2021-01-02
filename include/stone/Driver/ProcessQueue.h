@@ -5,7 +5,7 @@
 
 #include "llvm/ADT/PriorityQueue.h"
 
-namespace stone {
+namespace Stone {
 class Process;
 class ProcessQueue final {
   llvm::PriorityQueue<Process *> queue;
@@ -15,5 +15,5 @@ public:
   ~ProcessQueue();
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

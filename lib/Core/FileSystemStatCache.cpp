@@ -18,7 +18,7 @@
 #include "llvm/Support/VirtualFileSystem.h"
 #include <utility>
 
-using namespace stone;
+using namespace Stone;
 
 void FileSystemStatCache::anchor() {}
 

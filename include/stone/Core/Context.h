@@ -5,9 +5,8 @@
 #include "stone/Core/Diagnostics.h"
 #include "stone/Core/LangOptions.h"
 
-namespace stone {
+namespace Stone {
 class Context {
-
 protected:
   LangOptions langOpts;
   DiagnosticOptions diagOpts;
@@ -29,5 +28,5 @@ public:
   const DiagnosticOptions &GetDiagOptions() const { return diagOpts; }
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

@@ -6,8 +6,8 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 
-using namespace stone;
-using namespace stone::file;
+using namespace Stone;
+using namespace Stone::file;
 
 struct FileTypeEntry {
   const char *Name;

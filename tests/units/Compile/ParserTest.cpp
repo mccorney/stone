@@ -1,7 +1,7 @@
 #include "stone/Core/SrcMgr.h"
 #include "gtest/gtest.h"
 
-using namespace stone;
+using namespace Stone;
 
 class ParserTest : public ::testing::Test {
 public:

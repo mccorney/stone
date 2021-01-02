@@ -3,7 +3,7 @@
 
 #include "llvm/ADT/Hashing.h"
 
-namespace stone {
+namespace Stone {
 
 /// Options for controlling diagnostics.
 class DiagnosticOptions final {
@@ -21,6 +21,6 @@ public:
   FormattingStyle textFormattingStyle = FormattingStyle::LLVM;
 };
 
-} // namespace stone
+} // namespace Stone
 
 #endif

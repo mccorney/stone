@@ -2,12 +2,12 @@
 #define STONE_CORE_TYPES_H
 #include <string>
 
-namespace stone {
-
+namespace Stone {
+namespace Syntax {
 class TypeLoc {};
 
 class Type {};
 
-} // namespace stone
-
+} // namespace Syntax
+} // namespace Stone
 #endif

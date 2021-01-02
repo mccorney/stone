@@ -1,7 +1,7 @@
 #include "stone/Compile/Parser.h"
 #include "stone/Core/Ret.h"
 
-using namespace stone;
+using namespace Stone;
 
 Parser::Parser(Analysis &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}

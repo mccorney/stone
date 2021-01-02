@@ -5,7 +5,7 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
 
-namespace stone {
+namespace Stone {
 
 enum class TriviaKind { GarbageText };
 
@@ -85,6 +85,6 @@ struct Trivia {
   bool operator!=(const Trivia &other) const { return !(*this == other); }
 };
 
-} // namespace stone
+} // namespace Stone
 
 #endif

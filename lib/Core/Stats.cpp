@@ -1,6 +1,6 @@
 #include "stone/Core/Stats.h"
 
-using namespace stone;
+using namespace Stone;
 
 StatEngine::StatEngine() {}
 

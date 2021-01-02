@@ -11,7 +11,7 @@
 
 #include <memory>
 
-namespace stone {
+namespace Stone {
 class Parser;
 class CompilePipeline;
 
@@ -52,5 +52,5 @@ public:
   void ParseExpr();
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

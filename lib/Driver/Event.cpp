@@ -1,6 +1,6 @@
 #include "stone/Driver/Event.h"
 
-using namespace stone;
+using namespace Stone;
 
 const char *Event::GetName(Event::Kind k) {
   switch (k) {

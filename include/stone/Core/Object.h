@@ -1,9 +1,9 @@
 #ifndef STONE_CORE_OBJECT_H
 #define STONE_CORE_OBJECT_H
 
-namespace stone {
+namespace Stone {
 class Object {
 public:
 };
-} // namespace stone
+} // namespace Stone
 #endif

@@ -31,7 +31,7 @@
 #include <set>
 #include <system_error>
 
-using namespace stone;
+using namespace Stone;
 using namespace llvm::opt;
 
 static void SetInstallDir(llvm::ArrayRef<const char *> &argv, Driver &driver,
@@ -61,10 +61,10 @@ static void SetInstallDir(llvm::ArrayRef<const char *> &argv, Driver &driver,
   }
 }
 
-int stone::Run(llvm::ArrayRef<const char *> args, const char *arg0,
+int Stone::Run(llvm::ArrayRef<const char *> args, const char *arg0,
                void *mainAddr) {
 
-  auto driverPath = stone::GetExecutablePath(arg0);
+  auto driverPath = Stone::GetExecutablePath(arg0);
   auto driverName = llvm::sys::path::stem(arg0);
 
   Driver driver(driverPath, driverName);

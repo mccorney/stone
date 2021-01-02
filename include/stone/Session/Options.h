@@ -13,7 +13,7 @@ namespace opt {
 class OptTable;
 }
 } // namespace llvm
-namespace stone {
+namespace Stone {
 namespace opts {
 
 enum OptFlag {
@@ -35,6 +35,6 @@ enum OptID : unsigned {
 };
 } // namespace opts
 std::unique_ptr<llvm::opt::OptTable> CreateOptTable();
-} // namespace stone
+} // namespace Stone
 
 #endif

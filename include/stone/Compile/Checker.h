@@ -11,7 +11,7 @@
 
 #include <memory>
 
-namespace stone {
+namespace Stone {
 class Checker;
 class CompilePipeline;
 
@@ -42,5 +42,5 @@ public:
   void CheckExpr();
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

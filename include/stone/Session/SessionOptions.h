@@ -4,7 +4,7 @@
 #include "stone/Core/LangOptions.h"
 #include "stone/Session/Options.h"
 
-namespace stone {
+namespace Stone {
 
 class SessionOptions {
   std::unique_ptr<llvm::opt::OptTable> optTable;
@@ -14,11 +14,11 @@ public:
   bool showLifecycle = false;
 
 public:
-  SessionOptions() : optTable(stone::CreateOptTable()) {}
+  SessionOptions() : optTable(Stone::CreateOptTable()) {}
 
 public:
   llvm::opt::OptTable &GetOpts() const { return *optTable.get(); }
 };
-} // namespace stone
+} // namespace Stone
 
 #endif

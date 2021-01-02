@@ -1,7 +1,7 @@
 #include "stone/Core/Diagnostics.h"
 #include "gtest/gtest.h"
 
-using namespace stone;
+using namespace Stone;
 
 class DiagTest : public ::testing::Test {
 public:

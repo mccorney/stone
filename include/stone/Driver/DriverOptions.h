@@ -3,13 +3,13 @@
 
 #include "stone/Session/SessionOptions.h"
 
-namespace stone {
+namespace Stone {
 class DriverOptions final : public SessionOptions {
 public:
   DriverOptions() {}
 
 public:
 };
-} // namespace stone
+} // namespace Stone
 
 #endif

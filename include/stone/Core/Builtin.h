@@ -1,14 +1,11 @@
 #ifndef STONE_CORE_BUILTIN_H
 #define STONE_CORE_BUILTIN_H
 
-namespace stone {
-
-class BuiltinCtx {};
+namespace Stone {
+namespace Syntax {
 class ASTContext;
 
 class Builtin final {
-
-  BuiltinCtx builtinCtx;
 
   enum BuiltinID {
     None,
@@ -28,6 +25,6 @@ public:
 
   void Init(ASTContext &astCtx);
 };
-
-} // namespace stone
+} // namespace Syntax
+} // namespace Stone
 #endif

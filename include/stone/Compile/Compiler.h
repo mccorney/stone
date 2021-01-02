@@ -8,12 +8,14 @@
 
 #include "llvm/ADT/ArrayRef.h"
 
-namespace stone {
+using namespace Stone::Syntax;
+
+namespace Stone {
 
 class CompilePipeline;
 
-class CompileInputInstance {};
-class CompileOutputInstance {};
+class CompileInputs {};
+class CompileOutputs {};
 
 class Compiler final : public Session {
 
@@ -58,5 +60,5 @@ protected:
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
 
-} // namespace stone
+} // namespace Stone
 #endif

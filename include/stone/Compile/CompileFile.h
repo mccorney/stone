@@ -4,9 +4,9 @@
 #include "stone/Core/FileMgr.h"
 #include "llvm/ADT/ArrayRef.h"
 
-namespace stone {
+namespace Stone {
 class CompileFile final : public SrcFile {
 public:
 };
-} // namespace stone
+} // namespace Stone
 #endif
