@@ -3,15 +3,15 @@
 #include "stone/Core/Ret.h"
 #include "stone/Public.h"
 
-using namespace Stone;
-using namespace Stone::Syntax;
-using namespace Stone::Backend;
+using namespace stone;
+using namespace stone::syntax;
+using namespace stone::backend;
 
 std::unique_ptr<llvm::TargetMachine>
-Backend::CreateTargetMachine(const GenOptions &Opts, ASTContext &astCtx) {
+backend::CreateTargetMachine(const GenOptions &Opts, ASTContext &astCtx) {
   return nullptr;
 }
-bool Backend::GenObject(llvm::Module *llvmModule, const GenOptions &genOpts,
+bool backend::GenObject(llvm::Module *llvmModule, const GenOptions &genOpts,
                         ASTContext &astCtx, llvm::StringRef outputFilename) {
   return true;
 }

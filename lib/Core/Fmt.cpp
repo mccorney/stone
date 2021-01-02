@@ -1,5 +1,5 @@
 #include "stone/Core/Fmt.h"
 
-using namespace Stone;
+using namespace stone;
 
 void fmt::Print() {}

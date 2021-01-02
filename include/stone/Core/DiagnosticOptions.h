@@ -3,7 +3,7 @@
 
 #include "llvm/ADT/Hashing.h"
 
-namespace Stone {
+namespace stone {
 
 /// Options for controlling diagnostics.
 class DiagnosticOptions final {
@@ -15,12 +15,12 @@ public:
   // (d2Start = d1End + 1  , d2End = d1End + max)
   unsigned int maxMessagesPerDiagnostic = 100;
 
-  enum FormattingStyle { LLVM, Stone };
+  enum FormattingStyle { LLVM, stone };
   // If set to true, use the more descriptive experimental formatting style for
   // diagnostics.
   FormattingStyle textFormattingStyle = FormattingStyle::LLVM;
 };
 
-} // namespace Stone
+} // namespace stone
 
 #endif

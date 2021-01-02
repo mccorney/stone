@@ -1,10 +1,10 @@
 #include "stone/Driver/ToolChain.h"
 
-using namespace Stone;
-using namespace Stone::Driver;
+using namespace stone;
+using namespace stone::driver;
 
 DarwinToolChain::DarwinToolChain(
-    const DriverSession &driver, const llvm::Triple &triple,
+    const Driver &driver, const llvm::Triple &triple,
     const llvm::Optional<llvm::Triple> &targetVariant)
     : ToolChain(driver, triple), targetVariant(targetVariant) {}
 
@@ -13,6 +13,6 @@ Tool *DarwinToolChain::BuildAssembleTool() const { nullptr; }
 Tool *DarwinToolChain::BuildDynamicLinkTool() const { nullptr; }
 Tool *DarwinToolChain::BuildStaticLinkTool() const { nullptr; }
 Tool *DarwinToolChain::BuildGCCTool() const { nullptr; }
-Tool *DarwinToolChain::BuildStoneTool() const { nullptr; }
+Tool *DarwinToolChain::BuildstoneTool() const { nullptr; }
 
 Tool *DarwinToolChain::GetTool(ModeType modeType) const { nullptr; }

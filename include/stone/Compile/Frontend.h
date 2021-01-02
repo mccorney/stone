@@ -12,17 +12,17 @@ class TargetOptions;
 class TargetMachine;
 } // namespace llvm
 
-namespace Stone {
+namespace stone {
 class Context;
 class CompilePipeline;
 class GenOptions;
 
-namespace Syntax {
+namespace syntax {
 class ModuleDecl;
 class ASTContext;
-} // namespace Syntax
+} // namespace syntax
 
-namespace Analysis {
+namespace analysis {
 class AnalysisContext;
 
 /// Parse a source file
@@ -32,12 +32,12 @@ int Parse(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 int Check(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 
 /// May want to pass Module instead
-llvm::Module *GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
-                    const Stone::Context &ctx, const GenOptions &genOpts,
+llvm::Module *GenIR(stone::syntax::ModuleDecl *moduleDecl,
+                    const stone::Context &ctx, const GenOptions &genOpts,
                     llvm::StringRef outputModulename);
 
 void OptimizeIR(llvm::Module *llvmModule, const GenOptions &genOpts,
                 llvm::TargetMachine *targetMachine);
-} // namespace Analysis
-} // namespace Stone
+} // namespace analysis
+} // namespace stone
 #endif

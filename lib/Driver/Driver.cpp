@@ -27,22 +27,21 @@
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/raw_ostream.h"
 
-using namespace Stone;
-using namespace Stone::Driver;
+using namespace stone;
+using namespace stone::driver;
 
 using namespace llvm::opt;
 
-DriverSession::DriverSession(llvm::StringRef stoneExecutable,
-                             std::string driverName)
-    : AbstractSession(driverOpts), stoneExecutablePath(stoneExecutablePath),
+Driver::Driver(llvm::StringRef stoneExecutable, std::string driverName)
+    : Session(driverOpts), stoneExecutablePath(stoneExecutablePath),
       driverName(driverName),
       /*sysRoot(DEFAULT_SYSROOT),*/
-      driverTitle("Stone Compiler"), strSaver(bumpAlloc),
+      driverTitle("stone Compiler"), strSaver(bumpAlloc),
       checkInputFilesExist(true) {}
 /// Parse the given list of strings into an InputArgList.
-bool DriverSession::Build(llvm::ArrayRef<const char *> args) {
+bool Driver::Build(llvm::ArrayRef<const char *> args) {
 
-  excludedFlagsBitmask = Options::NoDriverOption;
+  excludedFlagsBitmask = opts::NoDriverOption;
   originalArgs = BuildArgList(args);
   toolChain = BuildToolChain(*originalArgs);
   compilation = BuildCompilation(*toolChain, *originalArgs);
@@ -51,9 +50,9 @@ bool DriverSession::Build(llvm::ArrayRef<const char *> args) {
 }
 
 std::unique_ptr<ToolChain>
-DriverSession::BuildToolChain(const llvm::opt::InputArgList &argList) {
+Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
 
-  if (const llvm::opt::Arg *arg = argList.getLastArg(Options::Target)) {
+  if (const llvm::opt::Arg *arg = argList.getLastArg(opts::Target)) {
     targetTriple = llvm::Triple::normalize(arg->getValue());
   }
   llvm::Triple target(targetTriple);
@@ -63,20 +62,20 @@ DriverSession::BuildToolChain(const llvm::opt::InputArgList &argList) {
   case llvm::Triple::Darwin:
   case llvm::Triple::MacOSX: {
     llvm::Optional<llvm::Triple> targetVariant;
-    if (const llvm::opt::Arg *A = argList.getLastArg(Options::TargetVariant)) {
+    if (const llvm::opt::Arg *A = argList.getLastArg(opts::TargetVariant)) {
       targetVariant = llvm::Triple(llvm::Triple::normalize(A->getValue()));
     }
     return llvm::make_unique<DarwinToolChain>(*this, target, targetVariant);
   }
     /*
       case llvm::Triple::Linux:
-        return llvm::make_unique<Stone::Linux>(*this, target);
+        return llvm::make_unique<stone::Linux>(*this, target);
       case llvm::Triple::FreeBSD:
-        return llvm::make_unique<Stone::FreeBSD>(*this, target);
+        return llvm::make_unique<stone::FreeBSD>(*this, target);
       case llvm::Triple::OpenBSD:
-        return llvm::make_unique<Stone::OpenBSD>(*this, target);
+        return llvm::make_unique<stone::OpenBSD>(*this, target);
       case llvm::Triple::Win32:
-        return llvm::make_unique<Stone::Win>(*this, target);
+        return llvm::make_unique<stone::Win>(*this, target);
     */
 
   default:
@@ -87,10 +86,9 @@ DriverSession::BuildToolChain(const llvm::opt::InputArgList &argList) {
   }
 }
 
-bool DriverSession::HandleImmediateArgs(const ArgList &args,
-                                        const ToolChain &tc) {
+bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {
 
-  if (args.hasArg(Options::Help)) {
+  if (args.hasArg(opts::Help)) {
     PrintHelp(false);
     return false;
   }
@@ -99,7 +97,7 @@ bool DriverSession::HandleImmediateArgs(const ArgList &args,
 
 /// Check that the file referenced by \p Input exists. If it doesn't,
 /// issue a diagnostic and return false.
-static bool DoesInputExist(DriverSession &driver, const DerivedArgList &args,
+static bool DoesInputExist(Driver &driver, const DerivedArgList &args,
                            DiagnosticEngine &de, llvm::StringRef input) {
 
   // TODO:
@@ -120,8 +118,8 @@ static bool DoesInputExist(DriverSession &driver, const DerivedArgList &args,
   return false;
 }
 // TODO: May move to session
-void DriverSession::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
-                                InputFiles &inputs) {
+void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
+                         InputFiles &inputs) {
 
   llvm::DenseMap<llvm::StringRef, llvm::StringRef> seenSourceFiles;
 
@@ -133,7 +131,7 @@ void DriverSession::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
       // stdin must be handled specially.
       if (argValue.equals("-")) {
         // By default, treat stdin as Swift input.
-        ft = file::FileType::Stone;
+        ft = file::FileType::stone;
       } else {
         // Otherwise lookup by extension.
         ft = file::GetTypeByExt(file::GetExt(argValue));
@@ -149,7 +147,7 @@ void DriverSession::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
         inputs.push_back(std::make_pair(ft, arg));
       }
 
-      if (ft == file::FileType::Stone) {
+      if (ft == file::FileType::stone) {
         auto basename = llvm::sys::path::filename(argValue);
         if (!seenSourceFiles.insert({basename, argValue}).second) {
           Out() << "de.D(SourceLoc(),"
@@ -165,14 +163,14 @@ void DriverSession::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
   }
 }
 
-void DriverSession::BuildOutputs(const ToolChain &toolChain,
-                                 const llvm::opt::DerivedArgList &args,
-                                 const bool batchMode, const InputFiles &inputs,
-                                 DriverOutputs &outputs) const {}
+void Driver::BuildOutputs(const ToolChain &toolChain,
+                          const llvm::opt::DerivedArgList &args,
+                          const bool batchMode, const InputFiles &inputs,
+                          DriverOutputs &outputs) const {}
 
-static void BuildEvent(DriverSession &driver) {}
+static void BuildEvent(Driver &driver) {}
 
-void DriverSession::BuildEvents() {
+void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
   if (driverOutputs.compileType ==
@@ -184,19 +182,19 @@ void DriverSession::BuildEvents() {
   }
 }
 
-static void BuildProc(DriverSession &driver) {}
-void DriverSession::BuildProcs() {}
+static void BuildProc(Driver &driver) {}
+void Driver::BuildProcs() {}
 
-void DriverSession::ComputeMode(const llvm::opt::DerivedArgList &args) {
-  AbstractSession::ComputeMode(args);
+void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
+  Session::ComputeMode(args);
   if (mode.GetID() == 0) {
-    mode.SetID(Options::EmitExecutable); /// Default mode -- TODO: SetModeType
+    mode.SetID(opts::EmitExecutable); /// Default mode -- TODO: SetModeType
   }
 }
 
 std::unique_ptr<Compilation>
-DriverSession::BuildCompilation(const ToolChain &tc,
-                                const llvm::opt::InputArgList &argList) {
+Driver::BuildCompilation(const ToolChain &tc,
+                         const llvm::opt::InputArgList &argList) {
 
   llvm::PrettyStackTraceString CrashInfo("Compilation construction");
 
@@ -230,7 +228,7 @@ DriverSession::BuildCompilation(const ToolChain &tc,
   // About to move argument list, so capture some flags that will be needed
   // later.
   // const bool driverPrintActions =
-  //    ArgList->hasArg(Options::DriverPrintActions);
+  //    ArgList->hasArg(opts::DriverPrintActions);
 
   // const bool DriverPrintDerivedOutputFileMap =
   //    ArgList->hasArg(options::OPT_driver_print_derived_output_file_map);
@@ -238,23 +236,23 @@ DriverSession::BuildCompilation(const ToolChain &tc,
   // const bool ContinueBuildingAfterErrors =
   //    computeContinueBuildingAfterErrors(BatchMode, ArgList.get());
 
-  driverOpts.showLifecycle = argList.hasArg(Options::ShowLifecycle);
+  driverOpts.showLifecycle = argList.hasArg(opts::ShowLifecycle);
 
   std::unique_ptr<Compilation> compilation(new Compilation(*this, tc));
 }
 
-void DriverSession::PrintLifecycle() {}
+void Driver::PrintLifecycle() {}
 
-void DriverSession::PrintHelp(bool showHidden) {
-  excludedFlagsBitmask = Options::NoDriverOption;
+void Driver::PrintHelp(bool showHidden) {
+  excludedFlagsBitmask = opts::NoDriverOption;
   // if (!showHidden)
   //  excludedFlagsBitmask |= HelpHidden;
 
-  driverOpts.GetOpts().PrintHelp(Out(), driverName.c_str(), "Stone Compiler",
+  driverOpts.GetOpts().PrintHelp(Out(), driverName.c_str(), "stone Compiler",
                                  includedFlagsBitmask, excludedFlagsBitmask,
                                  /*ShowAllAliases*/ false);
 }
-int DriverSession::Run() {
+int Driver::Run() {
   // Perform a quick help check
   if (driverOpts.showHelp) {
     // PrintHelp();

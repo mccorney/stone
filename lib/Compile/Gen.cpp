@@ -9,11 +9,11 @@
 
 #include "llvm/IR/Module.h"
 
-using namespace Stone;
-using namespace Stone::Syntax;
-using namespace Stone::Analysis;
+using namespace stone;
+using namespace stone::syntax;
+using namespace stone::analysis;
 
-llvm::Module *Stone::Analysis::GenIR(Syntax::ModuleDecl *moduleDecl,
+llvm::Module *stone::analysis::GenIR(syntax::ModuleDecl *moduleDecl,
                                      const Context &ctx,
                                      const GenOptions &genOpts,
                                      llvm::StringRef outputModulename) {

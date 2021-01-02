@@ -8,16 +8,16 @@
 
 #include "llvm/ADT/ArrayRef.h"
 
-using namespace Stone::Syntax;
+using namespace stone::syntax;
 
-namespace Stone {
+namespace stone {
 class CompilePipeline;
 
-namespace Analysis {
+namespace analysis {
 class CompileInputs {};
 class CompileOutputs {};
 
-class Compiler final : public AbstractSession {
+class Compiler final : public Session {
   SrcMgr sm;
   FileMgr fm;
   CompilePipeline *pipeline = nullptr;
@@ -58,6 +58,6 @@ protected:
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
-} // namespace Analysis
-} // namespace Stone
+} // namespace analysis
+} // namespace stone
 #endif

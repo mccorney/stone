@@ -23,9 +23,9 @@ def ModeGroup : OptionGroup<"<mode options>">, HelpText<"MODES">;
 class ModeOpt : Group<ModeGroup>;
 
 
-def InternalGroup : OptionGroup<"<Stone internal options>">;
+def InternalGroup : OptionGroup<"<stone internal options>">;
 def InternalDebugGroup :
-OptionGroup<"<Stone debug/development internal options>">,
+OptionGroup<"<stone debug/development internal options>">,
 Group<InternalGroup>, HelpText<"DEBUG/DEVELOPMENT OPTIONS">;
 
 class InternalDebugOpt : Group<InternalDebugGroup>,

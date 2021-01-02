@@ -3,9 +3,9 @@
 
 #include "llvm/IR/Module.h"
 
-using namespace Stone;
-using namespace Stone::Analysis;
+using namespace stone;
+using namespace stone::analysis;
 
-void Stone::Analysis::OptimizeIR(llvm::Module *llvmModule,
+void stone::analysis::OptimizeIR(llvm::Module *llvmModule,
                                  const GenOptions &genOpts,
                                  llvm::TargetMachine *targetMachine) {}

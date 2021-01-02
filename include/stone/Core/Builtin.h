@@ -1,8 +1,8 @@
 #ifndef STONE_CORE_BUILTIN_H
 #define STONE_CORE_BUILTIN_H
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 class ASTContext;
 
 class Builtin final {
@@ -23,6 +23,6 @@ public:
 
   void Init(ASTContext &astCtx);
 };
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 #endif

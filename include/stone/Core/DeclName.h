@@ -1,8 +1,8 @@
 #ifndef STONE_CORE_DECLNAME_H
 #define STONE_CORE_DECLNAME_H
 #include "stone/Core/Identifier.h"
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 
 class DeclNameLoc {};
 class DeclName {
@@ -12,6 +12,6 @@ public:
   // TODO:
   Identifier *GetAsIdentifier() const {}
 };
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 #endif

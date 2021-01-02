@@ -6,7 +6,7 @@
 namespace {
 enum { TOKON = 0x1, TOKOFF = 0x2, TOKRSV = 0x4 };
 }
-namespace Stone {
+namespace stone {
 
 enum class tk {
 #define TOKEN(X) X,
@@ -22,6 +22,6 @@ bool IsTokenTextDetermined(tk kind);
 llvm::StringRef GetTokenText(tk kind);
 
 void DumpTokenKind(llvm::raw_ostream &os, tk kind);
-} // namespace Stone
+} // namespace stone
 
 #endif

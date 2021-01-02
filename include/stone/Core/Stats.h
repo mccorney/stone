@@ -4,7 +4,7 @@
 #include "stone/Core/Mem.h"
 #include <iostream>
 
-namespace Stone {
+namespace stone {
 
 class Stats {
 protected:
@@ -26,6 +26,6 @@ public:
   ///
   void Print();
 };
-} // namespace Stone
+} // namespace stone
 
 #endif

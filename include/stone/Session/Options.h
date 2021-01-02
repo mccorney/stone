@@ -13,8 +13,8 @@ namespace opt {
 class OptTable;
 }
 } // namespace llvm
-namespace Stone {
-namespace Options {
+namespace stone {
+namespace opts {
 
 enum OptFlag {
   CompileOption = (1 << 4),
@@ -33,8 +33,8 @@ enum OptID : unsigned {
   LAST
 #undef OPTION
 };
-} // namespace Options
+} // namespace opts
 std::unique_ptr<llvm::opt::OptTable> CreateOptTable();
-} // namespace Stone
+} // namespace stone
 
 #endif

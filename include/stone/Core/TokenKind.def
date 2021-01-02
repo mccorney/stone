@@ -24,14 +24,14 @@
 #endif
 
 /// EXPR_KEYWORD(kw)
-///   Expands for every Stone keyword used in an expression, such as 'true',
+///   Expands for every stone keyword used in an expression, such as 'true',
 ///   'false', and 'as'
 #ifndef EXPR_KEYWORD
 #define EXPR_KEYWORD(kw, S) KEYWORD(kw, S)
 #endif
 
 /// PAT_KEYWORD(kw)
-///   Expands for every Stone keyword used in a pattern, which is currently
+///   Expands for every stone keyword used in a pattern, which is currently
 ///   limited to '_'
 #ifndef PAT_KEYWORD
 #define PAT_KEYWORD(kw, S) KEYWORD(kw, S)

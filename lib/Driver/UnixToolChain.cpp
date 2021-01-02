@@ -1,6 +1,6 @@
 #include "stone/Driver/ToolChain.h"
 
-using namespace Stone;
+using namespace stone;
 
 /*
 UnixToolChain::UnixToolChain(const Driver &driver, const llvm::Triple &triple)

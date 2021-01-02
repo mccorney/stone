@@ -1,11 +1,11 @@
 #ifndef STONE_CORE_ASTVISITOR_H
 #define STONE_CORE_ASTVISITOR_H
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 class ASTVisitor {
 public:
 };
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 #endif

@@ -3,14 +3,14 @@
 
 #include "stone/Core/Identifier.h"
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 
 class Comment {
 public:
   Comment();
   ~Comment();
 };
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 #endif

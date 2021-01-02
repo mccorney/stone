@@ -5,7 +5,7 @@
 #include "stone/Core/LLVM.h"
 #include "llvm/Target/TargetMachine.h"
 
-using namespace Stone::Syntax;
+using namespace stone::syntax;
 
 namespace llvm {
 class raw_pwrite_stream;
@@ -16,18 +16,18 @@ class TargetOptions;
 class TargetMachine;
 } // namespace llvm
 
-namespace Stone {
+namespace stone {
 class GenOptions;
 
-namespace Syntax {
+namespace syntax {
 class ASTContext;
 }
-namespace Backend {
+namespace backend {
 std::unique_ptr<llvm::TargetMachine> CreateTargetMachine(const GenOptions &Opts,
                                                          ASTContext &astCtx);
 
 bool GenObject(llvm::Module *llvmModule, const GenOptions &genOpts,
                ASTContext &astCtx, llvm::StringRef outputFilename);
-} // namespace Backend
-} // namespace Stone
+} // namespace backend
+} // namespace stone
 #endif

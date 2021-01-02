@@ -3,25 +3,25 @@
 
 #include <cstddef>
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 class ASTContext;
 }
-} // namespace Stone
+} // namespace stone
 
 // Defined in CompilationContext.h
-void *operator new(size_t bytes, const Stone::Syntax::ASTContext &astCtx,
+void *operator new(size_t bytes, const stone::syntax::ASTContext &astCtx,
                    size_t alignment = 8);
 //
-void *operator new[](size_t bytes, const Stone::Syntax::ASTContext &C,
+void *operator new[](size_t bytes, const stone::syntax::ASTContext &C,
                      size_t alignment = 8);
 // It is good practice to pair new/delete operators.  Also, MSVC gives many
 // warnings if a matching delete overload is not declared, even though the
 // throw() spec guarantees it will not be implicitly called.
-void operator delete(void *Ptr, const Stone::Syntax::ASTContext &astCtx,
+void operator delete(void *Ptr, const stone::syntax::ASTContext &astCtx,
                      size_t);
 //
-void operator delete[](void *Ptr, const Stone::Syntax::ASTContext &astCtx,
+void operator delete[](void *Ptr, const stone::syntax::ASTContext &astCtx,
                        size_t);
 
 #endif

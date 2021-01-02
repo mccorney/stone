@@ -36,10 +36,10 @@ class FileSystem;
 } // namespace vfs
 } // namespace llvm
 
-namespace Stone {
-namespace Driver {
+namespace stone {
+namespace driver {
 class ToolChain;
-class DriverSession;
+class Driver;
 
 class Tool {
   /// The tool name (for debugging).
@@ -83,11 +83,11 @@ public:
   ~ClangTool();
 };
 
-class StoneTool final : public Tool {
+class stoneTool final : public Tool {
 public:
-  StoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
+  stoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
             const ToolChain &toolChain);
-  ~StoneTool();
+  ~stoneTool();
 };
 
 class GCCTool final : public Tool {
@@ -119,17 +119,17 @@ public:
 };
 
 class ToolChain {
-  const DriverSession &driver;
+  const Driver &driver;
   const llvm::Triple triple;
 
   /// A special name used to identify the 'stone' executable itself.
-  constexpr static const char *const StoneExecutableName = "stone";
+  constexpr static const char *const stoneExecutableName = "stone";
 
 public:
   using Paths = llvm::SmallVector<std::string, 16>;
 
 protected:
-  ToolChain(const DriverSession &driver, const llvm::Triple &triple);
+  ToolChain(const Driver &driver, const llvm::Triple &triple);
 
 private:
   /// The list of toolchain specific path prefixes to search for libraries.
@@ -148,12 +148,12 @@ protected:
   std::unique_ptr<StaticLinkTool> dynamicLinkTool;
   std::unique_ptr<AssembleTool> assembleTool;
   std::unique_ptr<GCCTool> gccTool;
-  std::unique_ptr<StoneTool> stoneTool;
+  std::unique_ptr<stoneTool> stoneTool;
 
 public:
   virtual ~ToolChain() = default;
 
-  const DriverSession &GetDriver() const { return driver; }
+  const Driver &GetDriver() const { return driver; }
   const llvm::Triple &GetTriple() const { return triple; }
 
   /// Construct a Process for the action \p JA, taking the given information
@@ -188,7 +188,7 @@ public:
   virtual Tool *BuildDynamicLinkTool() const = 0;
   virtual Tool *BuildStaticLinkTool() const = 0;
   virtual Tool *BuildGCCTool() const = 0;
-  virtual Tool *BuildStoneTool() const = 0;
+  virtual Tool *BuildstoneTool() const = 0;
   virtual Tool *GetTool(ModeType modeType) const = 0;
 };
 
@@ -196,7 +196,7 @@ class DarwinToolChain final : public ToolChain {
   const llvm::Optional<llvm::Triple> &targetVariant;
 
 public:
-  DarwinToolChain(const DriverSession &driver, const llvm::Triple &triple,
+  DarwinToolChain(const Driver &driver, const llvm::Triple &triple,
                   const llvm::Optional<llvm::Triple> &targetVariant);
   ~DarwinToolChain() = default;
 
@@ -206,7 +206,7 @@ public:
   Tool *BuildDynamicLinkTool() const override;
   Tool *BuildStaticLinkTool() const override;
   Tool *BuildGCCTool() const override;
-  Tool *BuildStoneTool() const override;
+  Tool *BuildstoneTool() const override;
 
   Tool *GetTool(ModeType modeType) const override;
 };
@@ -271,6 +271,6 @@ public:
   Tool *GetTool(ModeType modeType) override const;
 };
 */
-} // namespace Driver
-} // namespace Stone
+} // namespace driver
+} // namespace stone
 #endif

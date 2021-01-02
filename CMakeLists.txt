@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Stone)
+project(stone)
 
 # Make sure that our source directory is on the current cmake module path so that
 # we can include cmake files from this directory.
@@ -33,7 +33,7 @@ install_stone()
 add_definitions( -D_GNU_SOURCE )
 
 option(STONE_BUILD_TOOLS
-  "Build the Stone tools. If OFF, just generate build targets." ON)
+  "Build the stone tools. If OFF, just generate build targets." ON)
 
 add_subdirectory(include)
 add_subdirectory(lib)

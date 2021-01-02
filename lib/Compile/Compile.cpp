@@ -7,12 +7,12 @@
 #include "stone/Public.h"
 #include "stone/Session/Options.h"
 
-using namespace Stone;
-using namespace Stone::Syntax;
-using namespace Stone::Analysis;
-using namespace Stone::Backend;
+using namespace stone;
+using namespace stone::syntax;
+using namespace stone::analysis;
+using namespace stone::backend;
 
-int Stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
+int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, CompilePipeline *pipeline) {
 
   Compiler compiler(pipeline);
@@ -38,12 +38,12 @@ int Stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
 
   */
 
-  // We are not passing the compiler directly, we are pass Stone::Context
-  auto llvmModule = Stone::Analysis::GenIR(
+  // We are not passing the compiler directly, we are pass stone::Context
+  auto llvmModule = stone::analysis::GenIR(
       compiler.GetAnalysisContext().GetMainModule(), compiler,
       compiler.compileOpts.genOpts, /*TODO*/ {});
 
-  bool status = Stone::Backend::GenObject(
+  bool status = stone::backend::GenObject(
       llvmModule, compiler.compileOpts.genOpts,
       compiler.GetAnalysisContext().GetASTContext(), /*TODO*/ {});
 

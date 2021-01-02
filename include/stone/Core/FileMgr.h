@@ -24,7 +24,7 @@ class MemoryBuffer;
 
 } // end namespace llvm
 
-namespace Stone {
+namespace stone {
 
 class FileSystemStatCache;
 
@@ -262,6 +262,6 @@ public:
   void PrintStats() const;
 };
 
-} // end namespace Stone
+} // end namespace stone
 
 #endif // LLVM_CLANG_BASIC_FILEMANAGER_H

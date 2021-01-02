@@ -1,10 +1,10 @@
 #ifndef STONE_CORE_ASTFILE_H
 #define STONE_CORE_ASTFILE_H
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 class ASTFile final {};
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 
 #endif

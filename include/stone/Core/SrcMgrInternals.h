@@ -11,7 +11,7 @@
 #include <map>
 #include <vector>
 
-namespace Stone {
+namespace stone {
 
 //===----------------------------------------------------------------------===//
 // Line Table Implementation
@@ -113,6 +113,6 @@ public:
   void AddEntry(FileID FID, const std::vector<SrcLine> &Entries);
 };
 
-} // namespace Stone
+} // namespace stone
 
 #endif // LLVM_CLANG_BASIC_SOURCEMANAGERINTERNALS_H

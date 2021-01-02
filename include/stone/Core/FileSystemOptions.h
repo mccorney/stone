@@ -3,13 +3,13 @@
 
 #include <string>
 
-namespace Stone {
+namespace stone {
 
 class FileSystemOptions final {
 public:
   std::string WorkingDir;
 };
 
-} // namespace Stone
+} // namespace stone
 
 #endif

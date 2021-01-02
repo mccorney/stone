@@ -16,9 +16,9 @@
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/VirtualFileSystem.h"
 
-namespace Stone {
+namespace stone {
 
-class AbstractSession : public Context {
+class Session : public Context {
 
   /// The mode id for this session
   SessionOptions &sessionOpts;
@@ -67,8 +67,8 @@ public:
   llvm::sys::TimePoint<> endTime = llvm::sys::TimePoint<>::min();
 
 public:
-  AbstractSession(SessionOptions &sessionOpts);
-  ~AbstractSession();
+  Session(SessionOptions &sessionOpts);
+  ~Session();
 
 protected:
   std::unique_ptr<llvm::opt::InputArgList>
@@ -118,5 +118,5 @@ protected:
   void Purge();
 };
 
-} // namespace Stone
+} // namespace stone
 #endif

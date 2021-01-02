@@ -30,8 +30,8 @@ class DerivedArgList;
 } // namespace opt
 } // namespace llvm
 
-namespace Stone {
-namespace Driver {
+namespace stone {
+namespace driver {
 
 class Event;
 class Process;
@@ -105,7 +105,7 @@ public:
   mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
 };
 
-class DriverSession final : public AbstractSession {
+class Driver final : public Session {
   DriverCache cache;
   std::unique_ptr<ToolChain> toolChain;
   std::unique_ptr<Compilation> compilation;
@@ -209,7 +209,7 @@ private:
   bool HandleImmediateArgs(const ArgList &args, const ToolChain &tc);
 
 public:
-  DriverSession(llvm::StringRef executablePath, std::string driverName);
+  Driver(llvm::StringRef executablePath, std::string driverName);
 
   /// Parse the given list of strings into an InputArgList.
   bool Build(llvm::ArrayRef<const char *> args) override;
@@ -256,6 +256,6 @@ protected:
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
-} // namespace Driver
-} // namespace Stone
+} // namespace driver
+} // namespace stone
 #endif

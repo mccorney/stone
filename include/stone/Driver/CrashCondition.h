@@ -1,12 +1,12 @@
 #ifndef STONE_DRIVER_CRASHCONDITION_H
 #define STONE_DRIVER_CRASHCONDITION_H
 
-namespace Stone {
-namespace Driver {
+namespace stone {
+namespace driver {
 class CrashCondition final {
 public:
 };
-} // namespace Driver
-} // namespace Stone
+} // namespace driver
+} // namespace stone
 
 #endif

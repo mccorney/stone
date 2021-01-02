@@ -3,8 +3,8 @@
 
 #include "llvm/IR/LLVMContext.h"
 
-namespace Stone {
+namespace stone {
 llvm::LLVMContext &GetLLVMContext();
-} // namespace Stone
+} // namespace stone
 
 #endif

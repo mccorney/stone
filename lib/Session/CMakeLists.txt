@@ -11,11 +11,11 @@ set(stone_session_sources
 	Session.cpp
 
 	LINK_LIBS
-	StoneCore
+	stoneCore
 )
-add_stone_library(StoneSession
+add_stone_library(stoneSession
 	${stone_session_sources}
 
 	DEPENDS
-	StoneOptions
+	stoneOptions
 )

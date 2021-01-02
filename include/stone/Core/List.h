@@ -12,7 +12,7 @@
 #include <string>
 #include <utility>
 
-namespace Stone {
+namespace stone {
 
 /// JobList - A sequence of jobs to perform.
 template <typename T> class List {
@@ -42,5 +42,5 @@ public:
   const_iterator end() const { return entries.end(); }
 };
 
-} // namespace Stone
+} // namespace stone
 #endif

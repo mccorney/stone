@@ -2,8 +2,8 @@
 #include "stone/Core/Char.h"
 #include "stone/Core/SrcMgr.h"
 
-using namespace Stone;
-using namespace Stone::Analysis;
+using namespace stone;
+using namespace stone::analysis;
 
 /// CLO8 - Return the number of leading ones in the specified 8-bit value.
 static unsigned CLO8(unsigned char C) {
@@ -21,7 +21,7 @@ static bool IsStartOfUTF8Char(unsigned char C) {
 /// validateUTF8CharacterAndAdvance - Given a pointer to the starting byte of a
 /// UTF8 character, validate it and advance the lexer past it.  This returns the
 /// encoded character or ~0U if the encoding is invalid.
-uint32_t Stone::Analysis::ValidateUTF8CharAndAdvance(const char *&Ptr,
+uint32_t stone::analysis::ValidateUTF8CharAndAdvance(const char *&Ptr,
                                                      const char *End) {
   if (Ptr >= End)
     return ~0U;
@@ -81,7 +81,7 @@ uint32_t Stone::Analysis::ValidateUTF8CharAndAdvance(const char *&Ptr,
 static bool IsValidIdentifierContinuationCodePoint(uint32_t c) {
 
   if (c < 0x80)
-    return Stone::isIdentifierBody(c, /*dollar*/ true);
+    return stone::isIdentifierBody(c, /*dollar*/ true);
 
   // N1518: Recommendations for extended identifier characters for C and C++
   // Proposed Annex X.1: Ranges of characters allowed
@@ -122,7 +122,7 @@ static bool IsValidIdentifierStartCodePoint(uint32_t c) {
   if (!IsValidIdentifierContinuationCodePoint(c))
     return false;
 
-  if (c < 0x80 && (Stone::isDigit(c) || c == '$'))
+  if (c < 0x80 && (stone::isDigit(c) || c == '$'))
     return false;
 
   // N1518: Recommendations for extended identifier characters for C and C++
@@ -353,7 +353,7 @@ static bool IsIdentifier(const signed char ch) {
   }
 }
 
-Lexer::Lexer(const FileID srcID, SrcMgr &sm, const Stone::Context &ctx,
+Lexer::Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx,
              CompilePipeline *pipeline)
     : srcID(srcID), sm(sm), ctx(ctx) {
 

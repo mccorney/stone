@@ -1,8 +1,8 @@
 #include "stone/Compile/Checker.h"
 #include "stone/Core/Ret.h"
 
-using namespace Stone;
-using namespace Stone::Analysis;
+using namespace stone;
+using namespace stone::analysis;
 
 Checker::Checker(AnalysisContext &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}

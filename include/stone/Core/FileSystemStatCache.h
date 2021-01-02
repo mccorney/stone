@@ -14,7 +14,7 @@
 #include <string>
 #include <utility>
 
-namespace Stone {
+namespace stone {
 
 /// Abstract interface for introducing a FileMgr cache for 'stat'
 /// system calls, which is used by precompiled and pretokenized headers to
@@ -69,6 +69,6 @@ public:
                           llvm::vfs::FileSystem &FS) override;
 };
 
-} // namespace Stone
+} // namespace stone
 
 #endif // LLVM_CLANG_BASIC_FILESYSTEMSTATCACHE_H

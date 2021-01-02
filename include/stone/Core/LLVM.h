@@ -35,7 +35,7 @@ class raw_pwrite_stream;
 // TODO: DenseMap, ...
 } // namespace llvm
 
-namespace Stone {
+namespace stone {
 // Casting operators.
 using llvm::cast;
 using llvm::cast_or_null;
@@ -67,6 +67,6 @@ using llvm::RefCountedBase;
 
 using llvm::raw_ostream;
 using llvm::raw_pwrite_stream;
-} // namespace Stone
+} // namespace stone
 
 #endif

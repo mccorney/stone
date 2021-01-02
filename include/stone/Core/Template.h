@@ -25,8 +25,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 /// Represents a template argument.
 class TemplateArgument final {
 public:
@@ -82,7 +82,7 @@ public:
 class TemplateDecl : public NamingDecl {
 public:
 };
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 
 #endif

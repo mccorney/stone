@@ -11,10 +11,10 @@
 
 #include <memory>
 
-namespace Stone {
+namespace stone {
 class CompilePipeline;
 
-namespace Analysis {
+namespace analysis {
 class Checker;
 
 class CheckerStats final : public Stats {
@@ -43,6 +43,6 @@ public:
 public:
   void CheckExpr();
 };
-} // namespace Analysis
-} // namespace Stone
+} // namespace analysis
+} // namespace stone
 #endif

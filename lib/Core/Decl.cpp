@@ -30,8 +30,8 @@
 #include <tuple>
 #include <utility>
 
-using namespace Stone;
-using namespace Stone::Syntax;
+using namespace stone;
+using namespace stone::syntax;
 
 void *Decl::operator new(std::size_t size, const ASTContext &astCtx,
                          unsigned globalDeclID, std::size_t extra) {
@@ -83,7 +83,7 @@ void *Decl::operator new(std::size_t size, const ASTContext &astCtx,
   return ::operator new(size + extra, astCtx);
 }
 
-// Stone::Module *Decl::GetOwningModule() const {
+// stone::Module *Decl::GetOwningModule() const {
 //  assert(IsFromASTFile() && "Not from AST file?");
 //  return GetASTContext().GetExternalSource()->GetModule(GetOwningModuleID());
 //}

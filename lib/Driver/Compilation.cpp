@@ -28,12 +28,12 @@
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/raw_ostream.h"
 
-using namespace Stone;
-using namespace Stone::Driver;
+using namespace stone;
+using namespace stone::driver;
 
 using namespace llvm::opt;
 
-Compilation::Compilation(DriverSession &driver, const ToolChain &tc)
+Compilation::Compilation(Driver &driver, const ToolChain &tc)
     : driver(driver), tc(tc) {}
 
 Compilation::~Compilation() {}

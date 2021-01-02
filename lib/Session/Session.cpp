@@ -1,10 +1,10 @@
 #include "stone/Session/Session.h"
 #include "llvm/Support/FileSystem.h"
 
-using namespace Stone;
+using namespace stone;
 using namespace llvm::opt;
 
-AbstractSession::AbstractSession(SessionOptions &sessionOpts)
+Session::Session(SessionOptions &sessionOpts)
     : sessionOpts(sessionOpts), mode(0),
       targetTriple(llvm::sys::getDefaultTargetTriple()),
       fileSystem(llvm::vfs::getRealFileSystem()) {
@@ -12,10 +12,10 @@ AbstractSession::AbstractSession(SessionOptions &sessionOpts)
   startTime = std::chrono::system_clock::now();
 }
 
-AbstractSession::~AbstractSession() {}
+Session::~Session() {}
 
 std::unique_ptr<llvm::opt::InputArgList>
-AbstractSession::BuildArgList(llvm::ArrayRef<const char *> args) {
+Session::BuildArgList(llvm::ArrayRef<const char *> args) {
 
   std::unique_ptr<llvm::opt::InputArgList> argList =
       llvm::make_unique<llvm::opt::InputArgList>(
@@ -35,7 +35,7 @@ AbstractSession::BuildArgList(llvm::ArrayRef<const char *> args) {
   }
 
   // Check for unknown arguments.
-  for (const llvm::opt::Arg *arg : argList->filtered(Options::UNKNOWN)) {
+  for (const llvm::opt::Arg *arg : argList->filtered(opts::UNKNOWN)) {
     os << "D(SourceLoc(), "
        << "msg::error_unknown_arg,"
        << "arg->getAsString(*ArgList));" << '\n';
@@ -44,41 +44,41 @@ AbstractSession::BuildArgList(llvm::ArrayRef<const char *> args) {
   return argList;
 }
 
-void AbstractSession::SetTargetTriple(const llvm::Triple &triple) {
+void Session::SetTargetTriple(const llvm::Triple &triple) {
   // TODO: langOpts.SetTarget(triple);
 }
-void AbstractSession::SetTargetTriple(llvm::StringRef triple) {
+void Session::SetTargetTriple(llvm::StringRef triple) {
   SetTargetTriple(llvm::Triple(triple));
 }
 
-void AbstractSession::ComputeMode(const llvm::opt::DerivedArgList &args) {
+void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
 
   assert(mode.GetID() == 0 && "mode id already computed");
-  const llvm::opt::Arg *const modeArg = args.getLastArg(Options::ModeGroup);
+  const llvm::opt::Arg *const modeArg = args.getLastArg(opts::ModeGroup);
 
   // TODO: may have to claim
   if (modeArg) {
     switch (modeArg->getOption().getID()) {
-    case Options::Parse:
-      mode.SetID(Options::Parse);
+    case opts::Parse:
+      mode.SetID(opts::Parse);
       break;
-    case Options::Check:
-      mode.SetID(Options::Check);
+    case opts::Check:
+      mode.SetID(opts::Check);
       break;
-    case Options::EmitIR:
-      mode.SetID(Options::EmitIR);
+    case opts::EmitIR:
+      mode.SetID(opts::EmitIR);
       break;
-    case Options::EmitBC:
-      mode.SetID(Options::EmitBC);
+    case opts::EmitBC:
+      mode.SetID(opts::EmitBC);
       break;
-    case Options::EmitObject:
-      mode.SetID(Options::EmitObject);
+    case opts::EmitObject:
+      mode.SetID(opts::EmitObject);
       break;
-    case Options::EmitAssembly:
-      mode.SetID(Options::EmitAssembly);
+    case opts::EmitAssembly:
+      mode.SetID(opts::EmitAssembly);
       break;
-    case Options::EmitLibrary:
-      mode.SetID(Options::EmitLibrary);
+    case opts::EmitLibrary:
+      mode.SetID(opts::EmitLibrary);
       break;
     default:
       break;
@@ -88,21 +88,21 @@ void AbstractSession::ComputeMode(const llvm::opt::DerivedArgList &args) {
     mode.SetName(modeArg->getAsString(args));
   }
 }
-bool AbstractSession::IsModeOutput() {
+bool Session::IsModeOutput() {
 
   switch (mode.GetID()) {
-  case Options::EmitIR:
-  case Options::EmitBC:
-  case Options::EmitObject:
-  case Options::EmitAssembly:
-  case Options::EmitLibrary:
+  case opts::EmitIR:
+  case opts::EmitBC:
+  case opts::EmitObject:
+  case opts::EmitAssembly:
+  case opts::EmitLibrary:
     return true;
   default:
     return false;
   }
 }
 llvm::opt::DerivedArgList *
-AbstractSession::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
+Session::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
 
   DerivedArgList *dArgList = new DerivedArgList(args);
   for (Arg *arg : args) {
@@ -111,34 +111,34 @@ AbstractSession::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
   return dArgList;
 }
 
-Mode &AbstractSession::GetMode() {
+Mode &Session::GetMode() {
   assert(mode.IsValid() && "did not find a mid");
   return mode;
 }
 
-void AbstractSession::Purge() {}
+void Session::Purge() {}
 
-void AbstractSession::Finish() {
+void Session::Finish() {
   Purge();
   PrintDiagnostics();
   PrintStatistics();
 }
-void AbstractSession::PrintDiagnostics() {}
-void AbstractSession::PrintStatistics() {}
+void Session::PrintDiagnostics() {}
+void Session::PrintStatistics() {}
 
 // TODO:
 ModeType Mode::GetType() {
   /*
           switch (mode.GetID()) {
-    case Options::EmitIR:
+    case opts::EmitIR:
                   return MdodeType::EmitIR;
-    case Options::EmitBC:
+    case opts::EmitBC:
                   return ModeType:EmitBC;
-    case Options::EmitObject:
+    case opts::EmitObject:
                   return ModeType::EmitObject;
-    case Options::EmitAssembly:
+    case opts::EmitAssembly:
                   return ModeType::EmitAssembly;
-    case Options::EmitLibrary:
+    case opts::EmitLibrary:
                   return ModeType::EmitLibrary;
     default:
       return ModeType::None;

@@ -4,6 +4,6 @@ add_stone_tool(stone
 )
 target_link_libraries(stone
 	PRIVATE
-	StoneCompile
-	StoneDriver
+	stoneCompile
+	stoneDriver
 )

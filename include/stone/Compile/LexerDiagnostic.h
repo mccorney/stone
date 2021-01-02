@@ -5,12 +5,12 @@
 
 #include <memory>
 
-namespace Stone {
-namespace Analysis {
+namespace stone {
+namespace analysis {
 class LexerDiagnostics final : public Diagnostics {
 public:
 };
-} // namespace Analysis
-} // namespace Stone
+} // namespace analysis
+} // namespace stone
 
 #endif

@@ -6,12 +6,12 @@
 #include <memory>
 #include <stdio.h>
 
-namespace Stone {
+namespace stone {
 namespace mem {
 ///
 void Allocate();
 ///
 void DeAllocate();
 } // namespace mem
-} // namespace Stone
+} // namespace stone
 #endif

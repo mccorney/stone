@@ -43,8 +43,8 @@
 #include <utility>
 #include <vector>
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 
 class BlockExpr;
 class LangABI;
@@ -76,7 +76,7 @@ class ASTContext final {
 
   /// The language options used to create the AST associated with
   ///  this ASTContext object.
-  const Stone::Context &ctx;
+  const stone::Context &ctx;
 
   /// The search path options
   const SearchPathOptions &searchPathOpts;
@@ -93,7 +93,7 @@ class ASTContext final {
   mutable llvm::SmallVector<Type *, 0> types;
 
 public:
-  ASTContext(const Stone::Context &ctx, const SearchPathOptions &pathOpts,
+  ASTContext(const stone::Context &ctx, const SearchPathOptions &pathOpts,
              SrcMgr &sm);
   ~ASTContext();
 
@@ -106,7 +106,7 @@ public:
   //
   Builtin &GetBuiltin() const;
   //
-  const Stone::Context &GetContext() const { return ctx; }
+  const stone::Context &GetContext() const { return ctx; }
   //
   LangABI *GetLangABI() const;
   //
@@ -131,8 +131,8 @@ public:
 
 public:
 };
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 /// Placement new for using the ASTContext's allocator.
 ///
 /// This placement form of operator new uses the ASTContext's allocator for
@@ -161,7 +161,7 @@ public:
 /// @param Alignment The alignment of the allocated memory (if the underlying
 ///                  allocator supports it).
 /// @return The allocated memory. Could be nullptr.
-inline void *operator new(size_t bytes, const Stone::Syntax::ASTContext &C,
+inline void *operator new(size_t bytes, const stone::syntax::ASTContext &C,
                           size_t alignment /* = 8 */) {
   return C.Allocate(bytes, alignment);
 }
@@ -172,7 +172,7 @@ inline void *operator new(size_t bytes, const Stone::Syntax::ASTContext &C,
 /// invoking it directly; see the new operator for more details. This operator
 /// is called implicitly by the compiler if a placement new expression using
 /// the ASTContext throws in the object constructor.
-inline void operator delete(void *Ptr, const Stone::Syntax::ASTContext &C,
+inline void operator delete(void *Ptr, const stone::syntax::ASTContext &C,
                             size_t) {
   C.Deallocate(Ptr);
 }
@@ -201,7 +201,7 @@ inline void operator delete(void *Ptr, const Stone::Syntax::ASTContext &C,
 ///                  allocator supports it).
 /// @return The allocated memory. Could be nullptr.
 inline void *operator new[](size_t bytes,
-                            const Stone::Syntax::ASTContext &astCtx,
+                            const stone::syntax::ASTContext &astCtx,
                             size_t alignment /* = 8 */) {
   return astCtx.Allocate(bytes, alignment);
 }
@@ -213,7 +213,7 @@ inline void *operator new[](size_t bytes,
 /// is called implicitly by the compiler if a placement new[] expression using
 /// the ASTContext throws in the object constructor.
 inline void operator delete[](void *Ptr,
-                              const Stone::Syntax::ASTContext &astCtx, size_t) {
+                              const stone::syntax::ASTContext &astCtx, size_t) {
   astCtx.Deallocate(Ptr);
 }
 

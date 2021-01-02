@@ -25,16 +25,16 @@ class InputArgList;
 } // namespace opt
 } // namespace llvm
 
-namespace Stone {
-namespace Driver {
+namespace stone {
+namespace driver {
 
 class ToolChain;
-class DriverSession;
+class Driver;
 
 class Compilation final {
 
   /// The System we were created by.
-  const DriverSession &driver;
+  const Driver &driver;
 
   // TODO: Move to DriverProfile
   /// The default tool chain.
@@ -60,7 +60,7 @@ class Compilation final {
   ProcessList procs;
 
 public:
-  Compilation(DriverSession &driver, const ToolChain &tc);
+  Compilation(Driver &driver, const ToolChain &tc);
   ~Compilation();
 
 public:
@@ -69,7 +69,7 @@ public:
   /// The new Event is *not* added to the list returned by GetEvents().
   template <typename T, typename... Args> T *CreateEvent(Args &&...arg) {
     auto event = new T(std::forward<Args>(arg)...);
-    events.Add(std::unique_ptr<Stone::Driver::Event>(event));
+    events.Add(std::unique_ptr<stone::driver::Event>(event));
     return event;
   }
 
@@ -101,7 +101,7 @@ public:
   bool PurgeFiles(const llvm::opt::ArgStringList &files,
                   bool issueErrors = false) const;
 
-  // bool ExecuteProcs(std::unique_ptr<Stone::ProcessQueue> &&queue);
+  // bool ExecuteProcs(std::unique_ptr<stone::ProcessQueue> &&queue);
   /// ExecuteProc - Execute an actual command.
   ///
   /// \param fallBackProc - For non-zero results, this will be set to the
@@ -119,6 +119,6 @@ public:
 
   ToolChain const &GetToolChain() const { return tc; }
 };
-} // namespace Driver
-} // namespace Stone
+} // namespace driver
+} // namespace stone
 #endif

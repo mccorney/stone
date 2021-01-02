@@ -8,7 +8,7 @@
 
 #include <functional>
 
-namespace Stone {
+namespace stone {
 namespace file {
 enum FileType : uint8_t {
 #define FILE_TYPE(NAME, TYPE, TEMP_SUFFIX, FLAGS) TYPE,
@@ -41,7 +41,7 @@ bool IsTextual(file::FileType FT);
 /// threaded compilation.
 bool IsAfterLLVM(file::FileType FT);
 
-/// Returns true if the type is a file that contributes to the Stone module
+/// Returns true if the type is a file that contributes to the stone module
 /// being compiled.
 ///
 /// These need to be passed to the stone Compile
@@ -57,11 +57,11 @@ template <typename Fn> void forAllTypes(const Fn &fn);
 
 } // namespace file
 
-} // namespace Stone
+} // namespace stone
 
 namespace llvm {
-template <> struct DenseMapInfo<Stone::file::FileType> {
-  using FT = Stone::file::FileType;
+template <> struct DenseMapInfo<stone::file::FileType> {
+  using FT = stone::file::FileType;
   static inline FT getEmptyKey() { return FT::INVALID; }
   static inline FT getTombstoneKey() {
     return static_cast<FT>(FT::INVALID + 1);
@@ -71,12 +71,12 @@ template <> struct DenseMapInfo<Stone::file::FileType> {
 };
 } // namespace llvm
 
-template <typename Fn> void Stone::file::forAllTypes(const Fn &fn) {
+template <typename Fn> void stone::file::forAllTypes(const Fn &fn) {
   static_assert(
-      std::is_constructible<std::function<void(Stone::file::FileType)>,
+      std::is_constructible<std::function<void(stone::file::FileType)>,
                             Fn>::value,
       "must have the signature 'void(file::FileType)'");
-  for (uint8_t i = 0; i < static_cast<uint8_t>(Stone::file::FileType::INVALID);
+  for (uint8_t i = 0; i < static_cast<uint8_t>(stone::file::FileType::INVALID);
        ++i)
     fn(static_cast<file::FileType>(i));
 }

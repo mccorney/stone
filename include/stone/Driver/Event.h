@@ -24,8 +24,8 @@ class Arg;
 }
 } // namespace llvm
 
-namespace Stone {
-namespace Driver {
+namespace stone {
+namespace driver {
 class Event {
   unsigned kind : 4;
   unsigned ty : 28;
@@ -121,7 +121,7 @@ public:
     return e->GetKind() == Event::Kind::Compile;
   }
 
-  /// Return a *single* FileType::Stone InputEvent, if one exists;
+  /// Return a *single* FileType::stone InputEvent, if one exists;
   /// if 0 or >1 such inputs exist, return nullptr.
   const InputEvent *FindSingleInput(file::FileType ty) const {
     auto inputs = GetInputs();
@@ -211,6 +211,6 @@ class EventList final : public List<Event> {
 public:
   void Print() const;
 };
-} // namespace Driver
-} // namespace Stone
+} // namespace driver
+} // namespace stone
 #endif

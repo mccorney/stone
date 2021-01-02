@@ -6,8 +6,8 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Path.h"
 
-using namespace Stone;
-using namespace Stone::file;
+using namespace stone;
+using namespace stone::file;
 
 struct FileTypeEntry {
   const char *Name;
@@ -52,7 +52,7 @@ file::FileType file::GetTypeByName(llvm::StringRef Name) {
 
 bool file::IsTextual(file::FileType FK) {
   switch (FK) {
-  case file::FileType::Stone:
+  case file::FileType::stone:
   case file::FileType::Assembly:
   case file::FileType::IR:
     return true;
@@ -76,7 +76,7 @@ bool file::IsAfterLLVM(file::FileType FK) {
   case file::FileType::BC:
   case file::FileType::Object:
     return true;
-  case file::FileType::Stone:
+  case file::FileType::stone:
   case file::FileType::Image:
   case file::FileType::None:
     return false;
@@ -90,7 +90,7 @@ bool file::IsAfterLLVM(file::FileType FK) {
 
 bool file::IsPartOfCompilation(file::FileType FK) {
   switch (FK) {
-  case file::FileType::Stone:
+  case file::FileType::stone:
     return true;
   case file::FileType::Assembly:
   case file::FileType::IR:

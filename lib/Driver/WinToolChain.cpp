@@ -1,6 +1,6 @@
 #include "stone/Driver/ToolChain.h"
 
-using namespace Stone;
+using namespace stone;
 
 /*
 WinToolChain::WinToolChain(const Driver &driver, const llvm::Triple &triple)

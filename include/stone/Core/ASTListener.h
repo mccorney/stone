@@ -1,10 +1,10 @@
 #ifndef STONE_CORE_ASTLISTENER_H
 #define STONE_CORE_ASTLISTENER_H
 
-namespace Stone {
-namespace Syntax {
+namespace stone {
+namespace syntax {
 class ASTListener final {};
-} // namespace Syntax
-} // namespace Stone
+} // namespace syntax
+} // namespace stone
 
 #endif

@@ -4,9 +4,9 @@
 #include "llvm/Support/raw_ostream.h"
 #include <stdio.h>
 
-namespace Stone {
+namespace stone {
 namespace fmt {
 void Print();
 }
-} // namespace Stone
+} // namespace stone
 #endif

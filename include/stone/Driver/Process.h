@@ -11,8 +11,8 @@
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/StringSaver.h"
 
-namespace Stone {
-namespace Driver {
+namespace stone {
+namespace driver {
 
 class Driver;
 // class ProcessOutput {
@@ -64,6 +64,6 @@ public:
   void Print() const;
 };
 
-} // namespace Driver
-} // namespace Stone
+} // namespace driver
+} // namespace stone
 #endif

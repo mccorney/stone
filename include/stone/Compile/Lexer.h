@@ -7,7 +7,7 @@
 #include "stone/Core/Context.h"
 #include "stone/Core/SrcLoc.h"
 
-namespace Stone {
+namespace stone {
 
 class SrcID;
 class SrcMgr;
@@ -15,7 +15,7 @@ class Token;
 class LangOptions;
 class CompilePipeline;
 
-namespace Analysis {
+namespace analysis {
 class Token;
 
 enum class TriviaRetentionMode {
@@ -32,7 +32,7 @@ class Lexer final {
 
   const FileID srcID;
   SrcMgr &sm;
-  const Stone::Context &ctx;
+  const stone::Context &ctx;
 
   std::unique_ptr<LexerDiagnostics> diagnostics;
 
@@ -96,7 +96,7 @@ private:
   tk GetKindOfIdentifier(StringRef tokStr);
 
 public:
-  Lexer(const FileID srcID, SrcMgr &sm, const Stone::Context &ctx,
+  Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx,
         CompilePipeline *pipeline = nullptr);
 
 public:
@@ -118,6 +118,6 @@ public:
 
   FileID GetSrcID() { return srcID; }
 };
-} // namespace Analysis
-} // namespace Stone
+} // namespace analysis
+} // namespace stone
 #endif

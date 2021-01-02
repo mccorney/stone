@@ -10,10 +10,10 @@
 #include "stone/Core/Stats.h"
 #include <memory>
 
-namespace Stone {
+namespace stone {
 
 class CompilePipeline;
-namespace Analysis {
+namespace analysis {
 class Parser;
 class ParserStats final : public Stats {
   const Parser &parser;
@@ -51,6 +51,6 @@ public:
   // Expr
   void ParseExpr();
 };
-} // namespace Analysis
-} // namespace Stone
+} // namespace analysis
+} // namespace stone
 #endif

@@ -24,10 +24,10 @@ set(stone_compile_sources
 	Transformer.cpp
 	
 	LINK_LIBS
-	StoneCore
-	StoneSession
+	stoneCore
+	stoneSession
 )
-add_stone_library(StoneCompile
+add_stone_library(stoneCompile
 	${stone_compile_sources}
 )
 

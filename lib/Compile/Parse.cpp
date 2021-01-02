@@ -5,9 +5,9 @@
 
 #include "stone/Compile/Parser.h"
 
-using namespace Stone::Analysis;
+using namespace stone::analysis;
 
-int Stone::Analysis::Parse(AnalysisContext &analysis,
+int stone::analysis::Parse(AnalysisContext &analysis,
                            CompilePipeline *pipeline) {
   return ret::ok;
 }

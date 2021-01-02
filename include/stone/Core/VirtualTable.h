@@ -1,9 +1,9 @@
 #ifndef STONE_CORE_VIRTUAL_TABLE_H
 #define STONE_CORE_VIRTUAL_TABLE_H
 
-namespace Stone {
+namespace stone {
 
 class VirtualTable {};
 
-} // namespace Stone
+} // namespace stone
 #endif

@@ -18,8 +18,8 @@
 #include <cstring>
 #include <string>
 
-using namespace Stone;
-using namespace Stone::Syntax;
+using namespace stone;
+using namespace stone::syntax;
 
 enum class KeywordStatus {
   On,

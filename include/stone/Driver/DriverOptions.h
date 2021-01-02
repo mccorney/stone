@@ -3,15 +3,15 @@
 
 #include "stone/Session/SessionOptions.h"
 
-namespace Stone {
-namespace Driver {
+namespace stone {
+namespace driver {
 class DriverOptions final : public SessionOptions {
 public:
   DriverOptions() {}
 
 public:
 };
-} // namespace Driver
-} // namespace Stone
+} // namespace driver
+} // namespace stone
 
 #endif

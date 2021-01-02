@@ -6,7 +6,7 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/DataTypes.h"
 
-namespace Stone {
+namespace stone {
 namespace ch {
 extern const uint16_t CharTable[256];
 enum {
@@ -182,6 +182,6 @@ LLVM_READONLY inline bool isValidIdentifier(StringRef S,
   return true;
 }
 
-} // end namespace Stone
+} // end namespace stone
 
 #endif

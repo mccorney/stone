@@ -34,7 +34,7 @@
 #include <string>
 #include <utility>
 
-using namespace Stone;
+using namespace stone;
 
 //===----------------------------------------------------------------------===//
 // Common logic.
