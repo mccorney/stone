@@ -4,6 +4,7 @@
 #include "stone/Core/Ret.h"
 
 using namespace Stone;
+using namespace Stone::Options; 
 using namespace Stone::Frontend;
 
 Compiler::Compiler(CompilePipeline *pipeline)
@@ -19,7 +20,7 @@ void Compiler::ComputeMode(const llvm::opt::DerivedArgList &args) {
 
 bool Compiler::Build(llvm::ArrayRef<const char *> args) {
 
-  excludedFlagsBitmask = opts::NoCompileOption;
+  excludedFlagsBitmask = Options::NoCompileOption;
   auto argList = BuildArgList(args);
 
   std::unique_ptr<llvm::opt::DerivedArgList> dArgList(

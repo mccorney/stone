@@ -4,7 +4,8 @@
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
 
-using namespace Stone::opts;
+using namespace Stone::Options;
+
 using namespace llvm::opt;
 
 #define PREFIX(NAME, VALUE) static const char *const NAME[] = VALUE;

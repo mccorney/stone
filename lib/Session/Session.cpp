@@ -35,7 +35,7 @@ Session::BuildArgList(llvm::ArrayRef<const char *> args) {
   }
 
   // Check for unknown arguments.
-  for (const llvm::opt::Arg *arg : argList->filtered(opts::UNKNOWN)) {
+  for (const llvm::opt::Arg *arg : argList->filtered(Options::UNKNOWN)) {
     os << "D(SourceLoc(), "
        << "msg::error_unknown_arg,"
        << "arg->getAsString(*ArgList));" << '\n';
@@ -54,31 +54,31 @@ void Session::SetTargetTriple(llvm::StringRef triple) {
 void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
 
   assert(mode.GetID() == 0 && "mode id already computed");
-  const llvm::opt::Arg *const modeArg = args.getLastArg(opts::ModeGroup);
+  const llvm::opt::Arg *const modeArg = args.getLastArg(Options::ModeGroup);
 
   // TODO: may have to claim
   if (modeArg) {
     switch (modeArg->getOption().getID()) {
-    case opts::Parse:
-      mode.SetID(opts::Parse);
+    case Options::Parse:
+      mode.SetID(Options::Parse);
       break;
-    case opts::Check:
-      mode.SetID(opts::Check);
+    case Options::Check:
+      mode.SetID(Options::Check);
       break;
-    case opts::EmitIR:
-      mode.SetID(opts::EmitIR);
+    case Options::EmitIR:
+      mode.SetID(Options::EmitIR);
       break;
-    case opts::EmitBC:
-      mode.SetID(opts::EmitBC);
+    case Options::EmitBC:
+      mode.SetID(Options::EmitBC);
       break;
-    case opts::EmitObject:
-      mode.SetID(opts::EmitObject);
+    case Options::EmitObject:
+      mode.SetID(Options::EmitObject);
       break;
-    case opts::EmitAssembly:
-      mode.SetID(opts::EmitAssembly);
+    case Options::EmitAssembly:
+      mode.SetID(Options::EmitAssembly);
       break;
-    case opts::EmitLibrary:
-      mode.SetID(opts::EmitLibrary);
+    case Options::EmitLibrary:
+      mode.SetID(Options::EmitLibrary);
       break;
     default:
       break;
@@ -91,11 +91,11 @@ void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
 bool Session::IsModeOutput() {
 
   switch (mode.GetID()) {
-  case opts::EmitIR:
-  case opts::EmitBC:
-  case opts::EmitObject:
-  case opts::EmitAssembly:
-  case opts::EmitLibrary:
+  case Options::EmitIR:
+  case Options::EmitBC:
+  case Options::EmitObject:
+  case Options::EmitAssembly:
+  case Options::EmitLibrary:
     return true;
   default:
     return false;
@@ -130,15 +130,15 @@ void Session::PrintStatistics() {}
 ModeType Mode::GetType() {
   /*
           switch (mode.GetID()) {
-    case opts::EmitIR:
+    case Options::EmitIR:
                   return MdodeType::EmitIR;
-    case opts::EmitBC:
+    case Options::EmitBC:
                   return ModeType:EmitBC;
-    case opts::EmitObject:
+    case Options::EmitObject:
                   return ModeType::EmitObject;
-    case opts::EmitAssembly:
+    case Options::EmitAssembly:
                   return ModeType::EmitAssembly;
-    case opts::EmitLibrary:
+    case Options::EmitLibrary:
                   return ModeType::EmitLibrary;
     default:
       return ModeType::None;

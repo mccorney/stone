@@ -42,7 +42,7 @@ DriverSession::DriverSession(llvm::StringRef stoneExecutable,
 /// Parse the given list of strings into an InputArgList.
 bool DriverSession::Build(llvm::ArrayRef<const char *> args) {
 
-  excludedFlagsBitmask = opts::NoDriverOption;
+  excludedFlagsBitmask = Options::NoDriverOption;
   originalArgs = BuildArgList(args);
   toolChain = BuildToolChain(*originalArgs);
   compilation = BuildCompilation(*toolChain, *originalArgs);
@@ -53,7 +53,7 @@ bool DriverSession::Build(llvm::ArrayRef<const char *> args) {
 std::unique_ptr<ToolChain>
 DriverSession::BuildToolChain(const llvm::opt::InputArgList &argList) {
 
-  if (const llvm::opt::Arg *arg = argList.getLastArg(opts::Target)) {
+  if (const llvm::opt::Arg *arg = argList.getLastArg(Options::Target)) {
     targetTriple = llvm::Triple::normalize(arg->getValue());
   }
   llvm::Triple target(targetTriple);
@@ -63,7 +63,7 @@ DriverSession::BuildToolChain(const llvm::opt::InputArgList &argList) {
   case llvm::Triple::Darwin:
   case llvm::Triple::MacOSX: {
     llvm::Optional<llvm::Triple> targetVariant;
-    if (const llvm::opt::Arg *A = argList.getLastArg(opts::TargetVariant)) {
+    if (const llvm::opt::Arg *A = argList.getLastArg(Options::TargetVariant)) {
       targetVariant = llvm::Triple(llvm::Triple::normalize(A->getValue()));
     }
     return llvm::make_unique<DarwinToolChain>(*this, target, targetVariant);
@@ -90,7 +90,7 @@ DriverSession::BuildToolChain(const llvm::opt::InputArgList &argList) {
 bool DriverSession::HandleImmediateArgs(const ArgList &args,
                                         const ToolChain &tc) {
 
-  if (args.hasArg(opts::Help)) {
+  if (args.hasArg(Options::Help)) {
     PrintHelp(false);
     return false;
   }
@@ -190,7 +190,7 @@ void DriverSession::BuildProcs() {}
 void DriverSession::ComputeMode(const llvm::opt::DerivedArgList &args) {
   Session::ComputeMode(args);
   if (mode.GetID() == 0) {
-    mode.SetID(opts::EmitExecutable); /// Default mode -- TODO: SetModeType
+    mode.SetID(Options::EmitExecutable); /// Default mode -- TODO: SetModeType
   }
 }
 
@@ -230,7 +230,7 @@ DriverSession::BuildCompilation(const ToolChain &tc,
   // About to move argument list, so capture some flags that will be needed
   // later.
   // const bool driverPrintActions =
-  //    ArgList->hasArg(opts::DriverPrintActions);
+  //    ArgList->hasArg(Options::DriverPrintActions);
 
   // const bool DriverPrintDerivedOutputFileMap =
   //    ArgList->hasArg(options::OPT_driver_print_derived_output_file_map);
@@ -238,7 +238,7 @@ DriverSession::BuildCompilation(const ToolChain &tc,
   // const bool ContinueBuildingAfterErrors =
   //    computeContinueBuildingAfterErrors(BatchMode, ArgList.get());
 
-  driverOpts.showLifecycle = argList.hasArg(opts::ShowLifecycle);
+  driverOpts.showLifecycle = argList.hasArg(Options::ShowLifecycle);
 
   std::unique_ptr<Compilation> compilation(new Compilation(*this, tc));
 }
@@ -246,7 +246,7 @@ DriverSession::BuildCompilation(const ToolChain &tc,
 void DriverSession::PrintLifecycle() {}
 
 void DriverSession::PrintHelp(bool showHidden) {
-  excludedFlagsBitmask = opts::NoDriverOption;
+  excludedFlagsBitmask = Options::NoDriverOption;
   // if (!showHidden)
   //  excludedFlagsBitmask |= HelpHidden;
 
