@@ -17,7 +17,7 @@ namespace Frontend {
 class CompileInputs {};
 class CompileOutputs {};
 
-class Compiler final : public Session {
+class Compiler final : public AbstractSession {
 
   SrcMgr sm;
   FileMgr fm;

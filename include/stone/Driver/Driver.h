@@ -105,8 +105,7 @@ public:
   mutable llvm::StringMap<std::unique_ptr<ToolChain>> toolChainCache;
 };
 
-class DriverSession final : public Session {
-
+class DriverSession final : public AbstractSession {
   DriverCache cache;
   std::unique_ptr<ToolChain> toolChain;
   std::unique_ptr<Compilation> compilation;

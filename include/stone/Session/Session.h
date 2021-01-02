@@ -18,7 +18,7 @@
 
 namespace Stone {
 
-class Session : public Context {
+class AbstractSession : public Context {
 
   /// The mode id for this session
   SessionOptions &sessionOpts;
@@ -67,8 +67,8 @@ public:
   llvm::sys::TimePoint<> endTime = llvm::sys::TimePoint<>::min();
 
 public:
-  Session(SessionOptions &sessionOpts);
-  ~Session();
+  AbstractSession(SessionOptions &sessionOpts);
+  ~AbstractSession();
 
 protected:
   std::unique_ptr<llvm::opt::InputArgList>

@@ -8,12 +8,10 @@ using namespace Stone::Syntax;
 using namespace Stone::Backend;
 
 std::unique_ptr<llvm::TargetMachine>
-Stone::Backend::CreateTargetMachine(const GenOptions &Opts,
-                                    ASTContext &astCtx) {
+Backend::CreateTargetMachine(const GenOptions &Opts, ASTContext &astCtx) {
   return nullptr;
 }
-bool Stone::Backend::GenObject(llvm::Module *llvmModule,
-                               const GenOptions &genOpts, ASTContext &astCtx,
-                               llvm::StringRef outputFilename) {
+bool Backend::GenObject(llvm::Module *llvmModule, const GenOptions &genOpts,
+                        ASTContext &astCtx, llvm::StringRef outputFilename) {
   return true;
 }

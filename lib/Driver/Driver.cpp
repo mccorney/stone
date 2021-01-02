@@ -34,7 +34,7 @@ using namespace llvm::opt;
 
 DriverSession::DriverSession(llvm::StringRef stoneExecutable,
                              std::string driverName)
-    : Session(driverOpts), stoneExecutablePath(stoneExecutablePath),
+    : AbstractSession(driverOpts), stoneExecutablePath(stoneExecutablePath),
       driverName(driverName),
       /*sysRoot(DEFAULT_SYSROOT),*/
       driverTitle("Stone Compiler"), strSaver(bumpAlloc),
@@ -188,7 +188,7 @@ static void BuildProc(DriverSession &driver) {}
 void DriverSession::BuildProcs() {}
 
 void DriverSession::ComputeMode(const llvm::opt::DerivedArgList &args) {
-  Session::ComputeMode(args);
+  AbstractSession::ComputeMode(args);
   if (mode.GetID() == 0) {
     mode.SetID(Options::EmitExecutable); /// Default mode -- TODO: SetModeType
   }

@@ -12,7 +12,7 @@ using namespace Stone;
 using namespace Stone::Syntax;
 using namespace Stone::Frontend;
 
-llvm::Module *Stone::Frontend::GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
+llvm::Module *Frontend::GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
                                      const Stone::Context &ctx,
                                      const GenOptions &genOpts,
                                      llvm::StringRef outputModulename) {

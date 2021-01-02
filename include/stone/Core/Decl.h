@@ -50,6 +50,15 @@ class alignas(8) Decl : public ASTNode /*TODO: Object */ {
   SrcLoc loc;
   DeclContext *dc;
 
+public:
+  enum class Kind : unsigned {
+#define DECL(Id, Parent) Id,
+#define LAST_DECL(Id) LastDecl = Id,
+#define DECL_RANGE(Id, FirstId, LastId)                                        \
+  First##Id##Decl = FirstId, Last##Id##Decl = LastId,
+#include "stone/Core/DeclKind.def"
+  };
+
 protected:
   /// Allocate memory for a deserialized declaration.
   ///

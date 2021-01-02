@@ -33,7 +33,7 @@ enum OptID : unsigned {
   LAST
 #undef OPTION
 };
-} // namespace opts
+} // namespace Options
 std::unique_ptr<llvm::opt::OptTable> CreateOptTable();
 } // namespace Stone
 

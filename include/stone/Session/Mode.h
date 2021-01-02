@@ -2,10 +2,9 @@
 #define STONE_SESSION_MODE_H
 
 namespace Stone {
-
 enum class ModeType { None, Parse, Check };
 class Mode final {
-  friend class Session;
+  friend class AbstractSession;
   unsigned mid = 0;
   llvm::StringRef name;
 

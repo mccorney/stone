@@ -4,18 +4,18 @@
 #include "stone/Core/Ret.h"
 
 using namespace Stone;
-using namespace Stone::Options; 
+using namespace Stone::Options;
 using namespace Stone::Frontend;
 
 Compiler::Compiler(CompilePipeline *pipeline)
-    : Session(compileOpts), pipeline(pipeline), fm(compileOpts.fsOpts),
+    : AbstractSession(compileOpts), pipeline(pipeline), fm(compileOpts.fsOpts),
       sm(GetDiagEngine(), fm) {
 
   analysis.reset(new Analysis(*this, compileOpts, GetSrcMgr()));
 }
 
 void Compiler::ComputeMode(const llvm::opt::DerivedArgList &args) {
-  Session::ComputeMode(args);
+  AbstractSession::ComputeMode(args);
 }
 
 bool Compiler::Build(llvm::ArrayRef<const char *> args) {

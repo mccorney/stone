@@ -4,7 +4,7 @@
 using namespace Stone;
 using namespace llvm::opt;
 
-Session::Session(SessionOptions &sessionOpts)
+AbstractSession::AbstractSession(SessionOptions &sessionOpts)
     : sessionOpts(sessionOpts), mode(0),
       targetTriple(llvm::sys::getDefaultTargetTriple()),
       fileSystem(llvm::vfs::getRealFileSystem()) {
@@ -12,10 +12,10 @@ Session::Session(SessionOptions &sessionOpts)
   startTime = std::chrono::system_clock::now();
 }
 
-Session::~Session() {}
+AbstractSession::~AbstractSession() {}
 
 std::unique_ptr<llvm::opt::InputArgList>
-Session::BuildArgList(llvm::ArrayRef<const char *> args) {
+AbstractSession::BuildArgList(llvm::ArrayRef<const char *> args) {
 
   std::unique_ptr<llvm::opt::InputArgList> argList =
       llvm::make_unique<llvm::opt::InputArgList>(
@@ -44,14 +44,14 @@ Session::BuildArgList(llvm::ArrayRef<const char *> args) {
   return argList;
 }
 
-void Session::SetTargetTriple(const llvm::Triple &triple) {
+void AbstractSession::SetTargetTriple(const llvm::Triple &triple) {
   // TODO: langOpts.SetTarget(triple);
 }
-void Session::SetTargetTriple(llvm::StringRef triple) {
+void AbstractSession::SetTargetTriple(llvm::StringRef triple) {
   SetTargetTriple(llvm::Triple(triple));
 }
 
-void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
+void AbstractSession::ComputeMode(const llvm::opt::DerivedArgList &args) {
 
   assert(mode.GetID() == 0 && "mode id already computed");
   const llvm::opt::Arg *const modeArg = args.getLastArg(Options::ModeGroup);
@@ -88,7 +88,7 @@ void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
     mode.SetName(modeArg->getAsString(args));
   }
 }
-bool Session::IsModeOutput() {
+bool AbstractSession::IsModeOutput() {
 
   switch (mode.GetID()) {
   case Options::EmitIR:
@@ -102,7 +102,7 @@ bool Session::IsModeOutput() {
   }
 }
 llvm::opt::DerivedArgList *
-Session::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
+AbstractSession::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
 
   DerivedArgList *dArgList = new DerivedArgList(args);
   for (Arg *arg : args) {
@@ -111,20 +111,20 @@ Session::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
   return dArgList;
 }
 
-Mode &Session::GetMode() {
+Mode &AbstractSession::GetMode() {
   assert(mode.IsValid() && "did not find a mid");
   return mode;
 }
 
-void Session::Purge() {}
+void AbstractSession::Purge() {}
 
-void Session::Finish() {
+void AbstractSession::Finish() {
   Purge();
   PrintDiagnostics();
   PrintStatistics();
 }
-void Session::PrintDiagnostics() {}
-void Session::PrintStatistics() {}
+void AbstractSession::PrintDiagnostics() {}
+void AbstractSession::PrintStatistics() {}
 
 // TODO:
 ModeType Mode::GetType() {

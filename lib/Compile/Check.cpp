@@ -6,6 +6,6 @@
 
 using namespace Stone::Frontend;
 
-int Stone::Frontend::Check(Analysis &analysis, CompilePipeline *pipeline) {
+int Frontend::Check(Analysis &analysis, CompilePipeline *pipeline) {
   return ret::ok;
 }
