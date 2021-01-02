@@ -23,14 +23,14 @@ set(stone_driver_sources
 	WinToolChain.cpp
 
 	LINK_LIBS
-	stoneCore
-	stoneSession
+	StoneCore
+	StoneSession
 )
-add_stone_library(stoneDriver
+add_stone_library(StoneDriver
 	${stone_driver_sources}
 
 	DEPENDS
-	stoneOptions
+	StoneOptions
 )
 
 

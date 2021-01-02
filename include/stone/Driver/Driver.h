@@ -4,6 +4,7 @@
 #include "stone/Core/Mem.h"
 #include "stone/Driver/Compilation.h"
 #include "stone/Driver/DriverOptions.h"
+#include "stone/Driver/Event.h"
 #include "stone/Driver/ToolChain.h"
 #include "stone/Session/Session.h"
 
@@ -38,17 +39,10 @@ class Process;
 class Compilation;
 class ToolChain;
 
-/*
-class DriverInputs final {
-  friend Driver;
-  InputFiles inputs;
+struct DriverInputProfile final {};
 
-public:
-  InputFiles &GetInputs() { return inputs; }
-};
-*/
-class DriverOutputs final {
-public:
+struct DriverOutputProfile final {
+
   enum class CompileType {
     None,
     /// Multiple compile invocations and -main-file.
@@ -58,7 +52,6 @@ public:
     /// Compile and execute the inputs immediately
     ImmediateInvocation,
   };
-
   enum class LTOKind { None, Full, Thin, Unknown };
 
   LTOKind ltoVariant = LTOKind::None;
@@ -68,9 +61,6 @@ public:
 
   /// Returns true if multi-threading is enabled.
   bool IsMultiThreading() const { return numThreads > 0; }
-
-  /// The name of the module which we are building.
-  std::string moduleName;
 
   /// The path to the SDK against which to build.
   /// (If empty, this implies no SDK.)
@@ -88,8 +78,6 @@ public:
 
   /// The output type which should be used for the compiler
   file::FileType compilerOutputFileType = file::FileType::INVALID;
-
-public:
 };
 
 class DriverCache final {
@@ -109,8 +97,8 @@ class Driver final : public Session {
   DriverCache cache;
   std::unique_ptr<ToolChain> toolChain;
   std::unique_ptr<Compilation> compilation;
-  // DriverInputs driverInputs;
-  DriverOutputs driverOutputs;
+  DriverInputProfile inputProfile;
+  DriverOutputProfile outputProfile;
 
 public:
   /// The options for the driver
@@ -200,7 +188,7 @@ private:
   void BuildOutputs(const ToolChain &toolChain,
                     const llvm::opt::DerivedArgList &args, const bool batchMode,
                     const InputFiles &inputs /*TODO: DriverInputs*/,
-                    DriverOutputs &outputs) const;
+                    DriverOutputProfile &outputProfile) const;
 
   std::unique_ptr<Compilation>
   BuildCompilation(const ToolChain &toolChain,
@@ -237,13 +225,11 @@ public:
   const ToolChain &GetToolChain() const { return *toolChain.get(); }
   ToolChain &GetToolChain() { return *toolChain.get(); }
 
-  // const DriverInputInstance &GetInputInstance() const {
-  //  return *inputInstance.get();
-  // }
-  // DriverInputInstance &GetInputInstance() { return *inputInstance.get(); }
+  const DriverOutputProfile &GetOutputProfile() const { return outputProfile; }
+  DriverOutputProfile &GetOutputProfile() { return outputProfile; }
 
-  const DriverOutputs &GetOutputs() const { return driverOutputs; }
-  DriverOutputs &GetOutputs() { return driverOutputs; }
+  const DriverInputProfile &GetInputProfile() const { return inputProfile; }
+  DriverInputProfile &GetInputProfile() { return inputProfile; }
 
   const DriverCache &GetCache() const { return cache; }
   DriverCache &GetCache() { return cache; }

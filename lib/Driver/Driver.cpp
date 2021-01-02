@@ -166,17 +166,17 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
 void Driver::BuildOutputs(const ToolChain &toolChain,
                           const llvm::opt::DerivedArgList &args,
                           const bool batchMode, const InputFiles &inputs,
-                          DriverOutputs &outputs) const {}
+                          DriverOutputProfile &outputProfile) const {}
 
 static void BuildEvent(Driver &driver) {}
 
 void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
-  if (driverOutputs.compileType ==
-      DriverOutputs::CompileType::MultipleInvocation) {
-  } else if (driverOutputs.compileType ==
-             DriverOutputs::CompileType::SingleInvocation) {
+  if (outputProfile.compileType ==
+      DriverOutputProfile::CompileType::MultipleInvocation) {
+  } else if (outputProfile.compileType ==
+             DriverOutputProfile::CompileType::SingleInvocation) {
   } else {
   }
 }

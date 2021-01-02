@@ -37,6 +37,9 @@ protected:
   /// Default target triple.
   std::string targetTriple;
 
+  /// The name of the module which we are building.
+  std::string moduleName;
+
   /// The original (untranslated) input argument list.
   std::unique_ptr<llvm::opt::InputArgList> originalArgs;
 
@@ -75,9 +78,6 @@ protected:
   std::unique_ptr<llvm::opt::InputArgList>
   BuildArgList(llvm::ArrayRef<const char *> args);
 
-  // void SetModeKind(ModeKind kind) {}
-  // void SetModeName(llvm::StringRef name) { mode.SetName(name); }
-
 public:
   ///
   virtual bool Build(llvm::ArrayRef<const char *> args) = 0;
@@ -109,6 +109,7 @@ public:
   llvm::opt::DerivedArgList &GettranslatedArgs() {
     return *translatedArgs.get();
   }
+  std::string GetModuleName() { return moduleName; }
 
 protected:
   // Compute the mode id -- TODO: virtual

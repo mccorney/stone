@@ -36,7 +36,7 @@ set(stone_core_sources
 	VirtualTable.cpp
 
 )
-add_stone_library(stoneCore
+add_stone_library(StoneCore
 	${stone_core_sources}
 )
 
