@@ -12,6 +12,8 @@
 #include "llvm/Support/StringSaver.h"
 
 namespace Stone {
+namespace Driver {
+
 class Driver;
 // class ProcessOutput {
 //};
@@ -61,5 +63,7 @@ class ProcessList final : public List<Process> {
 public:
   void Print() const;
 };
+
+} // namespace Driver
 } // namespace Stone
 #endif

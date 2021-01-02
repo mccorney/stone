@@ -1,9 +1,10 @@
 #include "stone/Driver/ToolChain.h"
 
 using namespace Stone;
+using namespace Stone::Driver;
 
 DarwinToolChain::DarwinToolChain(
-    const Driver &driver, const llvm::Triple &triple,
+    const DriverSession &driver, const llvm::Triple &triple,
     const llvm::Optional<llvm::Triple> &targetVariant)
     : ToolChain(driver, triple), targetVariant(targetVariant) {}
 

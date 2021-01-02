@@ -4,12 +4,14 @@
 #include "stone/Session/SessionOptions.h"
 
 namespace Stone {
+namespace Driver {
 class DriverOptions final : public SessionOptions {
 public:
   DriverOptions() {}
 
 public:
 };
+} // namespace Driver
 } // namespace Stone
 
 #endif

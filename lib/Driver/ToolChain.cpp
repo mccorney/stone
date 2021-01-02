@@ -1,6 +1,7 @@
 #include "stone/Driver/ToolChain.h"
 
 using namespace Stone;
+using namespace Stone::Driver;
 
 Tool::Tool(llvm::StringRef fullName, llvm::StringRef shortName,
            const ToolChain &toolChain)
@@ -48,7 +49,7 @@ AssembleTool::AssembleTool(llvm::StringRef fullName, llvm::StringRef shortName,
     : Tool(fullName, shortName, toolChain) {}
 AssembleTool::~AssembleTool() {}
 
-ToolChain::ToolChain(const Driver &driver, const llvm::Triple &triple)
+ToolChain::ToolChain(const DriverSession &driver, const llvm::Triple &triple)
     : driver(driver), triple(triple) {}
 
 std::unique_ptr<Process> ToolChain::CreateProc(/*const JobAction &JA, Compilation &C,

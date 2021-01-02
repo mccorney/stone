@@ -32,10 +32,12 @@
 #include <system_error>
 
 using namespace Stone;
+using namespace Stone::Driver;
+
 using namespace llvm::opt;
 
-static void SetInstallDir(llvm::ArrayRef<const char *> &argv, Driver &driver,
-                          bool canonicalPrefixes) {
+static void SetInstallDir(llvm::ArrayRef<const char *> &argv,
+                          DriverSession &driver, bool canonicalPrefixes) {
   // Attempt to find the original path used to invoke the driver, to determine
   // the installed path. We do this manually, because we want to support that
   // path being a symlink.
@@ -67,7 +69,7 @@ int Stone::Run(llvm::ArrayRef<const char *> args, const char *arg0,
   auto driverPath = Stone::GetExecutablePath(arg0);
   auto driverName = llvm::sys::path::stem(arg0);
 
-  Driver driver(driverPath, driverName);
+  DriverSession driver(driverPath, driverName);
 
   bool canonicalPrefixes = false;
 

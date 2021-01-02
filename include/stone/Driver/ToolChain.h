@@ -37,8 +37,9 @@ class FileSystem;
 } // namespace llvm
 
 namespace Stone {
-
+namespace Driver {
 class ToolChain;
+class DriverSession;
 
 class Tool {
   /// The tool name (for debugging).
@@ -118,7 +119,7 @@ public:
 };
 
 class ToolChain {
-  const Driver &driver;
+  const DriverSession &driver;
   const llvm::Triple triple;
 
   /// A special name used to identify the 'stone' executable itself.
@@ -128,7 +129,7 @@ public:
   using Paths = llvm::SmallVector<std::string, 16>;
 
 protected:
-  ToolChain(const Driver &driver, const llvm::Triple &triple);
+  ToolChain(const DriverSession &driver, const llvm::Triple &triple);
 
 private:
   /// The list of toolchain specific path prefixes to search for libraries.
@@ -152,7 +153,7 @@ protected:
 public:
   virtual ~ToolChain() = default;
 
-  const Driver &GetDriver() const { return driver; }
+  const DriverSession &GetDriver() const { return driver; }
   const llvm::Triple &GetTriple() const { return triple; }
 
   /// Construct a Process for the action \p JA, taking the given information
@@ -195,7 +196,7 @@ class DarwinToolChain final : public ToolChain {
   const llvm::Optional<llvm::Triple> &targetVariant;
 
 public:
-  DarwinToolChain(const Driver &driver, const llvm::Triple &triple,
+  DarwinToolChain(const DriverSession &driver, const llvm::Triple &triple,
                   const llvm::Optional<llvm::Triple> &targetVariant);
   ~DarwinToolChain() = default;
 
@@ -270,6 +271,6 @@ public:
   Tool *GetTool(ModeType modeType) override const;
 };
 */
-
+} // namespace Driver
 } // namespace Stone
 #endif

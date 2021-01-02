@@ -25,6 +25,7 @@ class Arg;
 } // namespace llvm
 
 namespace Stone {
+namespace Driver {
 class Event {
   unsigned kind : 4;
   unsigned ty : 28;
@@ -210,6 +211,6 @@ class EventList final : public List<Event> {
 public:
   void Print() const;
 };
-
+} // namespace Driver
 } // namespace Stone
 #endif
