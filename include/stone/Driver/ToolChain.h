@@ -189,7 +189,7 @@ public:
   virtual Tool *BuildStaticLinkTool() const = 0;
   virtual Tool *BuildGCCTool() const = 0;
   virtual Tool *BuildstoneTool() const = 0;
-  virtual Tool *GetTool(ModeType modeType) const = 0;
+  virtual Tool *GetTool(ModeKind kind) const = 0;
 };
 
 class DarwinToolChain final : public ToolChain {
@@ -208,7 +208,7 @@ public:
   Tool *BuildGCCTool() const override;
   Tool *BuildstoneTool() const override;
 
-  Tool *GetTool(ModeType modeType) const override;
+  Tool *GetTool(ModeKind kind) const override;
 };
 
 /*

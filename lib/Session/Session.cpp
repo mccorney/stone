@@ -5,7 +5,7 @@ using namespace stone;
 using namespace llvm::opt;
 
 Session::Session(SessionOptions &sessionOpts)
-    : sessionOpts(sessionOpts), mode(0),
+    : sessionOpts(sessionOpts), mode(ModeKind::None),
       targetTriple(llvm::sys::getDefaultTargetTriple()),
       fileSystem(llvm::vfs::getRealFileSystem()) {
 
@@ -53,52 +53,39 @@ void Session::SetTargetTriple(llvm::StringRef triple) {
 
 void Session::ComputeMode(const llvm::opt::DerivedArgList &args) {
 
-  assert(mode.GetID() == 0 && "mode id already computed");
+  assert(mode.GetKind() == ModeKind::None && "mode id already computed");
   const llvm::opt::Arg *const modeArg = args.getLastArg(opts::ModeGroup);
 
   // TODO: may have to claim
   if (modeArg) {
     switch (modeArg->getOption().getID()) {
     case opts::Parse:
-      mode.SetID(opts::Parse);
+      mode.SetKind(ModeKind::Parse);
       break;
     case opts::Check:
-      mode.SetID(opts::Check);
+      mode.SetKind(ModeKind::Check);
       break;
     case opts::EmitIR:
-      mode.SetID(opts::EmitIR);
+      mode.SetKind(ModeKind::EmitIR);
       break;
     case opts::EmitBC:
-      mode.SetID(opts::EmitBC);
+      mode.SetKind(ModeKind::EmitBC);
       break;
     case opts::EmitObject:
-      mode.SetID(opts::EmitObject);
+      mode.SetKind(ModeKind::EmitObject);
       break;
     case opts::EmitAssembly:
-      mode.SetID(opts::EmitAssembly);
+      mode.SetKind(ModeKind::EmitAssembly);
       break;
     case opts::EmitLibrary:
-      mode.SetID(opts::EmitLibrary);
+      mode.SetKind(ModeKind::EmitLibrary);
       break;
     default:
       break;
     }
   }
-  if (mode.GetID() > 0) {
-    mode.SetName(modeArg->getAsString(args));
-  }
-}
-bool Session::IsModeOutput() {
-
-  switch (mode.GetID()) {
-  case opts::EmitIR:
-  case opts::EmitBC:
-  case opts::EmitObject:
-  case opts::EmitAssembly:
-  case opts::EmitLibrary:
-    return true;
-  default:
-    return false;
+  if (mode.GetKind() == ModeKind::None) {
+    mode.SetKind(GetDefaultModeKind());
   }
 }
 llvm::opt::DerivedArgList *
@@ -111,10 +98,33 @@ Session::TranslateInputArgs(const llvm::opt::InputArgList &args) const {
   return dArgList;
 }
 
-Mode &Session::GetMode() {
-  assert(mode.IsValid() && "did not find a mid");
-  return mode;
+Mode &Session::GetMode() { return mode; }
+
+/*
+static llvm::StringRef Mode::GetNameByKind(ModeKind kind) {
+        //TODO: I think you can get these from the mode group
+        // so that you do not have to dublicate the text -- fragile.
+  switch (kind) {
+  case ModeKind::Parse:
+    return "parse";
+        case Modekind::Check :
+                return "check";
+  case ModeKind::EmitIR:
+    return "emit-ir";
+  case ModeKind::EmitBC:
+    return "emit-bc";
+  case ModeKind::EmitObject:
+    return "emit-object";
+  case ModeKind::EmitAssembly:
+    return "emit-assembly";
+  case ModeKind::EmitLibrary:
+    return "emit-library";
+  case ModeKind::EmitExecutable:
+    return "emit-executable";
+  }
+        llvm_unreachable("Invalid ModeKind.");
 }
+*/
 
 void Session::Purge() {}
 
@@ -125,24 +135,3 @@ void Session::Finish() {
 }
 void Session::PrintDiagnostics() {}
 void Session::PrintStatistics() {}
-
-// TODO:
-ModeType Mode::GetType() {
-  /*
-          switch (mode.GetID()) {
-    case opts::EmitIR:
-                  return MdodeType::EmitIR;
-    case opts::EmitBC:
-                  return ModeType:EmitBC;
-    case opts::EmitObject:
-                  return ModeType::EmitObject;
-    case opts::EmitAssembly:
-                  return ModeType::EmitAssembly;
-    case opts::EmitLibrary:
-                  return ModeType::EmitLibrary;
-    default:
-      return ModeType::None;
-    }
-          */
-  return ModeType::None;
-}

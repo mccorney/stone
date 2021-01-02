@@ -26,6 +26,7 @@ class Arg;
 
 namespace stone {
 namespace driver {
+
 class Event {
   unsigned kind : 4;
   unsigned ty : 28;

@@ -21,12 +21,12 @@ static const OptTable::Info InfoTable[] = {
 };
 
 namespace {
-class stoneOptTable : public OptTable {
+class StoneOptTable : public OptTable {
 public:
-  stoneOptTable() : OptTable(InfoTable) {}
+  StoneOptTable() : OptTable(InfoTable) {}
 };
 } // end anonymous namespace
 
 std::unique_ptr<OptTable> stone::CreateOptTable() {
-  return std::unique_ptr<OptTable>(new stoneOptTable());
+  return std::unique_ptr<OptTable>(new StoneOptTable());
 }

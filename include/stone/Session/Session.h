@@ -18,8 +18,9 @@
 
 namespace stone {
 
-class Session : public Context {
+enum class SessionKind { Compiler, Driver };
 
+class Session : public Context {
   /// The mode id for this session
   SessionOptions &sessionOpts;
   llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fileSystem;
@@ -74,6 +75,9 @@ protected:
   std::unique_ptr<llvm::opt::InputArgList>
   BuildArgList(llvm::ArrayRef<const char *> args);
 
+  // void SetModeKind(ModeKind kind) {}
+  // void SetModeName(llvm::StringRef name) { mode.SetName(name); }
+
 public:
   ///
   virtual bool Build(llvm::ArrayRef<const char *> args) = 0;
@@ -96,7 +100,6 @@ public:
   void PrintStatistics();
 
   Mode &GetMode();
-  bool IsModeOutput();
 
   /// The original (untranslated) input argument list.
   llvm::opt::InputArgList &GetoriginalArgs() { return *originalArgs.get(); }
@@ -114,6 +117,8 @@ protected:
   /// arguments, after applying the standard argument translations.
   virtual llvm::opt::DerivedArgList *
   TranslateInputArgs(const llvm::opt::InputArgList &args) const;
+
+  virtual ModeKind GetDefaultModeKind() = 0;
 
   void Purge();
 };

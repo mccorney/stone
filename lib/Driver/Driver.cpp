@@ -175,22 +175,19 @@ void Driver::BuildEvents() {
 
   if (driverOutputs.compileType ==
       DriverOutputs::CompileType::MultipleInvocation) {
-
   } else if (driverOutputs.compileType ==
              DriverOutputs::CompileType::SingleInvocation) {
   } else {
   }
 }
 
-static void BuildProc(Driver &driver) {}
-void Driver::BuildProcs() {}
+ModeKind Driver::GetDefaultModeKind() { return ModeKind::EmitExecutable; }
 
 void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
   Session::ComputeMode(args);
-  if (mode.GetID() == 0) {
-    mode.SetID(opts::EmitExecutable); /// Default mode -- TODO: SetModeType
-  }
 }
+static void BuildProc(Driver &driver) {}
+void Driver::BuildProcs() {}
 
 std::unique_ptr<Compilation>
 Driver::BuildCompilation(const ToolChain &tc,

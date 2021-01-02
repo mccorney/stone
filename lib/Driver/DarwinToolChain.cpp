@@ -15,4 +15,4 @@ Tool *DarwinToolChain::BuildStaticLinkTool() const { nullptr; }
 Tool *DarwinToolChain::BuildGCCTool() const { nullptr; }
 Tool *DarwinToolChain::BuildstoneTool() const { nullptr; }
 
-Tool *DarwinToolChain::GetTool(ModeType modeType) const { nullptr; }
+Tool *DarwinToolChain::GetTool(ModeKind kind) const { nullptr; }

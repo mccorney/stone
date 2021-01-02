@@ -250,6 +250,7 @@ public:
 
 protected:
   void ComputeMode(const llvm::opt::DerivedArgList &args) override;
+  ModeKind GetDefaultModeKind() override;
 
   /// TranslateInputArgs - Create a new derived argument list from the input
   /// arguments, after applying the standard argument translations.

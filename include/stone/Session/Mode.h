@@ -2,23 +2,48 @@
 #define STONE_SESSION_MODE_H
 
 namespace stone {
-enum class ModeType { None, Parse, Check };
+
+enum class ModeKind {
+  None,
+  Parse,
+  Check,
+  EmitIR,
+  EmitBC,
+  EmitObject,
+  EmitLibrary,
+  EmitAssembly,
+  EmitExecutable
+};
+
 class Mode final {
   friend class Session;
-  unsigned mid = 0;
+  ModeKind kind;
   llvm::StringRef name;
 
-public:
-  bool IsValid() const { return mid != 0; }
-  unsigned GetID() const { return mid; }
-  llvm::StringRef GetName() const { return name; }
-  ModeType GetType();
-
-  void SetID(unsigned v) { mid = v; }
+  void SetKind(ModeKind k) { kind = k; }
   void SetName(llvm::StringRef v) { name = v; }
 
+public:
+  ModeKind GetKind() { return kind; }
+  llvm::StringRef GetName() const { return name; }
+
+  bool IsOutput() {
+    switch (GetKind()) {
+    case ModeKind::EmitIR:
+    case ModeKind::EmitBC:
+    case ModeKind::EmitObject:
+    case ModeKind::EmitAssembly:
+    case ModeKind::EmitLibrary:
+    case ModeKind::EmitExecutable:
+      return true;
+    default:
+      return false;
+    }
+  }
+  static llvm::StringRef GetNameByKind(ModeKind kind);
+
 private:
-  Mode(unsigned mid) : mid(mid) {}
+  Mode(ModeKind kind) : kind(kind) {}
 };
 } // namespace stone
 #endif

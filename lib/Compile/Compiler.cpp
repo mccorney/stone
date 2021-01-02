@@ -30,6 +30,7 @@ bool Compiler::Build(llvm::ArrayRef<const char *> args) {
 
   return true;
 }
+ModeKind Compiler::GetDefaultModeKind() { return ModeKind::EmitObject; }
 
 void Compiler::PrintLifecycle() {}
 
