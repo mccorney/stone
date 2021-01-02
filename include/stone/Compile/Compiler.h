@@ -14,8 +14,21 @@ namespace stone {
 class CompilePipeline;
 
 namespace analysis {
-class CompileInputs {};
-class CompileOutputs {};
+
+struct CompileInputProfile final {};
+struct CompileOutputProfile final {};
+
+class CompileScope final {
+  CompileScope(const CompileScope &) = delete;
+  void operator=(const CompileScope &) = delete;
+
+public:
+  CompileScope();
+  ~CompileScope();
+  void Enter();
+  void Exit();
+  void Print();
+};
 
 class Compiler final : public Session {
   SrcMgr sm;

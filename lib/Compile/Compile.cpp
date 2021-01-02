@@ -3,7 +3,9 @@
 #include "stone/Compile/Backend.h"
 #include "stone/Compile/Compiler.h"
 #include "stone/Compile/Frontend.h"
+#include "stone/Core/Defer.h"
 #include "stone/Core/Ret.h"
+
 #include "stone/Public.h"
 #include "stone/Session/Options.h"
 
@@ -16,7 +18,6 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, CompilePipeline *pipeline) {
 
   Compiler compiler(pipeline);
-  // TODO: cleanup
   if (compiler.Build(args)) {
     compiler.Run();
     compiler.Finish();
@@ -24,19 +25,6 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
       return ret::err;
     }
   }
-  /*
-          switch(compiler.GetMode().GetID()){
-                  case opts::Parse:{
-                          break;
-                  }
-                  case opts::Check: {
-                          break;
-                  }
-                  default:
-                          break;
-          }
-
-  */
 
   // We are not passing the compiler directly, we are pass stone::Context
   auto llvmModule = stone::analysis::GenIR(
@@ -46,6 +34,8 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
   bool status = stone::backend::GenObject(
       llvmModule, compiler.compileOpts.genOpts,
       compiler.GetAnalysisContext().GetASTContext(), /*TODO*/ {});
+
+  STONE_DEFER{};
 
   return ret::ok;
 }
