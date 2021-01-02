@@ -15,7 +15,7 @@ class Token;
 class LangOptions;
 class CompilePipeline;
 
-namespace Frontend {
+namespace Analysis {
 class Token;
 
 enum class TriviaRetentionMode {
@@ -118,6 +118,6 @@ public:
 
   FileID GetSrcID() { return srcID; }
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 #endif

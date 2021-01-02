@@ -1,2 +1,2 @@
 
-1. Future structure: Core, Analysis (Lexer, Parser, Checker), Gen, Compile, Driver, Session
+1. Future structure: Core, AnalysisContext (Lexer, Parser, Checker), Gen, Compile, Driver, Session

@@ -8,13 +8,12 @@
 #include "stone/Core/Context.h"
 #include "stone/Core/Module.h"
 #include "stone/Core/Stats.h"
-
 #include <memory>
 
 namespace Stone {
 
 class CompilePipeline;
-namespace Frontend {
+namespace Analysis {
 class Parser;
 class ParserStats final : public Stats {
   const Parser &parser;
@@ -28,12 +27,12 @@ public:
 
 class Parser final {
   friend ParserStats;
-  Analysis &analysis;
+  AnalysisContext &analysis;
   ParserStats stats;
   CompilePipeline *pipeline;
 
 public:
-  Parser(Analysis &analysis, CompilePipeline *pipeline = nullptr);
+  Parser(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 
 public:
   // Decl
@@ -52,6 +51,6 @@ public:
   // Expr
   void ParseExpr();
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 #endif

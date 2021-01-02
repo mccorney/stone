@@ -1,3 +1,4 @@
+#include "stone/Compile/Analysis.h"
 #include "stone/Compile/Frontend.h"
 #include "stone/Compile/GenOptions.h"
 #include "stone/Compile/Transformer.h"
@@ -10,10 +11,10 @@
 
 using namespace Stone;
 using namespace Stone::Syntax;
-using namespace Stone::Frontend;
+using namespace Stone::Analysis;
 
-llvm::Module *Frontend::GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
-                                     const Stone::Context &ctx,
+llvm::Module *Stone::Analysis::GenIR(Syntax::ModuleDecl *moduleDecl,
+                                     const Context &ctx,
                                      const GenOptions &genOpts,
                                      llvm::StringRef outputModulename) {
 
@@ -23,7 +24,3 @@ llvm::Module *Frontend::GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
 
   return nullptr;
 }
-
-/// TODO:
-void OptimizeIR(llvm::Module *llvmModule, const GenOptions &genOpts,
-                llvm::TargetMachine *targetMachine) {}

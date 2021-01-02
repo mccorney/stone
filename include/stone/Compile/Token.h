@@ -7,7 +7,7 @@
 #include "llvm/ADT/StringRef.h"
 
 namespace Stone {
-namespace Frontend {
+namespace Analysis {
 class Token final {
   /// kind - The actual flavor of token this is.
   ///
@@ -213,12 +213,12 @@ public:
            "custom string delimiter length > 255");
   }
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 
 namespace llvm {
 template <typename T> struct isPodLike;
-template <> struct isPodLike<Stone::Frontend::Token> {
+template <> struct isPodLike<Stone::Analysis::Token> {
   static const bool value = true;
 };
 } // end namespace llvm

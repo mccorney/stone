@@ -2,10 +2,10 @@
 #define STONE_COMPILE_ANALYSISOPTIONS_H
 
 namespace Stone {
-namespace Frontend {
+namespace Analysis {
 class AnalysisOptions final {
 public:
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 #endif

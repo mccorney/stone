@@ -5,13 +5,13 @@
 
 using namespace Stone;
 using namespace Stone::Options;
-using namespace Stone::Frontend;
+using namespace Stone::Analysis;
 
 Compiler::Compiler(CompilePipeline *pipeline)
     : AbstractSession(compileOpts), pipeline(pipeline), fm(compileOpts.fsOpts),
       sm(GetDiagEngine(), fm) {
 
-  analysis.reset(new Analysis(*this, compileOpts, GetSrcMgr()));
+  analysis.reset(new AnalysisContext(*this, compileOpts, GetSrcMgr()));
 }
 
 void Compiler::ComputeMode(const llvm::opt::DerivedArgList &args) {

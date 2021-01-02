@@ -6,11 +6,11 @@
 #include <memory>
 
 namespace Stone {
-namespace Frontend {
+namespace Analysis {
 class ParserDiagnostics final : public Diagnostics {
 public:
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 
 #endif

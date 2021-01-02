@@ -11,18 +11,17 @@
 using namespace Stone::Syntax;
 
 namespace Stone {
-
 class CompilePipeline;
-namespace Frontend {
+
+namespace Analysis {
 class CompileInputs {};
 class CompileOutputs {};
 
 class Compiler final : public AbstractSession {
-
   SrcMgr sm;
   FileMgr fm;
   CompilePipeline *pipeline = nullptr;
-  std::unique_ptr<Analysis> analysis;
+  std::unique_ptr<AnalysisContext> analysis;
 
 public:
   CompileOptions compileOpts;
@@ -39,7 +38,7 @@ public:
   void PrintHelp(bool showHidden) override;
 
 public:
-  Analysis &GetAnalysis() { return *analysis.get(); }
+  AnalysisContext &GetAnalysisContext() { return *analysis.get(); }
 
   SearchPathOptions &GetSearchPathOptions() { return compileOpts.spOpts; }
   const SearchPathOptions &GetSearchPathOptions() const {
@@ -59,6 +58,6 @@ protected:
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 #endif

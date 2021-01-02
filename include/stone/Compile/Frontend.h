@@ -13,32 +13,31 @@ class TargetMachine;
 } // namespace llvm
 
 namespace Stone {
+class Context;
 class CompilePipeline;
 class GenOptions;
-class Context;
 
 namespace Syntax {
 class ModuleDecl;
 class ASTContext;
 } // namespace Syntax
 
-namespace Frontend {
-class Analysis;
+namespace Analysis {
+class AnalysisContext;
 
 /// Parse a source file
-int Parse(Analysis &analysis, CompilePipeline *pipeline = nullptr);
+int Parse(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 
 /// Perform type checking
-int Check(Analysis &analysis, CompilePipeline *pipeline = nullptr);
+int Check(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 
 /// May want to pass Module instead
 llvm::Module *GenIR(Stone::Syntax::ModuleDecl *moduleDecl,
                     const Stone::Context &ctx, const GenOptions &genOpts,
                     llvm::StringRef outputModulename);
 
-/// TODO:
 void OptimizeIR(llvm::Module *llvmModule, const GenOptions &genOpts,
                 llvm::TargetMachine *targetMachine);
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 #endif

@@ -3,18 +3,18 @@
 
 using namespace Stone;
 using namespace Stone::Syntax;
-using namespace Stone::Frontend;
+using namespace Stone::Analysis;
 
-Analysis::Analysis(const Stone::Context &ctx, const CompileOptions &compileOpts,
-                   SrcMgr &sm)
+AnalysisContext::AnalysisContext(const Context &ctx,
+                                 const CompileOptions &compileOpts, SrcMgr &sm)
     : ctx(ctx), compileOpts(compileOpts), sm(sm) {
 
   ac.reset(new ASTContext(ctx, compileOpts.spOpts, sm));
 }
 
-ModuleDecl *Analysis::GetMainModule() const {
+ModuleDecl *AnalysisContext::GetMainModule() const {
   assert(mainModule && "Null Main Module.");
   return mainModule;
 }
 
-void Analysis::SetMainModule(ModuleDecl *moduleDecl) {}
+void AnalysisContext::SetMainModule(ModuleDecl *moduleDecl) {}

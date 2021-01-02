@@ -11,9 +11,9 @@
 using namespace Stone::Syntax;
 
 namespace Stone {
-namespace Frontend {
+namespace Analysis {
 
-class Analysis final {
+class AnalysisContext final {
 private:
   SrcMgr &sm;
   const CompileOptions &compileOpts;
@@ -24,13 +24,13 @@ private:
   mutable ModuleDecl *mainModule = nullptr;
   // StatEngine se;
 public:
-  Analysis(const Stone::Context &ctx, const CompileOptions &compileOpts,
-           SrcMgr &sm);
+  AnalysisContext(const Stone::Context &ctx, const CompileOptions &compileOpts,
+                  SrcMgr &sm);
 
-  Analysis(const Analysis &) = delete;
-  Analysis(Analysis &&) = delete;
-  Analysis &operator=(const Analysis &) = delete;
-  Analysis &operator=(Analysis &&) = delete;
+  AnalysisContext(const AnalysisContext &) = delete;
+  AnalysisContext(AnalysisContext &&) = delete;
+  AnalysisContext &operator=(const AnalysisContext &) = delete;
+  AnalysisContext &operator=(AnalysisContext &&) = delete;
 
 public:
   ASTContext &GetASTContext() { return *ac.get(); }
@@ -45,6 +45,6 @@ public:
 
   // StatEngine &GetStats() { return *stats.get(); }
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 #endif

@@ -2,9 +2,9 @@
 #include "stone/Core/Ret.h"
 
 using namespace Stone;
-using namespace Stone::Frontend;
+using namespace Stone::Analysis;
 
-Parser::Parser(Analysis &analysis, CompilePipeline *pipeline)
+Parser::Parser(AnalysisContext &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}
 
 //===----------------------------------------------------------------------===//

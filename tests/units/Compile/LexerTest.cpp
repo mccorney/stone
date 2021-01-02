@@ -1,4 +1,4 @@
-#include "stone/Analysis/Lexer.h"
+#include "stone/AnalysisContext/Lexer.h"
 #include "stone/Core/LangOptions.h"
 #include "stone/Core/Mem.h"
 #include "stone/Core/SrcMgr.h"

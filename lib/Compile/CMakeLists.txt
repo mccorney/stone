@@ -1,4 +1,13 @@
-
+set( LLVM_LINK_COMPONENTS
+  ${LLVM_TARGETS_TO_BUILD}
+	BitReader
+	BinaryFormat
+  BitstreamReader
+  Support
+  Core
+  IPO
+  Option
+  )
 set(stone_compile_sources
 	Analysis.cpp
 	Backend.cpp
@@ -7,8 +16,9 @@ set(stone_compile_sources
 	Compile.cpp
 	CompileFile.cpp
 	Compiler.cpp
-	GenIR.cpp
+	Gen.cpp
 	Lexer.cpp
+	Optimize.cpp
 	Parse.cpp
 	Parser.cpp
 	Transformer.cpp

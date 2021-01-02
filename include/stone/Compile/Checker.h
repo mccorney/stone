@@ -14,7 +14,7 @@
 namespace Stone {
 class CompilePipeline;
 
-namespace Frontend {
+namespace Analysis {
 class Checker;
 
 class CheckerStats final : public Stats {
@@ -27,12 +27,12 @@ public:
 
 class Checker final {
   friend CheckerStats;
-  Analysis &analysis;
+  AnalysisContext &analysis;
   CheckerStats stats;
   CompilePipeline *pipeline;
 
 public:
-  Checker(Analysis &analysis, CompilePipeline *pipeline = nullptr);
+  Checker(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 
 public:
   void CheckDecl();
@@ -43,6 +43,6 @@ public:
 public:
   void CheckExpr();
 };
-} // namespace Frontend
+} // namespace Analysis
 } // namespace Stone
 #endif
