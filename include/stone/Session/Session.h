@@ -114,6 +114,9 @@ public:
   }
   std::string GetModuleName() { return moduleName; }
 
+  // TODO: You want to say
+  void AddFile();
+
 protected:
   // Compute the mode id -- TODO: virtual
   virtual void ComputeMode(const llvm::opt::DerivedArgList &args);

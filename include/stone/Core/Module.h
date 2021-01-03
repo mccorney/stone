@@ -2,9 +2,9 @@
 #define STONE_CORE_MODULE_H
 
 #include "stone/Core/ASTContext.h"
+#include "stone/Core/ASTScope.h"
 #include "stone/Core/Decl.h"
 #include "stone/Core/Identifier.h"
-#include "stone/Core/ASTScope.h"
 #include "stone/Core/LLVM.h"
 
 #include "llvm/ADT/SmallVector.h"
@@ -31,12 +31,13 @@ public:
 
 class SourceUnit final : public ModuleUnit {
 private:
-	friend ASTContext;
-	bool isMain; 
-	//llvm::NullablePtr<ASTScope> scope = nullptr;
+  friend ASTContext;
+  bool isMain;
+  // llvm::NullablePtr<ASTScope> scope = nullptr;
 
 public:
   enum class Kind { Library };
+
 public:
   SourceUnit::Kind kind;
 

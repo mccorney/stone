@@ -166,21 +166,30 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
 void Driver::BuildOutputs(const ToolChain &toolChain,
                           const llvm::opt::DerivedArgList &args,
                           const bool batchMode, const InputFiles &inputs,
-                          DriverOutputProfile &outputProfile) const {}
+                          BuildProfile &profile) const {}
 
 static void BuildEvent(Driver &driver) {}
 
 void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
-  if (outputProfile.compileType ==
-      DriverOutputProfile::CompileType::MultipleInvocation) {
-  } else if (outputProfile.compileType ==
-             DriverOutputProfile::CompileType::SingleInvocation) {
-  } else {
+  // TODO: Move into the Build*Events
+  if (profile.compileType == CompileType::MultipleInvocation) {
+    switch (mode.GetKind()) {
+    case ModeKind::Parse:
+    case ModeKind::Check:
+    case ModeKind::EmitIR:
+    case ModeKind::EmitBC:
+    case ModeKind::EmitObject:
+    case ModeKind::EmitLibrary:
+    case ModeKind::EmitAssembly:
+      return BuildCompileEvents();
+    default:
+      return BuildLinkEvent();
+    }
+  } else if (profile.compileType == CompileType::SingleInvocation) {
   }
 }
-
 ModeKind Driver::GetDefaultModeKind() { return ModeKind::EmitExecutable; }
 
 void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
@@ -249,6 +258,15 @@ void Driver::PrintHelp(bool showHidden) {
                                  includedFlagsBitmask, excludedFlagsBitmask,
                                  /*ShowAllAliases*/ false);
 }
+
+void Driver::BuildCompileEvents() {
+  // Go through the files and build the compile events
+}
+void Driver::BuildLinkEvent() {
+
+  // BuildCompileEvents();
+}
+
 int Driver::Run() {
   // Perform a quick help check
   if (driverOpts.showHelp) {

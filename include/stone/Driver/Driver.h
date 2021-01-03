@@ -39,20 +39,30 @@ class Process;
 class Compilation;
 class ToolChain;
 
-struct DriverInputProfile final {};
+enum class CompileType {
+  None,
+  /// Multiple compile invocations and -main-file.
+  MultipleInvocation,
+  /// A compilation using a single compile invocation without -main-file.
+  SingleInvocation,
+  /// Compile and execute the inputs immediately
+  ImmediateInvocation,
+};
+enum class LTOKind { None, Full, Thin, Unknown };
 
-struct DriverOutputProfile final {
+class BuildProfile final {
+public:
+  /// The Events which were used to build the Jobs.
+  llvm::SmallVector<std::unique_ptr<const Event>, 32> events;
 
-  enum class CompileType {
-    None,
-    /// Multiple compile invocations and -main-file.
-    MultipleInvocation,
-    /// A compilation using a single compile invocation without -main-file.
-    SingleInvocation,
-    /// Compile and execute the inputs immediately
-    ImmediateInvocation,
-  };
-  enum class LTOKind { None, Full, Thin, Unknown };
+  /// The Processes which will be executed by this compilation.
+  llvm::SmallVector<std::unique_ptr<const Process>, 32> procs;
+
+  /// The inputs for the linker -- may not need this there
+  llvm::SmallVector<const Event *, 2> linkerInputs;
+
+  /// Default compile type
+  CompileType compileType = CompileType::None;
 
   LTOKind ltoVariant = LTOKind::None;
 
@@ -68,8 +78,6 @@ struct DriverOutputProfile final {
 
   // Whether or not the driver should generate a module.
   bool generateModule = false;
-  /// Default compile type
-  CompileType compileType = CompileType::None;
 
   /// Default linking kind
   LinkType linkType = LinkType::None;
@@ -97,8 +105,7 @@ class Driver final : public Session {
   DriverCache cache;
   std::unique_ptr<ToolChain> toolChain;
   std::unique_ptr<Compilation> compilation;
-  DriverInputProfile inputProfile;
-  DriverOutputProfile outputProfile;
+  BuildProfile profile;
 
 public:
   /// The options for the driver
@@ -188,7 +195,7 @@ private:
   void BuildOutputs(const ToolChain &toolChain,
                     const llvm::opt::DerivedArgList &args, const bool batchMode,
                     const InputFiles &inputs /*TODO: DriverInputs*/,
-                    DriverOutputProfile &outputProfile) const;
+                    BuildProfile &profile) const;
 
   std::unique_ptr<Compilation>
   BuildCompilation(const ToolChain &toolChain,
@@ -225,11 +232,8 @@ public:
   const ToolChain &GetToolChain() const { return *toolChain.get(); }
   ToolChain &GetToolChain() { return *toolChain.get(); }
 
-  const DriverOutputProfile &GetOutputProfile() const { return outputProfile; }
-  DriverOutputProfile &GetOutputProfile() { return outputProfile; }
-
-  const DriverInputProfile &GetInputProfile() const { return inputProfile; }
-  DriverInputProfile &GetInputProfile() { return inputProfile; }
+  const BuildProfile &GetProfile() const { return profile; }
+  BuildProfile &GetProfile() { return profile; }
 
   const DriverCache &GetCache() const { return cache; }
   DriverCache &GetCache() { return cache; }
@@ -242,6 +246,20 @@ protected:
   /// arguments, after applying the standard argument translations.
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
+private:
+  // Build Events
+  void BuildCompileEvents();
+  void BuildCompileEvent(CompilationEvent &event);
+  //
+  void BuildLinkEvent();
+  void BuildStaticLinkEvent();
+  void BuildStaticLinkEvent(CompilationEvent &event); // Calls BuildProcForEvent
+
+  void BuildDynamicLinkEvent();
+  void BuildDynamicLinkEvent(CompilationEvent &event);
+
+  void BuildBackendEvent();
+  void BuildAssemblyEvent();
 };
 } // namespace driver
 } // namespace stone
