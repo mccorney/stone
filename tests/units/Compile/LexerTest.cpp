@@ -23,10 +23,10 @@ protected:
   std::unique_ptr<Lexer> CreateLexer(llvm::StringRef srcBuffer) {
 
     auto memBuffer = llvm::MemoryBuffer::getMemBuffer(srcBuffer);
-    auto mainFileID = sm.CreateFileID(std::move(memBuffer));
+    auto mainSrcID = sm.CreateSrcID(std::move(memBuffer));
 
-    sm.SetMainFileID(mainFileID);
-    auto lexer = llvm::make_unique<Lexer>(mainFileID, sm, langOpts /*de*/);
+    sm.SetMainSrcID(mainSrcID);
+    auto lexer = llvm::make_unique<Lexer>(mainSrcID, sm, langOpts /*de*/);
     return lexer;
   }
   std::vector<Token> Lex(llvm::StringRef srcBuffer) {

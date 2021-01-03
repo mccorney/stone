@@ -30,7 +30,7 @@ uint32_t ValidateUTF8CharAndAdvance(const char *&startOfByte, const char *end);
 
 class Lexer final {
 
-  const FileID srcID;
+  const SrcID srcID;
   SrcMgr &sm;
   const stone::Context &ctx;
 
@@ -96,7 +96,7 @@ private:
   tk GetKindOfIdentifier(StringRef tokStr);
 
 public:
-  Lexer(const FileID srcID, SrcMgr &sm, const stone::Context &ctx,
+  Lexer(const SrcID srcID, SrcMgr &sm, const Context &ctx,
         CompilePipeline *pipeline = nullptr);
 
 public:
@@ -116,7 +116,7 @@ public:
   }
   Token &Peek() { return nextToken; }
 
-  FileID GetSrcID() { return srcID; }
+  SrcID GetSrcID() { return srcID; }
 };
 } // namespace analysis
 } // namespace stone

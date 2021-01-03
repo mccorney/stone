@@ -74,9 +74,9 @@ class SrcLineTable {
   llvm::StringMap<unsigned, llvm::BumpPtrAllocator> FilenameIDs;
   std::vector<llvm::StringMapEntry<unsigned> *> FilenamesByID;
 
-  /// Map from FileIDs to a list of line entries (sorted by the offset
+  /// Map from SrcIDs to a list of line entries (sorted by the offset
   /// at which they occur in the file).
-  std::map<FileID, std::vector<SrcLine>> LineEntries;
+  std::map<SrcID, std::vector<SrcLine>> LineEntries;
 
 public:
   void clear() {
@@ -94,23 +94,23 @@ public:
 
   unsigned getNumFilenames() const { return FilenamesByID.size(); }
 
-  void AddLineNote(FileID FID, unsigned Offset, unsigned LineNo, int FilenameID,
+  void AddLineNote(SrcID FID, unsigned Offset, unsigned LineNo, int FilenameID,
                    unsigned EntryExit, src::CharacteristicKind FileKind);
 
   /// Find the line entry nearest to FID that is before it.
   ///
   /// If there is no line entry before \p Offset in \p FID, returns null.
-  const SrcLine *FindNearestSrcLine(FileID FID, unsigned Offset);
+  const SrcLine *FindNearestSrcLine(SrcID FID, unsigned Offset);
 
   // Low-level access
-  using iterator = std::map<FileID, std::vector<SrcLine>>::iterator;
+  using iterator = std::map<SrcID, std::vector<SrcLine>>::iterator;
 
   iterator begin() { return LineEntries.begin(); }
   iterator end() { return LineEntries.end(); }
 
   /// Add a new line entry that has already been encoded into
   /// the internal representation of the line table.
-  void AddEntry(FileID FID, const std::vector<SrcLine> &Entries);
+  void AddEntry(SrcID FID, const std::vector<SrcLine> &Entries);
 };
 
 } // namespace stone

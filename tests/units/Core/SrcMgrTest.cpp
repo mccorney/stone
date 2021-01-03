@@ -32,44 +32,44 @@ TEST_F(SrcMgrTest, GetColNumber) {
 
   auto memBuffer = llvm::MemoryBuffer::getMemBuffer(Source);
 
-  auto MainFileID = sm.CreateFileID(std::move(memBuffer));
-  sm.SetMainFileID(MainFileID);
+  auto MainSrcID = sm.CreateSrcID(std::move(memBuffer));
+  sm.SetMainSrcID(MainSrcID);
 
   bool Invalid;
 
   Invalid = false;
-  EXPECT_EQ(1U, sm.GetColNumber(MainFileID, 0, &Invalid));
+  EXPECT_EQ(1U, sm.GetColNumber(MainSrcID, 0, &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  EXPECT_EQ(5U, sm.GetColNumber(MainFileID, 4, &Invalid));
+  EXPECT_EQ(5U, sm.GetColNumber(MainSrcID, 4, &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  EXPECT_EQ(1U, sm.GetColNumber(MainFileID, 7, &Invalid));
+  EXPECT_EQ(1U, sm.GetColNumber(MainSrcID, 7, &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  EXPECT_EQ(5U, sm.GetColNumber(MainFileID, 11, &Invalid));
+  EXPECT_EQ(5U, sm.GetColNumber(MainSrcID, 11, &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  EXPECT_EQ(7U, sm.GetColNumber(MainFileID, strlen(Source), &Invalid));
+  EXPECT_EQ(7U, sm.GetColNumber(MainSrcID, strlen(Source), &Invalid));
   EXPECT_TRUE(!Invalid);
 
   Invalid = false;
-  sm.GetColNumber(MainFileID, strlen(Source) + 1, &Invalid);
+  sm.GetColNumber(MainSrcID, strlen(Source) + 1, &Invalid);
   EXPECT_TRUE(Invalid);
 
   // Test invalid files
   Invalid = false;
-  sm.GetColNumber(FileID(), 0, &Invalid);
+  sm.GetColNumber(SrcID(), 0, &Invalid);
   EXPECT_TRUE(Invalid);
 
   Invalid = false;
-  sm.GetColNumber(FileID(), 1, &Invalid);
+  sm.GetColNumber(SrcID(), 1, &Invalid);
   EXPECT_TRUE(Invalid);
 
   // Test with no invalid flag.
-  EXPECT_EQ(1U, sm.GetColNumber(MainFileID, 0, nullptr));
+  EXPECT_EQ(1U, sm.GetColNumber(MainSrcID, 0, nullptr));
 }

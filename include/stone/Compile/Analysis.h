@@ -20,9 +20,8 @@ private:
 
   std::unique_ptr<ASTContext> ac;
   const stone::Context &ctx;
-
   mutable Module *mainModule = nullptr;
-  // StatEngine se;
+
 public:
   Analysis(const stone::Context &ctx, const CompileOptions &compileOpts,
            SrcMgr &sm);

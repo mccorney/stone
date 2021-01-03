@@ -23,7 +23,7 @@ class SrcMgr;
 /// An opaque identifier used by SrcMgr which refers to a
 /// source file (MemoryBuffer) along with its \#include path and \#line data.
 ///
-class FileID {
+class SrcID {
   /// A mostly-opaque identifier, where 0 is "invalid", >0 is
   /// this module, and <-1 is something loaded from another module.
   int ID = 0;
@@ -32,20 +32,20 @@ public:
   bool isValid() const { return ID != 0; }
   bool isInvalid() const { return ID == 0; }
 
-  bool operator==(const FileID &RHS) const { return ID == RHS.ID; }
-  bool operator<(const FileID &RHS) const { return ID < RHS.ID; }
-  bool operator<=(const FileID &RHS) const { return ID <= RHS.ID; }
-  bool operator!=(const FileID &RHS) const { return !(*this == RHS); }
-  bool operator>(const FileID &RHS) const { return RHS < *this; }
-  bool operator>=(const FileID &RHS) const { return RHS <= *this; }
+  bool operator==(const SrcID &RHS) const { return ID == RHS.ID; }
+  bool operator<(const SrcID &RHS) const { return ID < RHS.ID; }
+  bool operator<=(const SrcID &RHS) const { return ID <= RHS.ID; }
+  bool operator!=(const SrcID &RHS) const { return !(*this == RHS); }
+  bool operator>(const SrcID &RHS) const { return RHS < *this; }
+  bool operator>=(const SrcID &RHS) const { return RHS <= *this; }
 
-  static FileID getSentinel() { return get(-1); }
+  static SrcID getSentinel() { return get(-1); }
   unsigned getHashValue() const { return static_cast<unsigned>(ID); }
 
 private:
   friend class SrcMgr;
-  static FileID get(int V) {
-    FileID F;
+  static SrcID get(int V) {
+    SrcID F;
     F.ID = V;
     return F;
   }
@@ -76,7 +76,7 @@ class SrcLoc {
   enum : unsigned { MacroIDBit = 1U << 31 };
 
 public:
-  bool isFileID() const { return (ID & MacroIDBit) == 0; }
+  bool isSrcID() const { return (ID & MacroIDBit) == 0; }
   bool isMacroID() const { return (ID & MacroIDBit) != 0; }
 
   /// Return true if this is a valid SrcLoc object.
@@ -150,8 +150,7 @@ public:
   }
 
   static bool isPairOfFileLocations(SrcLoc Start, SrcLoc End) {
-    return Start.isValid() && Start.isFileID() && End.isValid() &&
-           End.isFileID();
+    return Start.isValid() && Start.isSrcID() && End.isValid() && End.isSrcID();
   }
 
   void print(raw_ostream &OS, const SrcMgr &SM) const;
@@ -257,13 +256,13 @@ public:
 /// You can get a PresumedLoc from a SrcLoc with SrcMgr.
 class PresumedLoc {
   const char *Filename = nullptr;
-  FileID ID;
+  SrcID ID;
   unsigned Line, Col;
   SrcLoc IncludeLoc;
 
 public:
   PresumedLoc() = default;
-  PresumedLoc(const char *FN, FileID FID, unsigned Ln, unsigned Co, SrcLoc IL)
+  PresumedLoc(const char *FN, SrcID FID, unsigned Ln, unsigned Co, SrcLoc IL)
       : Filename(FN), ID(FID), Line(Ln), Col(Co), IncludeLoc(IL) {}
 
   /// Return true if this object is invalid or uninitialized.
@@ -281,7 +280,7 @@ public:
     return Filename;
   }
 
-  FileID getFileID() const {
+  SrcID getSrcID() const {
     assert(isValid());
     return ID;
   }
@@ -338,7 +337,7 @@ public:
     return *srcMgr;
   }
 
-  FileID getFileID() const;
+  SrcID getSrcID() const;
 
   FullSrcLoc getExpansionLoc() const;
   FullSrcLoc getSpellingLoc() const;
@@ -363,14 +362,14 @@ public:
   const SrcFile *getSrcFile() const;
 
   /// Return a StringRef to the source buffer data for the
-  /// specified FileID.
+  /// specified SrcID.
   StringRef getBufferData(bool *Invalid = nullptr) const;
 
-  /// Decompose the specified location into a raw FileID + Offset pair.
+  /// Decompose the specified location into a raw SrcID + Offset pair.
   ///
-  /// The first element is the FileID, the second is the offset from the
+  /// The first element is the SrcID, the second is the offset from the
   /// start of the buffer of the location.
-  std::pair<FileID, unsigned> getDecomposedLoc() const;
+  std::pair<SrcID, unsigned> getDecomposedLoc() const;
 
   bool isInSystemHeader() const;
 
@@ -414,20 +413,16 @@ public:
 
 namespace llvm {
 
-/// Define DenseMapInfo so that FileID's can be used as keys in DenseMap and
+/// Define DenseMapInfo so that SrcID's can be used as keys in DenseMap and
 /// DenseSets.
-template <> struct DenseMapInfo<stone::FileID> {
-  static stone::FileID getEmptyKey() { return {}; }
+template <> struct DenseMapInfo<stone::SrcID> {
+  static stone::SrcID getEmptyKey() { return {}; }
 
-  static stone::FileID getTombstoneKey() {
-    return stone::FileID::getSentinel();
-  }
+  static stone::SrcID getTombstoneKey() { return stone::SrcID::getSentinel(); }
 
-  static unsigned getHashValue(stone::FileID S) { return S.getHashValue(); }
+  static unsigned getHashValue(stone::SrcID S) { return S.getHashValue(); }
 
-  static bool isEqual(stone::FileID LHS, stone::FileID RHS) {
-    return LHS == RHS;
-  }
+  static bool isEqual(stone::SrcID LHS, stone::SrcID RHS) { return LHS == RHS; }
 };
 
 // Teach SmallPtrSet how to handle SrcLoc.

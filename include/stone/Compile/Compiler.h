@@ -43,13 +43,13 @@ class Compiler final : public Session {
     llvm::SetVector<unsigned> primaryBufferIDs;
 
           /// Return whether there is an entry in PrimaryInputs for buffer \p
-    BufID. bool IsPrimaryInput(FileID fileID) const { return
+    BufID. bool IsPrimaryInput(SrcID fileID) const { return
     primaryBufferIDs.count(fileID) != 0;
     }
 
     /// Record in PrimaryBufferIDs the fact that \p BufID is a primary.
     /// If \p BufID is already in the set, do nothing.
-    void RecordPrimaryInputBuffer(FileID fileID);
+    void RecordPrimaryInputBuffer(SrcID fileID);
   */
 
 private:

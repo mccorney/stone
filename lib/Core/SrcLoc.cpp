@@ -48,7 +48,7 @@ void SrcLoc::print(raw_ostream &OS, const SrcMgr &SM) const {
     return;
   }
 
-  if (isFileID()) {
+  if (isSrcID()) {
     PresumedLoc PLoc = SM.getPresumedLoc(*this);
 
     if (PLoc.isInvalid()) {
@@ -87,7 +87,7 @@ LLVM_DUMP_METHOD void SrcRange::dump(const SrcMgr &SM) const {
 
 static PresumedLoc PrintDifference(raw_ostream &OS, const SrcMgr &SM,
                                    SrcLoc Loc, PresumedLoc Previous) {
-  if (Loc.isFileID()) {
+  if (Loc.isSrcID()) {
 
     PresumedLoc PLoc = SM.getPresumedLoc(Loc);
 
@@ -137,9 +137,9 @@ LLVM_DUMP_METHOD std::string SrcRange::printToString(const SrcMgr &SM) const {
 // FullSrcLoc
 //===----------------------------------------------------------------------===//
 
-FileID FullSrcLoc::getFileID() const {
+SrcID FullSrcLoc::getSrcID() const {
   assert(isValid());
-  return srcMgr->getFileID(*this);
+  return srcMgr->getSrcID(*this);
 }
 
 FullSrcLoc FullSrcLoc::getExpansionLoc() const {
@@ -189,17 +189,17 @@ unsigned FullSrcLoc::getFileOffset() const {
 
 unsigned FullSrcLoc::GetLineNumber(bool *Invalid) const {
   assert(isValid());
-  return srcMgr->GetLineNumber(getFileID(), getFileOffset(), Invalid);
+  return srcMgr->GetLineNumber(getSrcID(), getFileOffset(), Invalid);
 }
 
 unsigned FullSrcLoc::GetColNumber(bool *Invalid) const {
   assert(isValid());
-  return srcMgr->GetColNumber(getFileID(), getFileOffset(), Invalid);
+  return srcMgr->GetColNumber(getSrcID(), getFileOffset(), Invalid);
 }
 
 const SrcFile *FullSrcLoc::getSrcFile() const {
   assert(isValid());
-  return srcMgr->getSrcFileForID(getFileID());
+  return srcMgr->getSrcFileForID(getSrcID());
 }
 
 unsigned FullSrcLoc::getExpansionLineNumber(bool *Invalid) const {
@@ -241,9 +241,9 @@ const char *FullSrcLoc::getCharacterData(bool *Invalid) const {
 
 StringRef FullSrcLoc::getBufferData(bool *Invalid) const {
   assert(isValid());
-  return srcMgr->getBuffer(srcMgr->getFileID(*this), Invalid)->getBuffer();
+  return srcMgr->getBuffer(srcMgr->getSrcID(*this), Invalid)->getBuffer();
 }
 
-std::pair<FileID, unsigned> FullSrcLoc::getDecomposedLoc() const {
+std::pair<SrcID, unsigned> FullSrcLoc::getDecomposedLoc() const {
   return srcMgr->getDecomposedLoc(*this);
 }
