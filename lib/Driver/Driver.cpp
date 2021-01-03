@@ -14,8 +14,7 @@ Driver::Driver(llvm::StringRef stoneExecutable, std::string driverName)
     : Session(driverOpts), stoneExecutablePath(stoneExecutablePath),
       driverName(driverName),
       /*sysRoot(DEFAULT_SYSROOT),*/
-      driverTitle("stone Compiler"), strSaver(bumpAlloc),
-      checkInputFilesExist(true) {}
+      driverTitle("Stone Compiler"), checkInputFilesExist(true) {}
 /// Parse the given list of strings into an InputArgList.
 bool Driver::Build(llvm::ArrayRef<const char *> args) {
 
@@ -109,7 +108,7 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
       // stdin must be handled specially.
       if (argValue.equals("-")) {
         // By default, treat stdin as Swift input.
-        ft = file::FileType::stone;
+        ft = file::FileType::Stone;
       } else {
         // Otherwise lookup by extension.
         ft = file::GetTypeByExt(file::GetExt(argValue));
@@ -125,7 +124,7 @@ void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
         inputs.push_back(std::make_pair(ft, arg));
       }
 
-      if (ft == file::FileType::stone) {
+      if (ft == file::FileType::Stone) {
         auto basename = llvm::sys::path::filename(argValue);
         if (!seenSourceFiles.insert({basename, argValue}).second) {
           Out() << "de.D(SourceLoc(),"
@@ -151,30 +150,54 @@ static void BuildEvent(Driver &driver) {}
 void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
-  // TODO: Move into the Build*Events
-  if (profile.compileType == CompileType::MultipleInvocation) {
-    switch (mode.GetKind()) {
-    case ModeKind::Parse:
-    case ModeKind::Check:
-    case ModeKind::EmitIR:
-    case ModeKind::EmitBC:
-    case ModeKind::EmitObject:
-    case ModeKind::EmitLibrary:
-    case ModeKind::EmitAssembly:
-      return BuildCompileEvents();
-    default:
-      return BuildLinkEvent();
-    }
-  } else if (profile.compileType == CompileType::SingleInvocation) {
+  if (mode.IsCompileOnly()) {
+    return BuildCompileEvents(*compilation.get());
+  } else {
+    return BuildLinkEvent();
   }
 }
+
+void Driver::BuildCompileEvent(Compilation &compilation, Event *ie) {
+
+  // if (profile.compileType == CompileType::MultipleInvocation) {
+  //   } else if (profile.compileType == CompileType::SingleInvocation) {
+  //}
+  auto ce =
+      compilation.CreateEvent<CompileEvent>(ie, profile.compilerOutputFileType);
+}
+
+void Driver::BuildCompileEvents(Compilation &compilation) {
+  // Go through the files and build the compile events
+
+  for (const InputPair &input : profile.inputFiles) {
+    // BuildCompileEvent(input);
+    file::FileType inputType = input.first;
+    const llvm::opt::Arg *inputArg = input.second;
+    auto ie = compilation.CreateEvent<InputEvent>(*inputArg, inputType);
+
+    switch (inputType) {
+    case file::FileType::Stone: {
+      assert(file::IsPartOfCompilation(inputType));
+      BuildCompileEvent(compilation, ie);
+    }
+    default:
+      break;
+    }
+  }
+}
+
+void Driver::BuildLinkEvent() {
+
+  // BuildCompileEvents();
+}
+
 ModeKind Driver::GetDefaultModeKind() { return ModeKind::EmitExecutable; }
 
 void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
   Session::ComputeMode(args);
 }
-static void BuildProc(Driver &driver) {}
-void Driver::BuildProcs() {}
+static void BuildJob(Driver &driver) {}
+void Driver::BuildJobs() {}
 
 std::unique_ptr<Compilation>
 Driver::BuildCompilation(const ToolChain &tc,
@@ -200,9 +223,7 @@ Driver::BuildCompilation(const ToolChain &tc,
     return nullptr;
   }
 
-  // Construct the list of inputs.
-  InputFiles inputs;
-  BuildInputs(tc, *dArgList, inputs);
+  BuildInputs(tc, *dArgList, profile.inputFiles);
 
   if (de.HasError())
     return nullptr;
@@ -222,7 +243,9 @@ Driver::BuildCompilation(const ToolChain &tc,
 
   driverOpts.showLifecycle = argList.hasArg(opts::ShowLifecycle);
 
-  std::unique_ptr<Compilation> compilation(new Compilation(*this, tc));
+  compilation.reset(new Compilation(*this));
+
+  BuildEvents();
 }
 
 void Driver::PrintLifecycle() {}
@@ -232,17 +255,9 @@ void Driver::PrintHelp(bool showHidden) {
   // if (!showHidden)
   //  excludedFlagsBitmask |= HelpHidden;
 
-  driverOpts.GetOpts().PrintHelp(Out(), driverName.c_str(), "stone Compiler",
+  driverOpts.GetOpts().PrintHelp(Out(), driverName.c_str(), "Stone Compiler",
                                  includedFlagsBitmask, excludedFlagsBitmask,
                                  /*ShowAllAliases*/ false);
-}
-
-void Driver::BuildCompileEvents() {
-  // Go through the files and build the compile events
-}
-void Driver::BuildLinkEvent() {
-
-  // BuildCompileEvents();
 }
 
 int Driver::Run() {

@@ -49,6 +49,9 @@ enum class LTOKind { None, Full, Thin, Unknown };
 
 class BuildProfile final {
 public:
+  /// All of the input files that have been created
+  InputFiles inputFiles;
+
   /// The Events which were used to build the Jobs.
   llvm::SmallVector<std::unique_ptr<const Event>, 32> events;
 
@@ -83,11 +86,21 @@ public:
 
   /// The output type which should be used for the compiler
   file::FileType compilerOutputFileType = file::FileType::INVALID;
+
+public:
+  class ModuleInputs final {
+  private:
+    llvm::SmallVector<const Event *, 2> inputs;
+  };
+  class LinkerInputs final {
+  private:
+    llvm::SmallVector<const Event *, 2> inputs;
+  };
 };
 
 class DriverCache final {
 public:
-  /// A map for caching Procs for a given Event/ToolChain pair
+  /// A map for caching Jobs for a given Event/ToolChain pair
   llvm::DenseMap<std::pair<const Event *, const ToolChain *>, Job *>
       procChacheMap;
   /// Cache of all the ToolChains in use by the driver.
@@ -153,18 +166,12 @@ private:
   /// processes.
   unsigned checkInputFilesExist : 1;
 
-  /// Allocator for string saver.
-  llvm::BumpPtrAllocator bumpAlloc;
-
-  /// Object that stores strings read from configuration file.
-  llvm::StringSaver strSaver;
-
   /// Arguments originated from configuration file.
   std::unique_ptr<llvm::opt::InputArgList> cfgOpts;
 
 private:
   void BuildEvents();
-  void BuildProcs();
+  void BuildJobs();
   void BuildQueue();
 
   /// This uses a std::unique_ptr instead of returning a toolchain by value
@@ -245,8 +252,8 @@ protected:
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 private:
   // Build Events
-  void BuildCompileEvents();
-  void BuildCompileEvent(CompilationEvent &event);
+  void BuildCompileEvents(Compilation &compilation);
+  void BuildCompileEvent(Compilation &compilation, Event *ie);
   //
   void BuildLinkEvent();
   void BuildStaticLinkEvent();

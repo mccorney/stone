@@ -55,7 +55,8 @@ public:
   const char *GetName(Event::Kind kind);
 
 private:
-  /// Events must be created through Compilation::CreateEvent.
+  friend class Compilation;
+  /// Events must be created through Compilation::CreateEvent...
   void *operator new(size_t size) { return ::operator new(size); };
 };
 
@@ -74,8 +75,6 @@ public:
   }
 };
 
-class InputProfile {};
-
 class CompilationEvent : public Event {
   bool async = false;
   // A list of user events
@@ -83,7 +82,7 @@ class CompilationEvent : public Event {
 
 public:
   CompilationEvent(Event::Kind kind, llvm::ArrayRef<const Event *> inputs,
-                   file::FileType ty, InputProfile inputProfile)
+                   file::FileType ty)
       : Event(kind, ty), inputs(inputs) {}
   bool IsAsync() { return async; }
 
@@ -111,12 +110,10 @@ public:
 class CompileEvent final : public CompilationEvent {
 public:
   CompileEvent(file::FileType outputType)
-      : CompilationEvent(Event::Kind::Compile, llvm::None, outputType, {}) {}
+      : CompilationEvent(Event::Kind::Compile, llvm::None, outputType) {}
 
-  CompileEvent(Event *input, file::FileType outputType,
-               InputProfile inputProfile)
-      : CompilationEvent(Event::Kind::Compile, input, outputType,
-                         inputProfile) {}
+  CompileEvent(Event *input, file::FileType outputType)
+      : CompilationEvent(Event::Kind::Compile, input, outputType) {}
 
   static bool classof(const Event *e) {
     return e->GetKind() == Event::Kind::Compile;
@@ -151,7 +148,7 @@ private:
 
 public:
   BackendEvent(const Event *input, file::FileType outputType, size_t inputIndex)
-      : CompilationEvent(Event::Kind::Backend, input, outputType, {}),
+      : CompilationEvent(Event::Kind::Backend, input, outputType),
         inputIndex(inputIndex) {}
 
   static bool classof(const Event *e) {
@@ -168,7 +165,7 @@ public:
   DynamicLinkEvent(llvm::ArrayRef<const Event *> inputs, LinkType linkType,
                    bool shouldPerformLTO)
       : CompilationEvent(Event::Kind::DynamicLink, inputs,
-                         file::FileType::Image, {}),
+                         file::FileType::Image),
         linkType(linkType), shouldPerformLTO(shouldPerformLTO) {
 
     assert(linkType != LinkType::None && linkType != LinkType::StaticLibrary);
@@ -187,8 +184,8 @@ class StaticLinkEvent : public CompilationEvent {
 
 public:
   StaticLinkEvent(ArrayRef<const Event *> inputs, LinkType linkType)
-      : CompilationEvent(Event::Kind::StaticLink, inputs, file::FileType::Image,
-                         {}),
+      : CompilationEvent(Event::Kind::StaticLink, inputs,
+                         file::FileType::Image),
         linkType(linkType) {
     assert(linkType == LinkType::StaticLibrary);
   }
@@ -201,7 +198,7 @@ class AssembleEvent final : public CompilationEvent {
 
 public:
   AssembleEvent(const Event *input, file::FileType outputType)
-      : CompilationEvent(Event::Kind::Assemble, input, outputType, {}) {}
+      : CompilationEvent(Event::Kind::Assemble, input, outputType) {}
 
   static bool classof(const Event *e) {
     return e->GetKind() == Event::Kind::Assemble;

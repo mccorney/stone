@@ -19,6 +19,7 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
 
   Compiler compiler(pipeline);
   if (compiler.Build(args)) {
+    assert(compiler.GetMode().IsCompileOnly() && "Not a compile mode");
     compiler.Run();
     compiler.Finish();
     if (compiler.GetDiagEngine().HasError()) {

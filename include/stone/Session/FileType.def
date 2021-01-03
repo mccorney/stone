@@ -1,7 +1,7 @@
 // Input types
 // We are using cpp for the time being
 //
-FILE_TYPE("stone",		stone,      "stone", "")
+FILE_TYPE("stone",		Stone,      "stone", "")
 FILE_TYPE("image",	  Image,      "out",   "")
 FILE_TYPE("object",   Object,     "o",    "")
 FILE_TYPE("assembly", Assembly,   "s", "")

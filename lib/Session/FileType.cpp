@@ -50,9 +50,9 @@ file::FileType file::GetTypeByName(llvm::StringRef Name) {
       .Default(file::FileType::INVALID);
 }
 
-bool file::IsTextual(file::FileType FK) {
-  switch (FK) {
-  case file::FileType::stone:
+bool file::IsTextual(file::FileType ty) {
+  switch (ty) {
+  case file::FileType::Stone:
   case file::FileType::Assembly:
   case file::FileType::IR:
     return true;
@@ -69,14 +69,14 @@ bool file::IsTextual(file::FileType FK) {
   llvm_unreachable("All switch cases are covered");
 }
 
-bool file::IsAfterLLVM(file::FileType FK) {
-  switch (FK) {
+bool file::IsAfterLLVM(file::FileType ty) {
+  switch (ty) {
   case file::FileType::Assembly:
   case file::FileType::IR:
   case file::FileType::BC:
   case file::FileType::Object:
     return true;
-  case file::FileType::stone:
+  case file::FileType::Stone:
   case file::FileType::Image:
   case file::FileType::None:
     return false;
@@ -88,9 +88,9 @@ bool file::IsAfterLLVM(file::FileType FK) {
   llvm_unreachable("All switch cases are covered");
 }
 
-bool file::IsPartOfCompilation(file::FileType FK) {
-  switch (FK) {
-  case file::FileType::stone:
+bool file::IsPartOfCompilation(file::FileType ty) {
+  switch (ty) {
+  case file::FileType::Stone:
     return true;
   case file::FileType::Assembly:
   case file::FileType::IR:

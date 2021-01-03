@@ -11,6 +11,7 @@ enum class ModeKind {
   EmitBC,
   EmitObject,
   EmitLibrary,
+  EmitModuleOnly,
   EmitAssembly,
   EmitExecutable
 };
@@ -33,8 +34,24 @@ public:
     case ModeKind::EmitBC:
     case ModeKind::EmitObject:
     case ModeKind::EmitAssembly:
+    case ModeKind::EmitModuleOnly:
     case ModeKind::EmitLibrary:
     case ModeKind::EmitExecutable:
+      return true;
+    default:
+      return false;
+    }
+  }
+  bool IsCompileOnly() {
+    switch (GetKind()) {
+    case ModeKind::Parse:
+    case ModeKind::Check:
+    case ModeKind::EmitIR:
+    case ModeKind::EmitBC:
+    case ModeKind::EmitObject:
+    case ModeKind::EmitModuleOnly:
+    case ModeKind::EmitLibrary:
+    case ModeKind::EmitAssembly:
       return true;
     default:
       return false;

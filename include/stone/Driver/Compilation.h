@@ -36,10 +36,6 @@ class Compilation final {
   /// The System we were created by.
   const Driver &driver;
 
-  // TODO: Move to DriverProfile
-  /// The default tool chain.
-  const ToolChain &tc;
-
   /// Temporary files which should be removed on exit.
   llvm::opt::ArgStringList tempFiles;
 
@@ -57,10 +53,10 @@ class Compilation final {
   EventList events;
 
   /// A list of all the procs
-  JobList procs;
+  JobList jobs;
 
 public:
-  Compilation(Driver &driver, const ToolChain &tc);
+  Compilation(Driver &driver);
   ~Compilation();
 
 public:
@@ -76,10 +72,10 @@ public:
   EventList &GetEvents() { return events; }
   const EventList &GetEvents() const { return events; }
 
-  JobList &GetProcs() { return procs; }
-  const JobList &GetProcs() const { return procs; }
+  JobList &GetJobs() { return jobs; }
+  const JobList &GetJobs() const { return jobs; }
 
-  void AddProc(std::unique_ptr<Job> proc) { procs.Add(std::move(proc)); }
+  void AddJob(std::unique_ptr<Job> job) { jobs.Add(std::move(job)); }
 
   /// addTempFile - Add a file to remove on exit, and returns its
   /// argument.
@@ -107,17 +103,15 @@ public:
   /// \param fallBackProc - For non-zero results, this will be set to the
   /// Command which failed, if any.
   /// \return The result code of the subprocess.
-  int ExecuteProc(const Job &proc, const Job *&fallBackProc) const;
+  int ExecuteJob(const Job &job, const Job *&fallBackJob) const;
 
   /// ExecuteProc - Execute a single job.
   ///
   /// \param fallBackProc - For non-zero results, this will be a vector of
   /// failing commands and their associated result code.
-  void ExecuteProcs(
-      const JobList &procs,
+  void ExecuteJobs(
+      const JobList &jobss,
       llvm::SmallVectorImpl<std::pair<int, const Job *>> &fallBackProcs) const;
-
-  ToolChain const &GetToolChain() const { return tc; }
 };
 } // namespace driver
 } // namespace stone

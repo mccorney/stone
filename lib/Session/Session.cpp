@@ -7,7 +7,7 @@ using namespace llvm::opt;
 Session::Session(SessionOptions &sessionOpts)
     : sessionOpts(sessionOpts), mode(ModeKind::None),
       targetTriple(llvm::sys::getDefaultTargetTriple()),
-      fileSystem(llvm::vfs::getRealFileSystem()) {
+      fileSystem(llvm::vfs::getRealFileSystem()), strSaver(bumpAlloc) {
 
   startTime = std::chrono::system_clock::now();
 }

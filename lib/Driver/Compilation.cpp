@@ -33,7 +33,6 @@ using namespace stone::driver;
 
 using namespace llvm::opt;
 
-Compilation::Compilation(Driver &driver, const ToolChain &tc)
-    : driver(driver), tc(tc) {}
+Compilation::Compilation(Driver &driver) : driver(driver) {}
 
 Compilation::~Compilation() {}

@@ -34,6 +34,12 @@
 
 namespace stone {
 
+/// An input argument from the command line and its inferred type.
+using InputPair = std::pair<file::FileType, const llvm::opt::Arg *>;
+
+/// Type used for a list of input arguments.
+using InputFiles = llvm::SmallVector<InputPair, 16>;
+
 enum class SessionKind { Compiler, Driver };
 
 class Session : public Context {
@@ -66,13 +72,10 @@ protected:
   /// Allocator for Compiles
   mutable llvm::BumpPtrAllocator bumpAlloc;
 
+  /// Object that stores strings read from configuration file.
+  llvm::StringSaver strSaver;
+
 public:
-  /// An input argument from the command line and its inferred type.
-  using InputPair = std::pair<file::FileType, const llvm::opt::Arg *>;
-
-  /// Type used for a list of input arguments.
-  using InputFiles = llvm::SmallVector<InputPair, 16>;
-
   void SetFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs) {
     fileSystem = fs;
   }
@@ -121,11 +124,11 @@ public:
   Mode &GetMode();
 
   /// The original (untranslated) input argument list.
-  llvm::opt::InputArgList &GetoriginalArgs() { return *originalArgs.get(); }
+  llvm::opt::InputArgList &GetOriginalArgs() { return *originalArgs.get(); }
 
   /// The driver translated arguments. Note that toolchains may perform their
   /// own argument translation.
-  llvm::opt::DerivedArgList &GettranslatedArgs() {
+  llvm::opt::DerivedArgList &GetTranslatedArgs() {
     return *translatedArgs.get();
   }
   std::string GetModuleName() { return moduleName; }
