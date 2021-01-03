@@ -193,7 +193,6 @@ void Driver::BuildOutputs(const ToolChain &toolChain,
                           const bool batchMode, const InputFiles &inputs,
                           BuildProfile &profile) const {}
 
-static void BuildEvent(Driver &driver) {}
 
 ModeKind Driver::GetDefaultModeKind() { return ModeKind::EmitExecutable; }
 

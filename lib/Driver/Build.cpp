@@ -5,30 +5,16 @@
 using namespace stone;
 using namespace stone::driver; 
 
-
 void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
   if (mode.IsCompileOnly()) {
-    return BuildCompileEvents(*compilation.get());
+    BuildCompileEvents(*compilation.get(), nullptr /*No linking*/);
   } else {
-    return BuildLinkEvent();
+		BuildLinkEvent();
   }
 }
-
-void Driver::BuildCompileEvent(Compilation &compilation, Event *ie) {
-
-  // if (profile.compileType == CompileType::MultipleInvocation) {
-  //   } else if (profile.compileType == CompileType::SingleInvocation) {
-  //}
-  auto ce =
-      compilation.CreateEvent<CompileEvent>(ie, profile.compilerOutputFileType);
-
-  // Since we are here, let us build the jobs.
-  BuildJobsForCompileEvent(compilation, ce);
-}
-
-void Driver::BuildCompileEvents(Compilation &compilation) {
+void Driver::BuildCompileEvents(Compilation &compilation, Event* le) {
   // Go through the files and build the compile events
 
   for (const InputPair &input : profile.inputFiles) {
@@ -40,13 +26,26 @@ void Driver::BuildCompileEvents(Compilation &compilation) {
     switch (inputType) {
     case file::FileType::Stone: {
       assert(file::IsPartOfCompilation(inputType));
-      BuildCompileEvent(compilation, ie);
+      BuildCompileEvent(compilation, le, ie);
     }
     default:
       break;
     }
   }
 }
+
+void Driver::BuildCompileEvent(Compilation &compilation, Event* le, Event *ie) {
+
+  // if (profile.compileType == CompileType::MultipleInvocation) {
+  //   } else if (profile.compileType == CompileType::SingleInvocation) {
+  //}
+  auto ce =
+      compilation.CreateEvent<CompileEvent>(ie, profile.compilerOutputFileType);
+
+  // Since we are here, let us build the jobs.
+  BuildJobsForCompileEvent(compilation, ce);
+}
+
 void Driver::BuildJobsForCompileEvent(Compilation &compilation, const CompileEvent *ce) {
 
 
