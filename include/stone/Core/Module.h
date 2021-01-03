@@ -2,6 +2,8 @@
 #define STONE_CORE_MODULE_H
 
 #include "stone/Core/Decl.h"
+#include "stone/Core/Identifier.h"
+#include "stone/Core/ASTContext.h"
 
 #include "llvm/ADT/SmallVector.h"
 
@@ -26,6 +28,9 @@ public:
 };
 
 class Module final : public DeclContext, public TypeDecl {
+private:
+	Module(Identifier name, ASTContext &astContext);
+
 public:
   llvm::SmallVector<ModuleUnit *, 2> units;
 
