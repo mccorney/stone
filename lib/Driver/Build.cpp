@@ -3,7 +3,7 @@
 #include "stone/Driver/ToolChain.h"
 
 using namespace stone;
-using namespace stone::driver; 
+using namespace stone::driver;
 
 void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
@@ -11,10 +11,11 @@ void Driver::BuildEvents() {
   if (mode.IsCompileOnly()) {
     BuildCompileEvents(*compilation.get(), nullptr /*No linking*/);
   } else {
-		BuildLinkEvent();
+    BuildLinkEvent();
   }
 }
-void Driver::BuildCompileEvents(Compilation &compilation, Event* le) {
+void Driver::BuildCompileEvents(Compilation &compilation,
+                                CompilationEvent *le) {
   // Go through the files and build the compile events
 
   for (const InputPair &input : profile.inputFiles) {
@@ -34,7 +35,8 @@ void Driver::BuildCompileEvents(Compilation &compilation, Event* le) {
   }
 }
 
-void Driver::BuildCompileEvent(Compilation &compilation, Event* le, Event *ie) {
+void Driver::BuildCompileEvent(Compilation &compilation, CompilationEvent *le,
+                               InputEvent *ie) {
 
   // if (profile.compileType == CompileType::MultipleInvocation) {
   //   } else if (profile.compileType == CompileType::SingleInvocation) {
@@ -46,10 +48,8 @@ void Driver::BuildCompileEvent(Compilation &compilation, Event* le, Event *ie) {
   BuildJobsForCompileEvent(compilation, ce);
 }
 
-void Driver::BuildJobsForCompileEvent(Compilation &compilation, const CompileEvent *ce) {
-
-
-}
+void Driver::BuildJobsForCompileEvent(Compilation &compilation,
+                                      const CompileEvent *ce) {}
 
 void Driver::BuildLinkEvent() {
 

@@ -193,7 +193,6 @@ void Driver::BuildOutputs(const ToolChain &toolChain,
                           const bool batchMode, const InputFiles &inputs,
                           BuildProfile &profile) const {}
 
-
 ModeKind Driver::GetDefaultModeKind() { return ModeKind::EmitExecutable; }
 
 void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
