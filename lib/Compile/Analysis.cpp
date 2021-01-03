@@ -1,5 +1,5 @@
-#include "stone/Compile/Analysis.h"
 #include "stone/Core/Mem.h"
+#include "stone/Compile/Analysis.h"
 
 using namespace stone;
 using namespace stone::syntax;

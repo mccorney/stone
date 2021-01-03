@@ -3,7 +3,7 @@
 
 #include "stone/Core/LLVM.h"
 #include "stone/Core/Mem.h"
-#include "stone/Driver/Process.h"
+#include "stone/Driver/Job.h"
 #include "stone/Session/FileType.h"
 #include "stone/Session/Mode.h"
 #include "stone/Session/Options.h"
@@ -83,11 +83,11 @@ public:
   ~ClangTool();
 };
 
-class stoneTool final : public Tool {
+class StoneTool final : public Tool {
 public:
-  stoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
+  StoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
             const ToolChain &toolChain);
-  ~stoneTool();
+  ~StoneTool();
 };
 
 class GCCTool final : public Tool {
@@ -148,7 +148,7 @@ protected:
   std::unique_ptr<StaticLinkTool> dynamicLinkTool;
   std::unique_ptr<AssembleTool> assembleTool;
   std::unique_ptr<GCCTool> gccTool;
-  std::unique_ptr<stoneTool> stoneTool;
+  std::unique_ptr<StoneTool> StoneTool;
 
 public:
   virtual ~ToolChain() = default;
@@ -156,13 +156,13 @@ public:
   const Driver &GetDriver() const { return driver; }
   const llvm::Triple &GetTriple() const { return triple; }
 
-  /// Construct a Process for the action \p JA, taking the given information
+  /// Construct a Job for the action \p JA, taking the given information
   /// into account.
   ///
   /// This method dispatches to the various \c constructInvocation methods,
   /// which may be overridden by platform-specific subclasses.
-  std::unique_ptr<Process> CreateProc(/*const CompilationEvent &event, Compilation &compilation,
-                                    llvm::SmallVectorImpl<const Process *> &&procs,
+  std::unique_ptr<Job> CreateJob(/*const CompilationEvent &event, Compilation &compilation,
+                                    llvm::SmallVectorImpl<const Job *> &&jobs,
                                     ArrayRef<const Event *> events,
                                     std::unique_ptr<CommandOutput> output,
                                     const OutputInfo &OI*/) const;
@@ -188,7 +188,7 @@ public:
   virtual Tool *BuildDynamicLinkTool() const = 0;
   virtual Tool *BuildStaticLinkTool() const = 0;
   virtual Tool *BuildGCCTool() const = 0;
-  virtual Tool *BuildstoneTool() const = 0;
+  virtual Tool *BuildStoneTool() const = 0;
   virtual Tool *GetTool(ModeKind kind) const = 0;
 };
 
@@ -206,7 +206,7 @@ public:
   Tool *BuildDynamicLinkTool() const override;
   Tool *BuildStaticLinkTool() const override;
   Tool *BuildGCCTool() const override;
-  Tool *BuildstoneTool() const override;
+  Tool *BuildStoneTool() const override;
 
   Tool *GetTool(ModeKind kind) const override;
 };

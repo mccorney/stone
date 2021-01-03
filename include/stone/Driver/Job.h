@@ -1,5 +1,5 @@
-#ifndef STONE_DRIVER_PROCESS_H
-#define STONE_DRIVER_PROCESS_H
+#ifndef STONE_DRIVER_JOB_H
+#define STONE_DRIVER_JOB_H
 
 #include "stone/Core/List.h"
 #include "stone/Driver/CrashCondition.h"
@@ -15,10 +15,10 @@ namespace stone {
 namespace driver {
 
 class Driver;
-// class ProcessOutput {
+// class JobOutput {
 //};
 
-class Process {
+class Job {
   friend class Compilation;
 
   Driver &driver;
@@ -28,9 +28,9 @@ class Process {
   llvm::opt::ArgStringList inputFiles;
 
 public:
-  Process(CompilationEvent &trigger, Driver &driver)
+  Job(CompilationEvent &trigger, Driver &driver)
       : trigger(trigger), driver(driver) {}
-  virtual ~Process();
+  virtual ~Job();
 
 public:
   CompilationEvent &GetTrigger() { return trigger; }
@@ -47,7 +47,7 @@ public:
               std::string *errMsg, bool *failed) const;
 
 public:
-  // llvm::SmallVector<Process *, 10> deps;
+  // llvm::SmallVector<Job *, 10> deps;
   //
   /// Set an input file list, necessary if you specified an RF_FileList response
   /// file support.
@@ -56,10 +56,10 @@ public:
   }
 };
 
-class SyncProcess : public Process {};
-class AsyncProcess : public Process {};
+class SyncJob : public Job {};
+class AsyncJob : public Job {};
 
-class ProcessList final : public List<Process> {
+class JobList final : public List<Job> {
 public:
   void Print() const;
 };

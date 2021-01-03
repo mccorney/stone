@@ -35,7 +35,7 @@ namespace stone {
 namespace driver {
 
 class Event;
-class Process;
+class Job;
 class Compilation;
 class ToolChain;
 
@@ -55,8 +55,8 @@ public:
   /// The Events which were used to build the Jobs.
   llvm::SmallVector<std::unique_ptr<const Event>, 32> events;
 
-  /// The Processes which will be executed by this compilation.
-  llvm::SmallVector<std::unique_ptr<const Process>, 32> procs;
+  /// The Jobes which will be executed by this compilation.
+  llvm::SmallVector<std::unique_ptr<const Job>, 32> procs;
 
   /// The inputs for the linker -- may not need this there
   llvm::SmallVector<const Event *, 2> linkerInputs;
@@ -91,7 +91,7 @@ public:
 class DriverCache final {
 public:
   /// A map for caching Procs for a given Event/ToolChain pair
-  llvm::DenseMap<std::pair<const Event *, const ToolChain *>, Process *>
+  llvm::DenseMap<std::pair<const Event *, const ToolChain *>, Job *>
       procChacheMap;
   /// Cache of all the ToolChains in use by the driver.
   ///

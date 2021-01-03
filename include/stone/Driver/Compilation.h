@@ -3,7 +3,7 @@
 
 #include "stone/Core/LLVM.h"
 #include "stone/Driver/Event.h"
-#include "stone/Driver/ProcessQueue.h"
+#include "stone/Driver/JobQueue.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
@@ -57,7 +57,7 @@ class Compilation final {
   EventList events;
 
   /// A list of all the procs
-  ProcessList procs;
+  JobList procs;
 
 public:
   Compilation(Driver &driver, const ToolChain &tc);
@@ -76,10 +76,10 @@ public:
   EventList &GetEvents() { return events; }
   const EventList &GetEvents() const { return events; }
 
-  ProcessList &GetProcs() { return procs; }
-  const ProcessList &GetProcs() const { return procs; }
+  JobList &GetProcs() { return procs; }
+  const JobList &GetProcs() const { return procs; }
 
-  void AddProc(std::unique_ptr<Process> proc) { procs.Add(std::move(proc)); }
+  void AddProc(std::unique_ptr<Job> proc) { procs.Add(std::move(proc)); }
 
   /// addTempFile - Add a file to remove on exit, and returns its
   /// argument.
@@ -101,20 +101,20 @@ public:
   bool PurgeFiles(const llvm::opt::ArgStringList &files,
                   bool issueErrors = false) const;
 
-  // bool ExecuteProcs(std::unique_ptr<stone::ProcessQueue> &&queue);
+  // bool ExecuteProcs(std::unique_ptr<stone::JobQueue> &&queue);
   /// ExecuteProc - Execute an actual command.
   ///
   /// \param fallBackProc - For non-zero results, this will be set to the
   /// Command which failed, if any.
   /// \return The result code of the subprocess.
-  int ExecuteProc(const Process &proc, const Process *&fallBackProc) const;
+  int ExecuteProc(const Job &proc, const Job *&fallBackProc) const;
 
   /// ExecuteProc - Execute a single job.
   ///
   /// \param fallBackProc - For non-zero results, this will be a vector of
   /// failing commands and their associated result code.
-  void ExecuteProcs(const ProcessList &procs,
-                    llvm::SmallVectorImpl<std::pair<int, const Process *>>
+  void ExecuteProcs(const JobList &procs,
+                    llvm::SmallVectorImpl<std::pair<int, const Job *>>
                         &fallBackProcs) const;
 
   ToolChain const &GetToolChain() const { return tc; }

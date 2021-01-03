@@ -19,12 +19,12 @@ ClangTool::ClangTool(llvm::StringRef fullName, llvm::StringRef shortName,
 
 ClangTool::~ClangTool() {}
 
-stoneTool::stoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
+StoneTool::StoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
                      const ToolChain &toolChain)
     : Tool(fullName, shortName, toolChain) {
   canEmitIR = true;
 }
-stoneTool::~stoneTool() {}
+StoneTool::~StoneTool() {}
 
 GCCTool::GCCTool(llvm::StringRef fullName, llvm::StringRef shortName,
                  const ToolChain &toolChain)
@@ -52,7 +52,7 @@ AssembleTool::~AssembleTool() {}
 ToolChain::ToolChain(const Driver &driver, const llvm::Triple &triple)
     : driver(driver), triple(triple) {}
 
-std::unique_ptr<Process> ToolChain::CreateProc(/*const JobAction &JA, Compilation &C,
+std::unique_ptr<Job> ToolChain::CreateJob(/*const JobAction &JA, Compilation &C,
                                     SmallVectorImpl<const Job *> &&inputs,
                                     ArrayRef<const Action *> inputActions,
                                     std::unique_ptr<CommandOutput> output,

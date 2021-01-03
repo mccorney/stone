@@ -13,6 +13,6 @@ Tool *DarwinToolChain::BuildAssembleTool() const { nullptr; }
 Tool *DarwinToolChain::BuildDynamicLinkTool() const { nullptr; }
 Tool *DarwinToolChain::BuildStaticLinkTool() const { nullptr; }
 Tool *DarwinToolChain::BuildGCCTool() const { nullptr; }
-Tool *DarwinToolChain::BuildstoneTool() const { nullptr; }
+Tool *DarwinToolChain::BuildStoneTool() const { nullptr; }
 
 Tool *DarwinToolChain::GetTool(ModeKind kind) const { nullptr; }
