@@ -189,6 +189,10 @@ public:
   }
 };
 
+class TypeDecl : public NamingDecl {
+public:
+};
+
 class ValueDecl : public NamingDecl {
 public:
 };

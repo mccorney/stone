@@ -21,7 +21,7 @@ private:
   std::unique_ptr<ASTContext> ac;
   const stone::Context &ctx;
 
-  mutable ModuleDecl *mainModule = nullptr;
+  mutable Module *mainModule = nullptr;
   // StatEngine se;
 public:
   AnalysisContext(const stone::Context &ctx, const CompileOptions &compileOpts,
@@ -34,14 +34,14 @@ public:
 
 public:
   ASTContext &GetASTContext() { return *ac.get(); }
-  // stone::syntax::ModuleDecl &GetModule() { return *md.get(); }
+  // stone::syntax::Module &GetModule() { return *md.get(); }
   //
   /// Retrieve the main module containing the files being compiled.
-  ModuleDecl *GetMainModule() const;
+  Module *GetMainModule() const;
 
   /// Replace the current main module with a new one. This is used for top-level
   /// cached code completion.
-  void SetMainModule(ModuleDecl *moduleDecl);
+  void SetMainModule(Module *moduleDecl);
 
   // StatEngine &GetStats() { return *stats.get(); }
 };

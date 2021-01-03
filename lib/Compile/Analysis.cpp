@@ -12,9 +12,9 @@ AnalysisContext::AnalysisContext(const Context &ctx,
   ac.reset(new ASTContext(ctx, compileOpts.spOpts, sm));
 }
 
-ModuleDecl *AnalysisContext::GetMainModule() const {
+Module *AnalysisContext::GetMainModule() const {
   assert(mainModule && "Null Main Module.");
   return mainModule;
 }
 
-void AnalysisContext::SetMainModule(ModuleDecl *moduleDecl) {}
+void AnalysisContext::SetMainModule(Module *moduleDecl) {}

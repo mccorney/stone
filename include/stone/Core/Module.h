@@ -5,7 +5,23 @@
 
 namespace stone {
 namespace syntax {
-class ModuleDecl : public DeclContext, NamingDecl {};
+
+class ModuleUnit {
+public:
+  enum class Kind { Source, Builtin };
+};
+
+class SourceUnit final : public ModuleUnit {
+public:
+};
+
+class BuiltinUnit final : public ModuleUnit {
+public:
+};
+
+class Module final : public DeclContext, public TypeDecl {
+public:
+};
 } // namespace syntax
 } // namespace stone
 

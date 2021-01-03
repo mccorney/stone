@@ -18,7 +18,7 @@ class CompilePipeline;
 class GenOptions;
 
 namespace syntax {
-class ModuleDecl;
+class Module;
 class ASTContext;
 } // namespace syntax
 
@@ -32,7 +32,7 @@ int Parse(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 int Check(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
 
 /// May want to pass Module instead
-llvm::Module *GenIR(stone::syntax::ModuleDecl *moduleDecl,
+llvm::Module *GenIR(stone::syntax::Module *moduleDecl,
                     const stone::Context &ctx, const GenOptions &genOpts,
                     llvm::StringRef outputModulename);
 

@@ -47,6 +47,9 @@ protected:
   /// own argument translation.
   std::unique_ptr<llvm::opt::DerivedArgList> translatedArgs;
 
+  /// Allocator for Compiles
+  mutable llvm::BumpPtrAllocator bumpAlloc;
+
 public:
   /// An input argument from the command line and its inferred type.
   using InputPair = std::pair<file::FileType, const llvm::opt::Arg *>;

@@ -13,7 +13,7 @@ using namespace stone;
 using namespace stone::syntax;
 using namespace stone::analysis;
 
-llvm::Module *stone::analysis::GenIR(syntax::ModuleDecl *moduleDecl,
+llvm::Module *stone::analysis::GenIR(syntax::Module *moduleDecl,
                                      const Context &ctx,
                                      const GenOptions &genOpts,
                                      llvm::StringRef outputModulename) {

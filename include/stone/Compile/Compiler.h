@@ -25,9 +25,10 @@ class CompileScope final {
 public:
   CompileScope();
   ~CompileScope();
+
+public:
   void Enter();
   void Exit();
-  void Print();
 };
 
 class Compiler final : public Session {
@@ -35,6 +36,28 @@ class Compiler final : public Session {
   FileMgr fm;
   CompilePipeline *pipeline = nullptr;
   std::unique_ptr<AnalysisContext> analysis;
+
+  /*
+          /// Identifies the set of input buffers in the SrcMgr that are
+    /// considered main source files.
+    llvm::SetVector<unsigned> primaryBufferIDs;
+
+          /// Return whether there is an entry in PrimaryInputs for buffer \p
+    BufID. bool IsPrimaryInput(FileID fileID) const { return
+    primaryBufferIDs.count(fileID) != 0;
+    }
+
+    /// Record in PrimaryBufferIDs the fact that \p BufID is a primary.
+    /// If \p BufID is already in the set, do nothing.
+    void RecordPrimaryInputBuffer(FileID fileID);
+  */
+
+private:
+  struct Listener {
+    bool OnSourceFile(Compiler &compiler);
+    bool OnModule(Compiler &compiler);
+  };
+  bool Parse(Compiler::Listener *listener);
 
 public:
   CompileOptions compileOpts;
@@ -70,6 +93,10 @@ protected:
   /// arguments, after applying the standard argument translations.
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
+  //
+private:
+  void Parse();
+  void Check();
 };
 } // namespace analysis
 } // namespace stone
