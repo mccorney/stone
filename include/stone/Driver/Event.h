@@ -76,7 +76,9 @@ public:
 };
 
 class CompilationEvent : public Event {
-  bool async = false;
+  bool isAsync = false;
+  bool isTopLevel = false;
+
   // A list of user events
   llvm::TinyPtrVector<const Event *> inputs;
 
@@ -84,7 +86,6 @@ public:
   CompilationEvent(Event::Kind kind, llvm::ArrayRef<const Event *> inputs,
                    file::FileType ty)
       : Event(kind, ty), inputs(inputs) {}
-  bool IsAsync() { return async; }
 
 public:
   llvm::ArrayRef<const Event *> GetInputs() const { return inputs; }
@@ -102,12 +103,18 @@ public:
   // file, so we return 0 by default.
   virtual size_t GetInputIndex() const { return 0; }
 
+  bool IsTopLevel() { return isTopLevel; }
+  bool IsAsync() { return isAsync; }
+
   static bool classof(const Event *e) {
     return (e->GetKind() >= Kind::First && e->GetKind() <= Kind::Last);
   }
 };
 
 class CompileEvent final : public CompilationEvent {
+public:
+  class State {};
+
 public:
   CompileEvent(file::FileType outputType)
       : CompilationEvent(Event::Kind::Compile, llvm::None, outputType) {}

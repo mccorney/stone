@@ -254,6 +254,9 @@ private:
   // Build Events
   void BuildCompileEvents(Compilation &compilation);
   void BuildCompileEvent(Compilation &compilation, Event *ie);
+  void BuildJobsForCompileEvent(Compilation &compilation,
+                                const CompileEvent *ce);
+
   //
   void BuildLinkEvent();
   void BuildStaticLinkEvent();

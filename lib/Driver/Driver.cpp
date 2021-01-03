@@ -62,6 +62,54 @@ Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
     break;
   }
 }
+std::unique_ptr<Compilation>
+Driver::BuildCompilation(const ToolChain &tc,
+                         const llvm::opt::InputArgList &argList) {
+
+  llvm::PrettyStackTraceString CrashInfo("Compilation construction");
+
+  // TODO:
+  // workingDirectory = ComputeWorkingDirectory(argList.get());
+
+  std::unique_ptr<DerivedArgList> dArgList(TranslateInputArgs(argList));
+
+  // Computer the compiler mode.
+  ComputeMode(*dArgList);
+
+  // Perform toolchain specific args validation.
+  // toolChain.ValidateArguments(de, *dArgList, targetTriple);
+  //
+  if (de.HasError()) {
+    return nullptr;
+  }
+  if (!HandleImmediateArgs(*dArgList, tc)) {
+    return nullptr;
+  }
+
+  BuildInputs(tc, *dArgList, profile.inputFiles);
+
+  if (de.HasError())
+    return nullptr;
+
+  // TODO: ComputeCompileMod()
+  //
+  // About to move argument list, so capture some flags that will be needed
+  // later.
+  // const bool driverPrintActions =
+  //    ArgList->hasArg(opts::DriverPrintActions);
+
+  // const bool DriverPrintDerivedOutputFileMap =
+  //    ArgList->hasArg(options::OPT_driver_print_derived_output_file_map);
+
+  // const bool ContinueBuildingAfterErrors =
+  //    computeContinueBuildingAfterErrors(BatchMode, ArgList.get());
+
+  driverOpts.showLifecycle = argList.hasArg(opts::ShowLifecycle);
+
+  compilation.reset(new Compilation(*this));
+
+  BuildEvents();
+}
 
 bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {
 
@@ -147,50 +195,6 @@ void Driver::BuildOutputs(const ToolChain &toolChain,
 
 static void BuildEvent(Driver &driver) {}
 
-void Driver::BuildEvents() {
-  llvm::PrettyStackTraceString CrashInfo("Building compilation events");
-
-  if (mode.IsCompileOnly()) {
-    return BuildCompileEvents(*compilation.get());
-  } else {
-    return BuildLinkEvent();
-  }
-}
-
-void Driver::BuildCompileEvent(Compilation &compilation, Event *ie) {
-
-  // if (profile.compileType == CompileType::MultipleInvocation) {
-  //   } else if (profile.compileType == CompileType::SingleInvocation) {
-  //}
-  auto ce =
-      compilation.CreateEvent<CompileEvent>(ie, profile.compilerOutputFileType);
-}
-
-void Driver::BuildCompileEvents(Compilation &compilation) {
-  // Go through the files and build the compile events
-
-  for (const InputPair &input : profile.inputFiles) {
-    // BuildCompileEvent(input);
-    file::FileType inputType = input.first;
-    const llvm::opt::Arg *inputArg = input.second;
-    auto ie = compilation.CreateEvent<InputEvent>(*inputArg, inputType);
-
-    switch (inputType) {
-    case file::FileType::Stone: {
-      assert(file::IsPartOfCompilation(inputType));
-      BuildCompileEvent(compilation, ie);
-    }
-    default:
-      break;
-    }
-  }
-}
-
-void Driver::BuildLinkEvent() {
-
-  // BuildCompileEvents();
-}
-
 ModeKind Driver::GetDefaultModeKind() { return ModeKind::EmitExecutable; }
 
 void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
@@ -198,55 +202,6 @@ void Driver::ComputeMode(const llvm::opt::DerivedArgList &args) {
 }
 static void BuildJob(Driver &driver) {}
 void Driver::BuildJobs() {}
-
-std::unique_ptr<Compilation>
-Driver::BuildCompilation(const ToolChain &tc,
-                         const llvm::opt::InputArgList &argList) {
-
-  llvm::PrettyStackTraceString CrashInfo("Compilation construction");
-
-  // TODO:
-  // workingDirectory = ComputeWorkingDirectory(argList.get());
-
-  std::unique_ptr<DerivedArgList> dArgList(TranslateInputArgs(argList));
-
-  // Computer the compiler mode.
-  ComputeMode(*dArgList);
-
-  // Perform toolchain specific args validation.
-  // toolChain.ValidateArguments(de, *dArgList, targetTriple);
-  //
-  if (de.HasError()) {
-    return nullptr;
-  }
-  if (!HandleImmediateArgs(*dArgList, tc)) {
-    return nullptr;
-  }
-
-  BuildInputs(tc, *dArgList, profile.inputFiles);
-
-  if (de.HasError())
-    return nullptr;
-
-  // TODO: ComputeCompileMod()
-  //
-  // About to move argument list, so capture some flags that will be needed
-  // later.
-  // const bool driverPrintActions =
-  //    ArgList->hasArg(opts::DriverPrintActions);
-
-  // const bool DriverPrintDerivedOutputFileMap =
-  //    ArgList->hasArg(options::OPT_driver_print_derived_output_file_map);
-
-  // const bool ContinueBuildingAfterErrors =
-  //    computeContinueBuildingAfterErrors(BatchMode, ArgList.get());
-
-  driverOpts.showLifecycle = argList.hasArg(opts::ShowLifecycle);
-
-  compilation.reset(new Compilation(*this));
-
-  BuildEvents();
-}
 
 void Driver::PrintLifecycle() {}
 
