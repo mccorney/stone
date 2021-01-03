@@ -8,9 +8,6 @@
 #include "stone/Driver/ToolChain.h"
 #include "stone/Session/Session.h"
 
-#include "llvm/Support/StringSaver.h"
-#include "llvm/Support/VirtualFileSystem.h"
-
 #include <list>
 #include <map>
 #include <string>

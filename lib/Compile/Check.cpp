@@ -6,7 +6,6 @@
 
 using namespace stone::analysis;
 
-int stone::analysis::Check(Analysis &analysis,
-                           CompilePipeline *pipeline) {
+int stone::analysis::Check(Analysis &analysis, CompilePipeline *pipeline) {
   return ret::ok;
 }

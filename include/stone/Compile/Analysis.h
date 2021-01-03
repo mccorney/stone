@@ -25,7 +25,7 @@ private:
   // StatEngine se;
 public:
   Analysis(const stone::Context &ctx, const CompileOptions &compileOpts,
-                  SrcMgr &sm);
+           SrcMgr &sm);
 
   Analysis(const Analysis &) = delete;
   Analysis(Analysis &&) = delete;

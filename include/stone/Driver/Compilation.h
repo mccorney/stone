@@ -113,9 +113,9 @@ public:
   ///
   /// \param fallBackProc - For non-zero results, this will be a vector of
   /// failing commands and their associated result code.
-  void ExecuteProcs(const JobList &procs,
-                    llvm::SmallVectorImpl<std::pair<int, const Job *>>
-                        &fallBackProcs) const;
+  void ExecuteProcs(
+      const JobList &procs,
+      llvm::SmallVectorImpl<std::pair<int, const Job *>> &fallBackProcs) const;
 
   ToolChain const &GetToolChain() const { return tc; }
 };
