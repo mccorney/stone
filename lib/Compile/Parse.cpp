@@ -7,7 +7,7 @@
 
 using namespace stone::analysis;
 
-int stone::analysis::Parse(AnalysisContext &analysis,
+int stone::analysis::Parse(Analysis &analysis,
                            CompilePipeline *pipeline) {
   return ret::ok;
 }

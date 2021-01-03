@@ -28,12 +28,12 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
 
   // We are not passing the compiler directly, we are pass stone::Context
   auto llvmModule = stone::analysis::GenIR(
-      compiler.GetAnalysisContext().GetMainModule(), compiler,
+      compiler.GetAnalysis().GetMainModule(), compiler,
       compiler.compileOpts.genOpts, /*TODO*/ {});
 
   bool status = stone::backend::GenObject(
       llvmModule, compiler.compileOpts.genOpts,
-      compiler.GetAnalysisContext().GetASTContext(), /*TODO*/ {});
+      compiler.GetAnalysis().GetASTContext(), /*TODO*/ {});
 
   STONE_DEFER{};
 

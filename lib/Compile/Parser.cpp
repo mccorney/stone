@@ -4,7 +4,7 @@
 using namespace stone;
 using namespace stone::analysis;
 
-Parser::Parser(AnalysisContext &analysis, CompilePipeline *pipeline)
+Parser::Parser(Analysis &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}
 
 //===----------------------------------------------------------------------===//

@@ -27,12 +27,12 @@ public:
 
 class Parser final {
   friend ParserStats;
-  AnalysisContext &analysis;
+  Analysis &analysis;
   ParserStats stats;
   CompilePipeline *pipeline;
 
 public:
-  Parser(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
+  Parser(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 
 public:
   // Decl

@@ -13,7 +13,7 @@ using namespace stone::syntax;
 namespace stone {
 namespace analysis {
 
-class AnalysisContext final {
+class Analysis final {
 private:
   SrcMgr &sm;
   const CompileOptions &compileOpts;
@@ -24,13 +24,13 @@ private:
   mutable Module *mainModule = nullptr;
   // StatEngine se;
 public:
-  AnalysisContext(const stone::Context &ctx, const CompileOptions &compileOpts,
+  Analysis(const stone::Context &ctx, const CompileOptions &compileOpts,
                   SrcMgr &sm);
 
-  AnalysisContext(const AnalysisContext &) = delete;
-  AnalysisContext(AnalysisContext &&) = delete;
-  AnalysisContext &operator=(const AnalysisContext &) = delete;
-  AnalysisContext &operator=(AnalysisContext &&) = delete;
+  Analysis(const Analysis &) = delete;
+  Analysis(Analysis &&) = delete;
+  Analysis &operator=(const Analysis &) = delete;
+  Analysis &operator=(Analysis &&) = delete;
 
 public:
   ASTContext &GetASTContext() { return *ac.get(); }

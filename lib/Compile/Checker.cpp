@@ -4,7 +4,7 @@
 using namespace stone;
 using namespace stone::analysis;
 
-Checker::Checker(AnalysisContext &analysis, CompilePipeline *pipeline)
+Checker::Checker(Analysis &analysis, CompilePipeline *pipeline)
     : analysis(analysis), pipeline(pipeline), stats(*this) {}
 
 // Decl

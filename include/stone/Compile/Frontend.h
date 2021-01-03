@@ -23,13 +23,13 @@ class ASTContext;
 } // namespace syntax
 
 namespace analysis {
-class AnalysisContext;
+class Analysis;
 
 /// Parse a source file
-int Parse(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
+int Parse(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 
 /// Perform type checking
-int Check(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
+int Check(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 
 /// May want to pass Module instead
 llvm::Module *GenIR(stone::syntax::Module *moduleDecl,

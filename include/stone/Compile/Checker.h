@@ -27,12 +27,12 @@ public:
 
 class Checker final {
   friend CheckerStats;
-  AnalysisContext &analysis;
+  Analysis &analysis;
   CheckerStats stats;
   CompilePipeline *pipeline;
 
 public:
-  Checker(AnalysisContext &analysis, CompilePipeline *pipeline = nullptr);
+  Checker(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 
 public:
   void CheckDecl();

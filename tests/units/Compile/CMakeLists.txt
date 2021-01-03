@@ -3,13 +3,13 @@ set(LLVM_LINK_COMPONENTS
   Support
 )
 
-add_stone_unittest(stoneAnalysisContextTests
+add_stone_unittest(stoneAnalysisTests
 	LexerTest.cpp
 	ParserTest.cpp
 )
-target_link_libraries(stoneAnalysisContextTests
+target_link_libraries(stoneAnalysisTests
   PRIVATE
 	stoneCore
-	stoneAnalysisContext
+	stoneAnalysis
 )
 

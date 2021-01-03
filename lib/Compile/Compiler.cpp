@@ -11,7 +11,7 @@ Compiler::Compiler(CompilePipeline *pipeline)
     : Session(compileOpts), pipeline(pipeline), fm(compileOpts.fsOpts),
       sm(GetDiagEngine(), fm) {
 
-  analysis.reset(new AnalysisContext(*this, compileOpts, GetSrcMgr()));
+  analysis.reset(new Analysis(*this, compileOpts, GetSrcMgr()));
 }
 
 void Compiler::ComputeMode(const llvm::opt::DerivedArgList &args) {

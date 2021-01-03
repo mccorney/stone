@@ -35,7 +35,7 @@ class Compiler final : public Session {
   SrcMgr sm;
   FileMgr fm;
   CompilePipeline *pipeline = nullptr;
-  std::unique_ptr<AnalysisContext> analysis;
+  std::unique_ptr<Analysis> analysis;
 
   /*
           /// Identifies the set of input buffers in the SrcMgr that are
@@ -74,7 +74,7 @@ public:
   void PrintHelp(bool showHidden) override;
 
 public:
-  AnalysisContext &GetAnalysisContext() { return *analysis.get(); }
+  Analysis &GetAnalysis() { return *analysis.get(); }
 
   SearchPathOptions &GetSearchPathOptions() { return compileOpts.spOpts; }
   const SearchPathOptions &GetSearchPathOptions() const {
