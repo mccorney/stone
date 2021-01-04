@@ -17,8 +17,7 @@ class CompileScope;
 class Compiler;
 class OutputFile;
 
-
-//TODO: Replace with CompileUnit 
+// TODO: Replace with CompileUnit
 class alignas(8) InputFile final {
 
   SourceUnit *su = nullptr;

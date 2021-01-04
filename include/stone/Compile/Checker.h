@@ -32,6 +32,7 @@ class Checker final {
   CompilePipeline *pipeline;
 
 public:
+	// TODO: Pass CompileUnit 
   Checker(Analysis &analysis, CompilePipeline *pipeline = nullptr);
 
 public:
