@@ -27,12 +27,15 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
     }
   }
 
-	STONE_DEFER{};
+  STONE_DEFER{};
 
   switch (compiler.GetMode().GetKind()) {
   case ModeKind::Parse:
   case ModeKind::Check: {
-    return;
+    if (compiler.GetDiagEngine().HasError()) {
+      return ret::err;
+    }
+    return ret::ok;
   }
   default:
     break;
@@ -43,13 +46,18 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                              compiler.compileOpts.genOpts, /*TODO*/ {});
 
   if (compiler.GetMode().GetKind() == ModeKind::EmitIR) {
-    return;
+    if (compiler.GetDiagEngine().HasError()) {
+      return ret::err;
+    }
+    return ret::ok;
   }
 
   bool status = stone::backend::GenObject(
       llvmModule, compiler.compileOpts.genOpts,
       compiler.GetAnalysis().GetASTContext(), /*TODO*/ {});
 
-  
+  if (compiler.GetDiagEngine().HasError()) {
+    return ret::err;
+  }
   return ret::ok;
 }
