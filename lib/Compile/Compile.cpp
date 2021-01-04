@@ -27,16 +27,29 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
     }
   }
 
+	STONE_DEFER{};
+
+  switch (compiler.GetMode().GetKind()) {
+  case ModeKind::Parse:
+  case ModeKind::Check: {
+    return;
+  }
+  default:
+    break;
+  }
   // We are not passing the compiler directly, we are pass stone::Context
   auto llvmModule =
       stone::analysis::GenIR(compiler.GetAnalysis().GetMainModule(), compiler,
                              compiler.compileOpts.genOpts, /*TODO*/ {});
 
+  if (compiler.GetMode().GetKind() == ModeKind::EmitIR) {
+    return;
+  }
+
   bool status = stone::backend::GenObject(
       llvmModule, compiler.compileOpts.genOpts,
       compiler.GetAnalysis().GetASTContext(), /*TODO*/ {});
 
-  STONE_DEFER{};
-
+  
   return ret::ok;
 }

@@ -51,6 +51,11 @@ int Compiler::Run() {
   if (compileOpts.showHelp) {
     // PrintHelp();
   }
+  if (GetMode().GetKind() == ModeKind::Parse) {
+    Parse();
+  } else {
+    Check();
+  }
   return 0;
 }
 
@@ -66,9 +71,9 @@ void Compiler::Parse(bool check) {
       }
     }
   }
-	if(check && compileOpts.analysisOpts.wholeModuleCheck) {
-		CheckModule();
-	}
+  if (check && compileOpts.analysisOpts.wholeModuleCheck) {
+    CheckModule();
+  }
 }
 void Compiler::Check() { Parse(true); }
 
