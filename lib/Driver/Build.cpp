@@ -9,13 +9,12 @@ void Driver::BuildEvents() {
   llvm::PrettyStackTraceString CrashInfo("Building compilation events");
 
   if (mode.IsCompileOnly()) {
-    BuildCompileEvents(*compilation.get(), nullptr /*No linking*/);
+    BuildCompileEvents(*compilation.get());
   } else {
     BuildLinkEvent();
   }
 }
-void Driver::BuildCompileEvents(Compilation &compilation,
-                                CompilationEvent *le) {
+void Driver::BuildCompileEvents(Compilation &compilation, CompilationEvent *le) {
   // Go through the files and build the compile events
 
   for (const InputPair &input : profile.inputFiles) {
@@ -27,7 +26,7 @@ void Driver::BuildCompileEvents(Compilation &compilation,
     switch (inputType) {
     case file::FileType::Stone: {
       assert(file::IsPartOfCompilation(inputType));
-      BuildCompileEvent(compilation, le, ie);
+      BuildCompileEvent(compilation, ie, le);
     }
     default:
       break;
@@ -35,8 +34,7 @@ void Driver::BuildCompileEvents(Compilation &compilation,
   }
 }
 
-void Driver::BuildCompileEvent(Compilation &compilation, CompilationEvent *le,
-                               InputEvent *ie) {
+void Driver::BuildCompileEvent(Compilation &compilation, InputEvent *ie,CompilationEvent *le) {
 
   // if (profile.compileType == CompileType::MultipleInvocation) {
   //   } else if (profile.compileType == CompileType::SingleInvocation) {
@@ -48,8 +46,7 @@ void Driver::BuildCompileEvent(Compilation &compilation, CompilationEvent *le,
   BuildJobsForCompileEvent(compilation, ce);
 }
 
-void Driver::BuildJobsForCompileEvent(Compilation &compilation,
-                                      const CompileEvent *ce) {}
+void Driver::BuildJobsForCompileEvent(Compilation &compilation, const CompileEvent *ce) {}
 
 void Driver::BuildLinkEvent() {
 

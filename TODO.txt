@@ -1,2 +1,15 @@
 
 1. Future structure: Core, Analysis (Lexer, Parser, Checker), Gen, Compile, Driver, Session
+
+
+2. For the Driver, you may be better off implementing the listener pattern:
+
+class InputEventListener {
+	template<typename T> void OnInputEvent(T sender, InputEventArgs) = 0; 
+}
+
+class CompileEventListener : public InputEventListener {
+
+	
+};
+

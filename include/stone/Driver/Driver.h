@@ -252,9 +252,10 @@ protected:
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 private:
   // Build Events
-  void BuildCompileEvents(Compilation &compilation, CompilationEvent *le);
-  void BuildCompileEvent(Compilation &compilation, CompilationEvent *le,
-                         InputEvent *ie);
+  void BuildCompileEvents(Compilation &compilation,
+                          CompilationEvent *le = nullptr);
+  void BuildCompileEvent(Compilation &compilation, InputEvent *ie,
+                         CompilationEvent *le = nullptr);
 
   void BuildJobsForCompileEvent(Compilation &compilation,
                                 const CompileEvent *ce);
