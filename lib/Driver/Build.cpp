@@ -5,28 +5,29 @@
 using namespace stone;
 using namespace stone::driver;
 
-void Driver::BuildEvents() {
-  llvm::PrettyStackTraceString CrashInfo("Building compilation events");
+void Driver::BuildActivities() {
+  llvm::PrettyStackTraceString CrashInfo("Building compilation activities");
 
   if (mode.IsCompileOnly()) {
-    BuildCompileEvents(*compilation.get());
+    BuildCompileActivities(*compilation.get());
   } else {
-    BuildLinkEvent();
+    BuildLinkActivity();
   }
 }
-void Driver::BuildCompileEvents(Compilation &compilation, CompilationEvent *le) {
-  // Go through the files and build the compile events
+void Driver::BuildCompileActivities(Compilation &compilation,
+                                    CompilationActivity *le) {
+  // Go through the files and build the compile activities
 
   for (const InputPair &input : profile.inputFiles) {
-    // BuildCompileEvent(input);
+    // BuildCompileActivity(input);
     file::FileType inputType = input.first;
     const llvm::opt::Arg *inputArg = input.second;
-    auto ie = compilation.CreateEvent<InputEvent>(*inputArg, inputType);
+    auto ie = compilation.CreateActivity<InputActivity>(*inputArg, inputType);
 
     switch (inputType) {
     case file::FileType::Stone: {
       assert(file::IsPartOfCompilation(inputType));
-      BuildCompileEvent(compilation, ie, le);
+      BuildCompileActivity(compilation, ie, le);
     }
     default:
       break;
@@ -34,21 +35,23 @@ void Driver::BuildCompileEvents(Compilation &compilation, CompilationEvent *le) 
   }
 }
 
-void Driver::BuildCompileEvent(Compilation &compilation, InputEvent *ie,CompilationEvent *le) {
+void Driver::BuildCompileActivity(Compilation &compilation, InputActivity *ie,
+                                  CompilationActivity *le) {
 
   // if (profile.compileType == CompileType::MultipleInvocation) {
   //   } else if (profile.compileType == CompileType::SingleInvocation) {
   //}
-  auto ce =
-      compilation.CreateEvent<CompileEvent>(ie, profile.compilerOutputFileType);
+  auto ce = compilation.CreateActivity<CompileActivity>(
+      ie, profile.compilerOutputFileType);
 
   // Since we are here, let us build the jobs.
-  BuildJobsForCompileEvent(compilation, ce);
+  BuildJobsForCompileActivity(compilation, ce);
 }
 
-void Driver::BuildJobsForCompileEvent(Compilation &compilation, const CompileEvent *ce) {}
+void Driver::BuildJobsForCompileActivity(Compilation &compilation,
+                                         const CompileActivity *ce) {}
 
-void Driver::BuildLinkEvent() {
+void Driver::BuildLinkActivity() {
 
-  // BuildCompileEvents();
+  // BuildCompileActivitys();
 }

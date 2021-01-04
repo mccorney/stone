@@ -86,6 +86,8 @@ Driver::BuildCompilation(const ToolChain &tc,
     return nullptr;
   }
 
+  // Start here - BuildActivities(*args, inputs);
+
   BuildInputs(tc, *dArgList, profile.inputFiles);
 
   if (de.HasError())
@@ -108,7 +110,7 @@ Driver::BuildCompilation(const ToolChain &tc,
 
   compilation.reset(new Compilation(*this));
 
-  BuildEvents();
+  BuildActivities();
 }
 
 bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {

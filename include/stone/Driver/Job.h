@@ -2,8 +2,8 @@
 #define STONE_DRIVER_JOB_H
 
 #include "stone/Core/List.h"
+#include "stone/Driver/Activity.h"
 #include "stone/Driver/CrashCondition.h"
-#include "stone/Driver/Event.h"
 
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
@@ -22,18 +22,18 @@ class Job {
   friend class Compilation;
 
   Driver &driver;
-  CompilationEvent &trigger;
+  CompilationActivity &trigger;
   /// The input file list in case we need to emit a file list instead of a
   /// proper response file
   llvm::opt::ArgStringList inputFiles;
 
 public:
-  Job(CompilationEvent &trigger, Driver &driver)
+  Job(CompilationActivity &trigger, Driver &driver)
       : trigger(trigger), driver(driver) {}
   virtual ~Job();
 
 public:
-  CompilationEvent &GetTrigger() { return trigger; }
+  CompilationActivity &GetTrigger() { return trigger; }
 
   virtual void Print(llvm::raw_ostream &os, const char *terminator, bool quote,
                      CrashCondition *crash = nullptr) const;

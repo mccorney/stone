@@ -81,7 +81,7 @@ public:
 
   /// Return true if this is a valid SrcLoc object.
   ///
-  /// Invalid SrcLocs are often used when events have no corresponding
+  /// Invalid SrcLocs are often used when activities have no corresponding
   /// location in the source (e.g. a diagnostic is required for a command line
   /// option).
   bool isValid() const { return ID != 0; }

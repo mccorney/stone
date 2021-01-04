@@ -2,9 +2,9 @@
 #define STONE_DRIVER_DRIVER_H
 
 #include "stone/Core/Mem.h"
+#include "stone/Driver/Activity.h"
 #include "stone/Driver/Compilation.h"
 #include "stone/Driver/DriverOptions.h"
-#include "stone/Driver/Event.h"
 #include "stone/Driver/ToolChain.h"
 #include "stone/Session/Session.h"
 
@@ -31,7 +31,7 @@ class DerivedArgList;
 namespace stone {
 namespace driver {
 
-class Event;
+class Activity;
 class Job;
 class Compilation;
 class ToolChain;
@@ -52,14 +52,14 @@ public:
   /// All of the input files that have been created
   InputFiles inputFiles;
 
-  /// The Events which were used to build the Jobs.
-  llvm::SmallVector<std::unique_ptr<const Event>, 32> events;
+  /// The Activitys which were used to build the Jobs.
+  llvm::SmallVector<std::unique_ptr<const Activity>, 32> activities;
 
   /// The Jobes which will be executed by this compilation.
   llvm::SmallVector<std::unique_ptr<const Job>, 32> procs;
 
   /// The inputs for the linker -- may not need this there
-  llvm::SmallVector<const Event *, 2> linkerInputs;
+  llvm::SmallVector<const Activity *, 2> linkerInputs;
 
   /// Default compile type
   CompileType compileType = CompileType::None;
@@ -90,18 +90,18 @@ public:
 public:
   class ModuleInputs final {
   private:
-    llvm::SmallVector<const Event *, 2> inputs;
+    llvm::SmallVector<const Activity *, 2> inputs;
   };
   class LinkerInputs final {
   private:
-    llvm::SmallVector<const Event *, 2> inputs;
+    llvm::SmallVector<const Activity *, 2> inputs;
   };
 };
 
 class DriverCache final {
 public:
-  /// A map for caching Jobs for a given Event/ToolChain pair
-  llvm::DenseMap<std::pair<const Event *, const ToolChain *>, Job *>
+  /// A map for caching Jobs for a given Activity/ToolChain pair
+  llvm::DenseMap<std::pair<const Activity *, const ToolChain *>, Job *>
       procChacheMap;
   /// Cache of all the ToolChains in use by the driver.
   ///
@@ -170,7 +170,7 @@ private:
   std::unique_ptr<llvm::opt::InputArgList> cfgOpts;
 
 private:
-  void BuildEvents();
+  void BuildActivities();
   void BuildJobs();
   void BuildQueue();
 
@@ -251,25 +251,26 @@ protected:
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
 private:
-  // Build Events
-  void BuildCompileEvents(Compilation &compilation,
-                          CompilationEvent *le = nullptr);
-  void BuildCompileEvent(Compilation &compilation, InputEvent *ie,
-                         CompilationEvent *le = nullptr);
+  // Build Activitys
+  void BuildCompileActivities(Compilation &compilation,
+                              CompilationActivity *le = nullptr);
+  void BuildCompileActivity(Compilation &compilation, InputActivity *ie,
+                            CompilationActivity *le = nullptr);
 
-  void BuildJobsForCompileEvent(Compilation &compilation,
-                                const CompileEvent *ce);
+  void BuildJobsForCompileActivity(Compilation &compilation,
+                                   const CompileActivity *ce);
 
   //
-  void BuildLinkEvent();
-  void BuildStaticLinkEvent();
-  void BuildStaticLinkEvent(CompilationEvent &event); // Calls BuildProcForEvent
+  void BuildLinkActivity();
+  void BuildStaticLinkActivity();
+  void BuildStaticLinkActivity(
+      CompilationActivity &event); // Calls BuildProcForActivity
 
-  void BuildDynamicLinkEvent();
-  void BuildDynamicLinkEvent(CompilationEvent &event);
+  void BuildDynamicLinkActivity();
+  void BuildDynamicLinkActivity(CompilationActivity &event);
 
-  void BuildBackendEvent();
-  void BuildAssemblyEvent();
+  void BuildBackendActivity();
+  void BuildAssemblyActivity();
 };
 } // namespace driver
 } // namespace stone

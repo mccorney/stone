@@ -161,9 +161,9 @@ public:
   ///
   /// This method dispatches to the various \c constructInvocation methods,
   /// which may be overridden by platform-specific subclasses.
-  std::unique_ptr<Job> CreateJob(/*const CompilationEvent &event, Compilation &compilation,
+  std::unique_ptr<Job> CreateJob(/*const CompilationActivity &event, Compilation &compilation,
                                     llvm::SmallVectorImpl<const Job *> &&jobs,
-                                    ArrayRef<const Event *> events,
+                                    ArrayRef<const Activity *> activities,
                                     std::unique_ptr<CommandOutput> output,
                                     const OutputInfo &OI*/) const;
 
@@ -180,7 +180,7 @@ public:
   ///
   /// This can be overridden when a particular ToolChain needs to use
   /// a compiler other than Clang.
-  virtual Tool *PickTool(const CompilationEvent &event) const;
+  virtual Tool *PickTool(const CompilationActivity &event) const;
 
 public:
   virtual Tool *BuildClangTool() const = 0;

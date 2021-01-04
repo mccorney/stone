@@ -15,7 +15,7 @@ set(stone_driver_sources
 	Compilation.cpp
 	DarwinToolChain.cpp
 	Driver.cpp
-	Event.cpp
+	Activity.cpp
 	Job.cpp
 	JobQueue.cpp
 	Run.cpp

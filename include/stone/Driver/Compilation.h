@@ -2,7 +2,7 @@
 #define STONE_DRIVER_COMPILATION_H
 
 #include "stone/Core/LLVM.h"
-#include "stone/Driver/Event.h"
+#include "stone/Driver/Activity.h"
 #include "stone/Driver/JobQueue.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -49,8 +49,8 @@ class Compilation final {
   /// only be removed if we crash.
   // ArgStringMap failureResultFiles;
 
-  /// A list of all of the events
-  EventList events;
+  /// A list of all of the activities
+  ActivityList activities;
 
   /// A list of all the procs
   JobList jobs;
@@ -60,17 +60,17 @@ public:
   ~Compilation();
 
 public:
-  /// Creates a new Event owned by this Compilation.
+  /// Creates a new Activity owned by this Compilation.
   ///
-  /// The new Event is *not* added to the list returned by GetEvents().
-  template <typename T, typename... Args> T *CreateEvent(Args &&...arg) {
+  /// The new Activity is *not* added to the list returned by GetActivitys().
+  template <typename T, typename... Args> T *CreateActivity(Args &&...arg) {
     auto event = new T(std::forward<Args>(arg)...);
-    events.Add(std::unique_ptr<stone::driver::Event>(event));
+    activities.Add(std::unique_ptr<stone::driver::Activity>(event));
     return event;
   }
 
-  EventList &GetEvents() { return events; }
-  const EventList &GetEvents() const { return events; }
+  ActivityList &GetActivitys() { return activities; }
+  const ActivityList &GetActivitys() const { return activities; }
 
   JobList &GetJobs() { return jobs; }
   const JobList &GetJobs() const { return jobs; }
