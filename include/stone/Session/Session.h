@@ -22,10 +22,12 @@
 #include "llvm/ADT/StringSet.h"
 #include "llvm/ADT/StringSwitch.h"
 
+#include "llvm/Support/Casting.h"
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Host.h"
+#include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/StringSaver.h"
@@ -135,6 +137,10 @@ public:
 
   // TODO: You want to say
   void AddFile();
+
+  /// Return the total amount of physical memory allocated
+  /// for representing CompileInstances
+  size_t GetMemSize() const { return bumpAlloc.getTotalMemory(); }
 
 protected:
   // Compute the mode id -- TODO: virtual

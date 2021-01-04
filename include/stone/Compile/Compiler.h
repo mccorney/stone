@@ -6,8 +6,6 @@
 #include "stone/Core/SearchPathOptions.h"
 #include "stone/Session/Session.h"
 
-#include "llvm/ADT/ArrayRef.h"
-
 using namespace stone::syntax;
 
 namespace stone {
@@ -37,6 +35,9 @@ class Compiler final : public Session {
   CompilePipeline *pipeline = nullptr;
   std::unique_ptr<Analysis> analysis;
 
+  /// Current inputs in the system
+  std::vector<InputFile *> inputs;
+
   /*
           /// Identifies the set of input buffers in the SrcMgr that are
     /// considered main source files.
@@ -51,14 +52,6 @@ class Compiler final : public Session {
     /// If \p BufID is already in the set, do nothing.
     void RecordPrimaryInputBuffer(SrcID fileID);
   */
-
-private:
-  struct Listener {
-    bool OnSourceFile(Compiler &compiler);
-    bool OnModule(Compiler &compiler);
-  };
-  bool Parse(Compiler::Listener *listener);
-
 public:
   CompileOptions compileOpts;
 
@@ -96,7 +89,33 @@ protected:
   //
 private:
   void Parse();
+  void Parse(bool check);
+
   void Check();
+
+  void CheckSourceUnit();
+  void CheckModule();
+
+  void BuildInputs();
+
+public:
+  void *Allocate(size_t size, unsigned align) const {
+    return bumpAlloc.Allocate(size, align);
+  }
+  template <typename T> T *Allocate(size_t num = 1) const {
+    return static_cast<T *>(Allocate(num * sizeof(T), alignof(T)));
+  }
+  void Deallocate(void *ptr) const {}
+
+public:
+  template <typename InputFileTy, typename AllocatorTy>
+  static void *Allocate(AllocatorTy &alloc, size_t baseSize) {
+
+    static_assert(alignof(InputFileTy) >= sizeof(void *),
+                  "A pointer must fit in the alignment of the InputFile!");
+
+    return (void *)alloc.Allocate(baseSize, alignof(InputFileTy));
+  }
 };
 } // namespace analysis
 } // namespace stone

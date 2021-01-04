@@ -5,6 +5,9 @@ namespace stone {
 namespace analysis {
 class AnalysisOptions final {
 public:
+  bool wholeModuleCheck = false;
+
+public:
 };
 } // namespace analysis
 } // namespace stone

@@ -28,8 +28,18 @@ bool Compiler::Build(llvm::ArrayRef<const char *> args) {
   // Computer the compiler mode.
   ComputeMode(*dArgList);
 
+  BuildInputs();
+
+  // Setup the main module
+  // if (!mainModule) {
+  //  Identifier moduleName =
+  //  astCtx->GetIdentifier(GetInvocation().GetModuleName()); mainModule =
+  //  Module::Create(moduleName, *Context);
+  //}
+
   return true;
 }
+void Compiler::BuildInputs() {}
 ModeKind Compiler::GetDefaultModeKind() { return ModeKind::EmitObject; }
 
 void Compiler::PrintLifecycle() {}
@@ -43,3 +53,25 @@ int Compiler::Run() {
   }
   return 0;
 }
+
+void Compiler::Parse() { Parse(false); }
+
+void Compiler::Parse(bool check) {
+
+  for (auto input : inputs) {
+    // stone::analysis::Parse
+    if (check) {
+      if (!compileOpts.analysisOpts.wholeModuleCheck) {
+        CheckSourceUnit();
+      }
+    }
+  }
+	if(check && compileOpts.analysisOpts.wholeModuleCheck) {
+		CheckModule();
+	}
+}
+void Compiler::Check() { Parse(true); }
+
+void Compiler::CheckSourceUnit() {}
+
+void Compiler::CheckModule() {}

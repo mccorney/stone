@@ -5,6 +5,11 @@
 
 namespace stone {
 namespace driver {
+
+class InputFile final {};
+
+class OutputFile final {};
+
 class DriverOptions final : public SessionOptions {
 public:
   DriverOptions() {}

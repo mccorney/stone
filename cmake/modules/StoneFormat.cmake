@@ -19,6 +19,8 @@ set(stone_lib_files
 )
 set(stone_tools_files
 	${STONE_SOURCE_DIR}/tools/stone/*.cpp
+	${STONE_SOURCE_DIR}/tools/driver/*.cpp
+
 )
 
 set(stone_def_files

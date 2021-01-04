@@ -14,7 +14,6 @@ set(stone_compile_sources
 	Check.cpp
 	Checker.cpp
 	Compile.cpp
-	CompileFile.cpp
 	Compiler.cpp
 	Gen.cpp
 	Lexer.cpp
