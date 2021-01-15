@@ -1,9 +1,12 @@
 #ifndef LLVM_CLANG_BASIC_IDENTIFIERTABLE_H
 #define LLVM_CLANG_BASIC_IDENTIFIERTABLE_H
 
-#include "stone/Core/LLVM.h"
-#include "stone/Core/Stats.h"
-#include "stone/Core/TokenKind.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <utility>
 
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/SmallString.h"
@@ -12,13 +15,9 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/PointerLikeTypeTraits.h"
 #include "llvm/Support/type_traits.h"
-
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <string>
-#include <utility>
+#include "stone/Core/LLVM.h"
+#include "stone/Core/Stats.h"
+#include "stone/Core/TokenKind.h"
 
 namespace stone {
 class LangOptions;
@@ -98,13 +97,21 @@ class alignas(IdentifierAlignment) Identifier {
   llvm::StringMapEntry<Identifier *> *entry = nullptr;
 
   Identifier()
-      : kind(tk::identifier), BuiltinID(0), IsExtension(false),
-        isKeywordReserved(false), IsPoisoned(false), IsOperatorKeyword(false),
-        NeedsHandleIdentifier(false), IsFromAST(false), ChangedAfterLoad(false),
-        FEChangedAfterLoad(false), RevertedTokenID(false), OutOfDate(false),
+      : kind(tk::identifier),
+        BuiltinID(0),
+        IsExtension(false),
+        isKeywordReserved(false),
+        IsPoisoned(false),
+        IsOperatorKeyword(false),
+        NeedsHandleIdentifier(false),
+        IsFromAST(false),
+        ChangedAfterLoad(false),
+        FEChangedAfterLoad(false),
+        RevertedTokenID(false),
+        OutOfDate(false),
         IsModulesImport(false) {}
 
-public:
+ public:
   Identifier(const Identifier &) = delete;
   Identifier &operator=(const Identifier &) = delete;
   Identifier(Identifier &&) = delete;
@@ -113,7 +120,8 @@ public:
   /// Return true if this is the identifier for the specified string.
   ///
   /// This is intended to be used for string literals only: II->isStr("foo").
-  template <std::size_t StrLen> bool isStr(const char (&Str)[StrLen]) const {
+  template <std::size_t StrLen>
+  bool isStr(const char (&Str)[StrLen]) const {
     return getLength() == StrLen - 1 &&
            memcmp(getNameStart(), Str, StrLen - 1) == 0;
   }
@@ -181,7 +189,6 @@ public:
     return 0;
   }
   void setBuiltinID(unsigned ID) {
-
     // TODO:
     // ObjCOrBuiltinID = ID + tk::NUM_OBJC_KEYWORDS;
     // assert(ObjCOrBuiltinID - unsigned(tk::NUM_OBJC_KEYWORDS) == ID
@@ -319,7 +326,7 @@ public:
     return GetName() < RHS.GetName();
   }
 
-private:
+ private:
   /// The Preprocessor::HandleIdentifier does several special (but rare)
   /// things to identifiers of various sorts.  For example, it changes the
   /// \c for keyword token from tk::identifier to tok::for.
@@ -341,16 +348,14 @@ class PoisonIdentifierRAIIObject {
   Identifier *const II;
   const bool OldValue;
 
-public:
+ public:
   PoisonIdentifierRAIIObject(Identifier *II, bool NewValue)
       : II(II), OldValue(II ? II->isPoisoned() : false) {
-    if (II)
-      II->setIsPoisoned(NewValue);
+    if (II) II->setIsPoisoned(NewValue);
   }
 
   ~PoisonIdentifierRAIIObject() {
-    if (II)
-      II->setIsPoisoned(OldValue);
+    if (II) II->setIsPoisoned(OldValue);
   }
 };
 
@@ -365,10 +370,10 @@ public:
 /// operation. Subclasses of this iterator type will provide the
 /// actual functionality.
 class IdentifierIterator {
-protected:
+ protected:
   IdentifierIterator() = default;
 
-public:
+ public:
   IdentifierIterator(const IdentifierIterator &) = delete;
   IdentifierIterator &operator=(const IdentifierIterator &) = delete;
 
@@ -386,7 +391,7 @@ class IdentifierTable;
 class IdentifierTableStats final : public Stats {
   const IdentifierTable &table;
 
-public:
+ public:
   IdentifierTableStats(const IdentifierTable &table) : table(table) {}
   void Print() const override;
 };
@@ -397,14 +402,13 @@ public:
 /// piece of the code, as each occurrence of every identifier goes through
 /// here when lexed.
 class IdentifierTable final {
-
   const LangOptions &langOpts;
   friend IdentifierTableStats;
 
   using Entries = llvm::StringMap<Identifier *, llvm::BumpPtrAllocator>;
   Entries entries;
 
-public:
+ public:
   /// Create the identifier table, populating it with info about the
   /// language keywords for the language specified by \p LangOpts.
   explicit IdentifierTable(const LangOptions &langOpts);
@@ -414,7 +418,6 @@ public:
   /// Return the identifier token info for the specified named
   /// identifier.
   Identifier &Get(llvm::StringRef name) {
-
     auto &entry = *entries.insert(std::make_pair(name, nullptr)).first;
     Identifier *&identifier = entry.second;
     if (identifier) {
@@ -444,7 +447,6 @@ public:
   /// introduce or modify an identifier. If they called Get(), they would
   /// likely end up in a recursion.
   Identifier &GetOwn(llvm::StringRef name) {
-
     auto &entry = *entries.insert(std::make_pair(name, nullptr)).first;
     Identifier *&identifier = entry.second;
     if (identifier) {
@@ -485,7 +487,7 @@ class alignas(IdentifierAlignment) SpecialDeclName {
   friend class stone::syntax::DeclName;
   friend class stone::syntax::DeclNameTable;
 
-protected:
+ protected:
   /// The kind of "extra" information stored in the DeclName. See
   /// @c ExtraKindOrNumArgs for an explanation of how these enumerator values
   /// are used. Note that DeclName depends on the numerical values
@@ -511,14 +513,15 @@ protected:
   SpecialKind GetKind() const { return kind; }
 };
 
-} // namespace detail
-} // namespace syntax
-} // namespace stone
+}  // namespace detail
+}  // namespace syntax
+}  // namespace stone
 
 namespace llvm {
 // Provide PointerLikeTypeTraits for Identifier pointers, which
 // are not guaranteed to be 8-byte aligned.
-template <> struct PointerLikeTypeTraits<stone::syntax::Identifier *> {
+template <>
+struct PointerLikeTypeTraits<stone::syntax::Identifier *> {
   static void *getAsVoidPointer(stone::syntax::Identifier *P) { return P; }
 
   static stone::syntax::Identifier *getFromVoidPointer(void *P) {
@@ -528,7 +531,8 @@ template <> struct PointerLikeTypeTraits<stone::syntax::Identifier *> {
   enum { NumLowBitsAvailable = 1 };
 };
 
-template <> struct PointerLikeTypeTraits<const stone::syntax::Identifier *> {
+template <>
+struct PointerLikeTypeTraits<const stone::syntax::Identifier *> {
   static const void *getAsVoidPointer(const stone::syntax::Identifier *P) {
     return P;
   }
@@ -540,6 +544,6 @@ template <> struct PointerLikeTypeTraits<const stone::syntax::Identifier *> {
   enum { NumLowBitsAvailable = 1 };
 };
 
-} // namespace llvm
+}  // namespace llvm
 
 #endif

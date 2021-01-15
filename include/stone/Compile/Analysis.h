@@ -1,12 +1,12 @@
 #ifndef STONE_COMPILE_ANALYSIS_H
 #define STONE_COMPILE_ANALYSIS_H
 
+#include <memory>
+
 #include "stone/Compile/CompileOptions.h"
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 #include "stone/Core/SearchPathOptions.h"
-
-#include <memory>
 
 using namespace stone::syntax;
 
@@ -14,7 +14,7 @@ namespace stone {
 namespace analysis {
 
 class Analysis final {
-private:
+ private:
   SrcMgr &sm;
   const CompileOptions &compileOpts;
 
@@ -22,7 +22,7 @@ private:
   const stone::Context &ctx;
   mutable Module *mainModule = nullptr;
 
-public:
+ public:
   Analysis(const stone::Context &ctx, const CompileOptions &compileOpts,
            SrcMgr &sm);
 
@@ -31,7 +31,7 @@ public:
   Analysis &operator=(const Analysis &) = delete;
   Analysis &operator=(Analysis &&) = delete;
 
-public:
+ public:
   ASTContext &GetASTContext() { return *ac.get(); }
   // stone::syntax::Module &GetModule() { return *md.get(); }
   //
@@ -44,6 +44,6 @@ public:
 
   // StatEngine &GetStats() { return *stats.get(); }
 };
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 #endif

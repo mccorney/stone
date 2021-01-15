@@ -20,11 +20,11 @@ class CompileScope final {
   CompileScope(const CompileScope &) = delete;
   void operator=(const CompileScope &) = delete;
 
-public:
+ public:
   CompileScope();
   ~CompileScope();
 
-public:
+ public:
   void Enter();
   void Exit();
 };
@@ -52,10 +52,10 @@ class Compiler final : public Session {
     /// If \p BufID is already in the set, do nothing.
     void RecordPrimaryInputBuffer(SrcID fileID);
   */
-public:
+ public:
   CompileOptions compileOpts;
 
-public:
+ public:
   Compiler(CompilePipeline *pipeline = nullptr);
 
   /// Parse the given list of strings into an InputArgList.
@@ -66,7 +66,7 @@ public:
   void PrintLifecycle() override;
   void PrintHelp(bool showHidden) override;
 
-public:
+ public:
   Analysis &GetAnalysis() { return *analysis.get(); }
 
   SearchPathOptions &GetSearchPathOptions() { return compileOpts.spOpts; }
@@ -79,7 +79,7 @@ public:
 
   SrcMgr &GetSrcMgr() { return sm; }
 
-protected:
+ protected:
   void ComputeMode(const llvm::opt::DerivedArgList &args) override;
   ModeKind GetDefaultModeKind() override;
   /// TranslateInputArgs - Create a new derived argument list from the input
@@ -87,7 +87,7 @@ protected:
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
   //
-private:
+ private:
   void Parse();
   void Parse(bool check);
 
@@ -98,25 +98,25 @@ private:
 
   void BuildInputs();
 
-public:
+ public:
   void *Allocate(size_t size, unsigned align) const {
     return bumpAlloc.Allocate(size, align);
   }
-  template <typename T> T *Allocate(size_t num = 1) const {
+  template <typename T>
+  T *Allocate(size_t num = 1) const {
     return static_cast<T *>(Allocate(num * sizeof(T), alignof(T)));
   }
   void Deallocate(void *ptr) const {}
 
-public:
+ public:
   template <typename InputFileTy, typename AllocatorTy>
   static void *Allocate(AllocatorTy &alloc, size_t baseSize) {
-
     static_assert(alignof(InputFileTy) >= sizeof(void *),
                   "A pointer must fit in the alignment of the InputFile!");
 
     return (void *)alloc.Allocate(baseSize, alignof(InputFileTy));
   }
 };
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 #endif

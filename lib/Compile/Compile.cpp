@@ -1,11 +1,11 @@
 #include "stone/Compile/Compile.h"
+
 #include "stone/Compile/Analysis.h"
 #include "stone/Compile/Backend.h"
 #include "stone/Compile/Compiler.h"
 #include "stone/Compile/Frontend.h"
 #include "stone/Core/Defer.h"
 #include "stone/Core/Ret.h"
-
 #include "stone/Public.h"
 #include "stone/Session/Options.h"
 
@@ -16,7 +16,6 @@ using namespace stone::backend;
 
 int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
                    void *mainAddr, CompilePipeline *pipeline) {
-
   Compiler compiler(pipeline);
   if (compiler.Build(args)) {
     assert(compiler.GetMode().IsCompileOnly() && "Not a compile mode");
@@ -30,15 +29,15 @@ int stone::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
   STONE_DEFER{};
 
   switch (compiler.GetMode().GetKind()) {
-  case ModeKind::Parse:
-  case ModeKind::Check: {
-    if (compiler.GetDiagEngine().HasError()) {
-      return ret::err;
+    case ModeKind::Parse:
+    case ModeKind::Check: {
+      if (compiler.GetDiagEngine().HasError()) {
+        return ret::err;
+      }
+      return ret::ok;
     }
-    return ret::ok;
-  }
-  default:
-    break;
+    default:
+      break;
   }
   // We are not passing the compiler directly, we are pass stone::Context
   auto llvmModule =

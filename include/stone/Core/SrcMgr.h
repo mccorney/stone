@@ -34,9 +34,13 @@
 #ifndef STONE_CORE_SOURCEMANAGER_H
 #define STONE_CORE_SOURCEMANAGER_H
 
-#include "stone/Core/Diagnostics.h"
-#include "stone/Core/FileMgr.h"
-#include "stone/Core/SrcLoc.h"
+#include <cassert>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/BitVector.h"
@@ -49,14 +53,9 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"
-
-#include <cassert>
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
+#include "stone/Core/Diagnostics.h"
+#include "stone/Core/FileMgr.h"
+#include "stone/Core/SrcLoc.h"
 
 namespace stone {
 
@@ -111,7 +110,7 @@ class alignas(8) ContentCache {
   /// whether the buffer is invalid.
   mutable llvm::PointerIntPair<const llvm::MemoryBuffer *, 2> Buffer;
 
-public:
+ public:
   /// Reference to the file entry representing this ContentCache.
   ///
   /// This reference does not own the SrcFile object.
@@ -156,14 +155,20 @@ public:
   ContentCache(const SrcFile *Ent = nullptr) : ContentCache(Ent, Ent) {}
 
   ContentCache(const SrcFile *Ent, const SrcFile *contentEnt)
-      : Buffer(nullptr, false), OrigEntry(Ent), ContentsEntry(contentEnt),
-        BufferOverridden(false), IsSystemFile(false), IsTransient(false) {}
+      : Buffer(nullptr, false),
+        OrigEntry(Ent),
+        ContentsEntry(contentEnt),
+        BufferOverridden(false),
+        IsSystemFile(false),
+        IsTransient(false) {}
 
   /// The copy ctor does not allow copies where source object has either
   /// a non-NULL Buffer or SourceLineCache.  Ownership of allocated memory
   /// is not transferred, so this is a logical error.
   ContentCache(const ContentCache &RHS)
-      : Buffer(nullptr, false), BufferOverridden(false), IsSystemFile(false),
+      : Buffer(nullptr, false),
+        BufferOverridden(false),
+        IsSystemFile(false),
         IsTransient(false) {
     OrigEntry = RHS.OrigEntry;
     ContentsEntry = RHS.ContentsEntry;
@@ -246,7 +251,7 @@ class FileInfo {
   /// The location of the \#include that brought in this file.
   ///
   /// This is an invalid SLOC for the main file (top of the \#include chain).
-  unsigned IncludeLoc; // Really a SrcLoc
+  unsigned IncludeLoc;  // Really a SrcLoc
 
   /// Number of SrcIDs (files and macros) that were created during
   /// preprocessing of this \#include, including this SLocEntry.
@@ -261,7 +266,7 @@ class FileInfo {
   llvm::PointerIntPair<const ContentCache *, 3, CharacteristicKind>
       ContentAndKind;
 
-public:
+ public:
   /// Return a FileInfo object.
   static FileInfo get(SrcLoc IL, const ContentCache *Con,
                       CharacteristicKind FileCharacter) {
@@ -315,7 +320,7 @@ class ExpansionInfo {
   /// Whether the expansion range is a token range.
   bool ExpansionIsTokenRange;
 
-public:
+ public:
   SrcLoc getSpellingLoc() const {
     SrcLoc SpellLoc = SrcLoc::getFromRawEncoding(SpellingLoc);
     return SpellLoc.isInvalid() ? getExpansionLocStart() : SpellLoc;
@@ -419,7 +424,7 @@ class SLocEntry {
     ExpansionInfo Expansion;
   };
 
-public:
+ public:
   SLocEntry() : Offset(), IsExpansion(), File() {}
 
   unsigned getOffset() const { return Offset; }
@@ -456,11 +461,11 @@ public:
   }
 };
 
-} // namespace src
+}  // namespace src
 
 /// External source of source location entries.
 class ExternalSLocEntrySource {
-public:
+ public:
   virtual ~ExternalSLocEntrySource();
 
   /// Read the source location entry with index ID, which will always be
@@ -502,7 +507,7 @@ class InBeforeInTUCacheEntry {
   /// random token in the parent.
   unsigned LCommonOffset, RCommonOffset;
 
-public:
+ public:
   /// Return true if the currently cached values match up with
   /// the specified LHS/RHS query.
   ///
@@ -516,18 +521,15 @@ public:
   bool getCachedResult(unsigned LOffset, unsigned ROffset) const {
     // If one of the query files is the common file, use the offset.  Otherwise,
     // use the #include loc in the common file.
-    if (LQueryFID != CommonFID)
-      LOffset = LCommonOffset;
-    if (RQueryFID != CommonFID)
-      ROffset = RCommonOffset;
+    if (LQueryFID != CommonFID) LOffset = LCommonOffset;
+    if (RQueryFID != CommonFID) ROffset = RCommonOffset;
 
     // It is common for multiple macro expansions to be "included" from the same
     // location (expansion location), in which case use the order of the SrcIDs
     // to determine which came first. This will also take care the case where
     // one of the locations points at the inclusion/expansion point of the other
     // in which case its SrcID will come before the other.
-    if (LOffset == ROffset)
-      return IsLQFIDBeforeRQFID;
+    if (LOffset == ROffset) return IsLQFIDBeforeRQFID;
 
     return LOffset < ROffset;
   }
@@ -732,7 +734,7 @@ class SrcMgr : public RefCountedBase<SrcMgr> {
   /// we can add a cc1-level option to do so.
   SmallVector<std::pair<std::string, FullSrcLoc>, 2> StoredModuleBuildStack;
 
-public:
+ public:
   SrcMgr(DiagnosticEngine &de, FileMgr &fileMgr,
          bool UserFilesAreVolatile = false);
   explicit SrcMgr(const SrcMgr &) = delete;
@@ -940,8 +942,7 @@ public:
     bool MyInvalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
     if (MyInvalid || !Entry.isFile()) {
-      if (Invalid)
-        *Invalid = true;
+      if (Invalid) *Invalid = true;
 
       return getFakeBufferForRecovery();
     }
@@ -955,8 +956,7 @@ public:
     bool MyInvalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
     if (MyInvalid || !Entry.isFile()) {
-      if (Invalid)
-        *Invalid = true;
+      if (Invalid) *Invalid = true;
 
       return getFakeBufferForRecovery();
     }
@@ -969,20 +969,17 @@ public:
   const SrcFile *getSrcFileForID(SrcID FID) const {
     bool MyInvalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &MyInvalid);
-    if (MyInvalid || !Entry.isFile())
-      return nullptr;
+    if (MyInvalid || !Entry.isFile()) return nullptr;
 
     const src::ContentCache *Content = Entry.getFile().getContentCache();
-    if (!Content)
-      return nullptr;
+    if (!Content) return nullptr;
     return Content->OrigEntry;
   }
 
   /// Returns the SrcFile record for the provided SLocEntry.
   const SrcFile *getSrcFileForSLocEntry(const src::SLocEntry &sloc) const {
     const src::ContentCache *Content = sloc.getFile().getContentCache();
-    if (!Content)
-      return nullptr;
+    if (!Content) return nullptr;
     return Content->OrigEntry;
   }
 
@@ -998,8 +995,7 @@ public:
   unsigned getNumCreatedFIDsForSrcID(SrcID FID) const {
     bool Invalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
-    if (Invalid || !Entry.isFile())
-      return 0;
+    if (Invalid || !Entry.isFile()) return 0;
 
     return Entry.getFile().NumCreatedFIDs;
   }
@@ -1010,8 +1006,7 @@ public:
                                  bool Force = false) const {
     bool Invalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
-    if (Invalid || !Entry.isFile())
-      return;
+    if (Invalid || !Entry.isFile()) return;
 
     assert((Force || Entry.getFile().NumCreatedFIDs == 0) && "Already set!");
     const_cast<src::FileInfo &>(Entry.getFile()).NumCreatedFIDs = NumFIDs;
@@ -1031,8 +1026,7 @@ public:
     unsigned SLocOffset = SpellingLoc.getOffset();
 
     // If our one-entry cache covers this offset, just return it.
-    if (isOffsetInSrcID(LastSrcIDLookup, SLocOffset))
-      return LastSrcIDLookup;
+    if (isOffsetInSrcID(LastSrcIDLookup, SLocOffset)) return LastSrcIDLookup;
 
     return getSrcIDSlow(SLocOffset);
   }
@@ -1049,8 +1043,7 @@ public:
   SrcLoc getLocForStartOfFile(SrcID FID) const {
     bool Invalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
-    if (Invalid || !Entry.isFile())
-      return SrcLoc();
+    if (Invalid || !Entry.isFile()) return SrcLoc();
 
     unsigned FileOffset = Entry.getOffset();
     return SrcLoc::getFileLoc(FileOffset);
@@ -1061,8 +1054,7 @@ public:
   SrcLoc getLocForEndOfFile(SrcID FID) const {
     bool Invalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
-    if (Invalid || !Entry.isFile())
-      return SrcLoc();
+    if (Invalid || !Entry.isFile()) return SrcLoc();
 
     unsigned FileOffset = Entry.getOffset();
     return SrcLoc::getFileLoc(FileOffset + getSrcIDSize(FID));
@@ -1073,8 +1065,7 @@ public:
   SrcLoc getIncludeLoc(SrcID FID) const {
     bool Invalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
-    if (Invalid || !Entry.isFile())
-      return SrcLoc();
+    if (Invalid || !Entry.isFile()) return SrcLoc();
 
     return Entry.getFile().getIncludeLoc();
   }
@@ -1087,8 +1078,7 @@ public:
 
     // Positive file IDs are in the current translation unit, and -1 is a
     // placeholder.
-    if (FID.ID >= -1)
-      return std::make_pair(SrcLoc(), "");
+    if (FID.ID >= -1) return std::make_pair(SrcLoc(), "");
 
     return ExternalSLocEntries->getModuleImportLoc(FID.ID);
   }
@@ -1098,8 +1088,7 @@ public:
   SrcLoc getExpansionLoc(SrcLoc Loc) const {
     // Handle the non-mapped case inline, defer to out of line code to handle
     // expansions.
-    if (Loc.isSrcID())
-      return Loc;
+    if (Loc.isSrcID()) return Loc;
     return getExpansionLocSlowCase(Loc);
   }
 
@@ -1107,8 +1096,7 @@ public:
   /// location or the spelling location, depending on if it comes from a
   /// macro argument or not.
   SrcLoc getFileLoc(SrcLoc Loc) const {
-    if (Loc.isSrcID())
-      return Loc;
+    if (Loc.isSrcID()) return Loc;
     return getFileLocSlowCase(Loc);
   }
 
@@ -1147,8 +1135,7 @@ public:
   SrcLoc getSpellingLoc(SrcLoc Loc) const {
     // Handle the non-mapped case inline, defer to out of line code to handle
     // expansions.
-    if (Loc.isSrcID())
-      return Loc;
+    if (Loc.isSrcID()) return Loc;
     return getSpellingLocSlowCase(Loc);
   }
 
@@ -1164,8 +1151,7 @@ public:
   SrcLoc getComposedLoc(SrcID FID, unsigned Offset) const {
     bool Invalid = false;
     const src::SLocEntry &Entry = getSLocEntry(FID, &Invalid);
-    if (Invalid)
-      return SrcLoc();
+    if (Invalid) return SrcLoc();
 
     unsigned GlobalOffset = Entry.getOffset() + Offset;
     return Entry.isFile() ? SrcLoc::getFileLoc(GlobalOffset)
@@ -1180,8 +1166,7 @@ public:
     SrcID FID = getSrcID(Loc);
     bool Invalid = false;
     const src::SLocEntry &E = getSLocEntry(FID, &Invalid);
-    if (Invalid)
-      return std::make_pair(SrcID(), 0);
+    if (Invalid) return std::make_pair(SrcID(), 0);
     return std::make_pair(FID, Loc.getOffset() - E.getOffset());
   }
 
@@ -1193,12 +1178,10 @@ public:
     SrcID FID = getSrcID(Loc);
     bool Invalid = false;
     const src::SLocEntry *E = &getSLocEntry(FID, &Invalid);
-    if (Invalid)
-      return std::make_pair(SrcID(), 0);
+    if (Invalid) return std::make_pair(SrcID(), 0);
 
     unsigned Offset = Loc.getOffset() - E->getOffset();
-    if (Loc.isSrcID())
-      return std::make_pair(FID, Offset);
+    if (Loc.isSrcID()) return std::make_pair(FID, Offset);
 
     return getDecomposedExpansionLocSlowCase(E);
   }
@@ -1211,12 +1194,10 @@ public:
     SrcID FID = getSrcID(Loc);
     bool Invalid = false;
     const src::SLocEntry *E = &getSLocEntry(FID, &Invalid);
-    if (Invalid)
-      return std::make_pair(SrcID(), 0);
+    if (Invalid) return std::make_pair(SrcID(), 0);
 
     unsigned Offset = Loc.getOffset() - E->getOffset();
-    if (Loc.isSrcID())
-      return std::make_pair(FID, Offset);
+    if (Loc.isSrcID()) return std::make_pair(FID, Offset);
     return getDecomposedSpellingLocSlowCase(E, Offset);
   }
 
@@ -1282,8 +1263,7 @@ public:
     unsigned BeginOffs = Start.getOffset();
     unsigned EndOffs = BeginOffs + Length;
     if (LocOffs >= BeginOffs && LocOffs < EndOffs) {
-      if (RelativeOffset)
-        *RelativeOffset = LocOffs - BeginOffs;
+      if (RelativeOffset) *RelativeOffset = LocOffs - BeginOffs;
       return true;
     }
 
@@ -1302,8 +1282,7 @@ public:
     bool RHSLoaded = RHSOffs >= CurrentLoadedOffset;
 
     if (LHSLoaded == RHSLoaded) {
-      if (RelativeOffset)
-        *RelativeOffset = RHSOffs - LHSOffs;
+      if (RelativeOffset) *RelativeOffset = RHSOffs - LHSOffs;
       return true;
     }
 
@@ -1433,8 +1412,7 @@ public:
 
   /// Returns whether \p Loc is expanded from a macro in a system header.
   bool isInSystemMacro(SrcLoc loc) const {
-    if (!loc.isMacroID())
-      return false;
+    if (!loc.isMacroID()) return false;
 
     // This happens when the macro is the result of a paste, in that case
     // its spelling is the scratch memory, so we take the parent context.
@@ -1557,9 +1535,9 @@ public:
   /// \returns Pair of bools the first component is true if the two locations
   ///          are in the same TU. The second bool is true if the first is true
   ///          and \p LOffs is before \p ROffs.
-  std::pair<bool, bool>
-  isInTheSameTranslationUnit(std::pair<SrcID, unsigned> &LOffs,
-                             std::pair<SrcID, unsigned> &ROffs) const;
+  std::pair<bool, bool> isInTheSameTranslationUnit(
+      std::pair<SrcID, unsigned> &LOffs,
+      std::pair<SrcID, unsigned> &ROffs) const;
 
   /// Determines the order of 2 source locations in the "source location
   /// address space".
@@ -1575,8 +1553,7 @@ public:
     unsigned LHSOffset = LHS.getOffset();
     bool LHSLoaded = LHSOffset >= CurrentLoadedOffset;
     bool RHSLoaded = RHS >= CurrentLoadedOffset;
-    if (LHSLoaded == RHSLoaded)
-      return LHSOffset < RHS;
+    if (LHSLoaded == RHSLoaded) return LHSOffset < RHS;
 
     return LHSLoaded;
   }
@@ -1620,15 +1597,13 @@ public:
   const src::SLocEntry &getLoadedSLocEntry(unsigned Index,
                                            bool *Invalid = nullptr) const {
     assert(Index < LoadedSrcLocTable.size() && "Invalid index");
-    if (SLocEntryLoaded[Index])
-      return LoadedSrcLocTable[Index];
+    if (SLocEntryLoaded[Index]) return LoadedSrcLocTable[Index];
     return loadSLocEntry(Index, Invalid);
   }
 
   const src::SLocEntry &getSLocEntry(SrcID FID, bool *Invalid = nullptr) const {
     if (FID.ID == 0 || FID.ID == -1) {
-      if (Invalid)
-        *Invalid = true;
+      if (Invalid) *Invalid = true;
       return LocalSrcLocTable[0];
     }
     return getSLocEntryByID(FID.ID, Invalid);
@@ -1672,14 +1647,12 @@ public:
   /// Gets the location of the immediate macro caller, one level up the stack
   /// toward the initial macro typed into the source.
   SrcLoc getImmediateMacroCallerLoc(SrcLoc Loc) const {
-    if (!Loc.isMacroID())
-      return Loc;
+    if (!Loc.isMacroID()) return Loc;
 
     // When we have the location of (part of) an expanded parameter, its
     // spelling location points to the argument as expanded in the macro call,
     // and therefore is used to locate the macro caller.
-    if (isMacroArgExpansion(Loc))
-      return getImmediateSpellingLoc(Loc);
+    if (isMacroArgExpansion(Loc)) return getImmediateSpellingLoc(Loc);
 
     // Otherwise, the caller of the macro is located where this macro is
     // expanded (while the spelling is part of the macro definition).
@@ -1689,7 +1662,7 @@ public:
   /// \return Location of the top-level macro caller.
   SrcLoc getTopMacroCallerLoc(SrcLoc Loc) const;
 
-private:
+ private:
   friend class ASTReader;
   friend class ASTWriter;
 
@@ -1702,8 +1675,7 @@ private:
   const src::SLocEntry &getSLocEntryByID(int ID,
                                          bool *Invalid = nullptr) const {
     assert(ID != -1 && "Using SrcID sentinel value");
-    if (ID < 0)
-      return getLoadedSLocEntryByID(ID, Invalid);
+    if (ID < 0) return getLoadedSLocEntryByID(ID, Invalid);
     return getLocalSLocEntry(static_cast<unsigned>(ID), Invalid);
   }
 
@@ -1723,12 +1695,10 @@ private:
   inline bool isOffsetInSrcID(SrcID FID, unsigned SLocOffset) const {
     const src::SLocEntry &Entry = getSLocEntry(FID);
     // If the entry is after the offset, it can't contain it.
-    if (SLocOffset < Entry.getOffset())
-      return false;
+    if (SLocOffset < Entry.getOffset()) return false;
 
     // If this is the very last entry then it does.
-    if (FID.ID == -2)
-      return true;
+    if (FID.ID == -2) return true;
 
     // If it is the last local entry, then it does if the location is local.
     if (FID.ID + 1 == static_cast<int>(LocalSrcLocTable.size()))
@@ -1760,8 +1730,8 @@ private:
                                                    bool isSystemFile = false);
 
   /// Create a new ContentCache for the specified  memory buffer.
-  const src::ContentCache *
-  createMemBufferContentCache(const llvm::MemoryBuffer *Buf, bool DoNotFree);
+  const src::ContentCache *createMemBufferContentCache(
+      const llvm::MemoryBuffer *Buf, bool DoNotFree);
 
   SrcID getSrcIDSlow(unsigned SLocOffset) const;
   SrcID getSrcIDLocal(unsigned SLocOffset) const;
@@ -1771,11 +1741,10 @@ private:
   SrcLoc getSpellingLocSlowCase(SrcLoc Loc) const;
   SrcLoc getFileLocSlowCase(SrcLoc Loc) const;
 
-  std::pair<SrcID, unsigned>
-  getDecomposedExpansionLocSlowCase(const src::SLocEntry *E) const;
-  std::pair<SrcID, unsigned>
-  getDecomposedSpellingLocSlowCase(const src::SLocEntry *E,
-                                   unsigned Offset) const;
+  std::pair<SrcID, unsigned> getDecomposedExpansionLocSlowCase(
+      const src::SLocEntry *E) const;
+  std::pair<SrcID, unsigned> getDecomposedSpellingLocSlowCase(
+      const src::SLocEntry *E, unsigned Offset) const;
   void computeMacroArgsCache(MacroArgsMap &MacroArgsCache, SrcID FID) const;
   void associateFileChunkWithMacroArgExp(MacroArgsMap &MacroArgsCache,
                                          SrcID FID, SrcLoc SpellLoc,
@@ -1784,13 +1753,15 @@ private:
 };
 
 /// Comparison function object.
-template <typename T> class BeforeThanCompare;
+template <typename T>
+class BeforeThanCompare;
 
 /// Compare two source locations.
-template <> class BeforeThanCompare<SrcLoc> {
+template <>
+class BeforeThanCompare<SrcLoc> {
   SrcMgr &SM;
 
-public:
+ public:
   explicit BeforeThanCompare(SrcMgr &SM) : SM(SM) {}
 
   bool operator()(SrcLoc LHS, SrcLoc RHS) const {
@@ -1799,10 +1770,11 @@ public:
 };
 
 /// Compare two non-overlapping source ranges.
-template <> class BeforeThanCompare<SrcRange> {
+template <>
+class BeforeThanCompare<SrcRange> {
   SrcMgr &SM;
 
-public:
+ public:
   explicit BeforeThanCompare(SrcMgr &SM) : SM(SM) {}
 
   bool operator()(SrcRange LHS, SrcRange RHS) const {
@@ -1813,7 +1785,7 @@ public:
 /// SrcMgr and necessary depdencies (e.g. VFS, FileMgr) for a single
 /// in-memorty file.
 class SrcMgrForFile {
-public:
+ public:
   /// Creates SrcMgr and necessary depdencies (e.g. VFS, FileMgr).
   /// The main file in the SrcMgr will be \p FileName with \p Content.
   SrcMgrForFile(StringRef FileName, StringRef Content);
@@ -1823,7 +1795,7 @@ public:
     return *SourceMgr;
   }
 
-private:
+ private:
   // The order of these fields are important - they should be in the same order
   // as they are created in `createSrcMgrForFile` so that they can be
   // deleted in the reverse order as they are created.
@@ -1832,6 +1804,6 @@ private:
   std::unique_ptr<SrcMgr> SourceMgr;
 };
 
-} // namespace stone
+}  // namespace stone
 
-#endif // LLVM_CLANG_BASIC_SOURCEMANAGER_H
+#endif  // LLVM_CLANG_BASIC_SOURCEMANAGER_H

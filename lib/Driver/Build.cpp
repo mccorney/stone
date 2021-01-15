@@ -25,19 +25,18 @@ void Driver::BuildCompileActivities(Compilation &compilation,
     auto ie = compilation.CreateActivity<InputActivity>(*inputArg, inputType);
 
     switch (inputType) {
-    case file::FileType::Stone: {
-      assert(file::IsPartOfCompilation(inputType));
-      BuildCompileActivity(compilation, ie, le);
-    }
-    default:
-      break;
+      case file::FileType::Stone: {
+        assert(file::IsPartOfCompilation(inputType));
+        BuildCompileActivity(compilation, ie, le);
+      }
+      default:
+        break;
     }
   }
 }
 
 void Driver::BuildCompileActivity(Compilation &compilation, InputActivity *ie,
                                   CompilationActivity *le) {
-
   // if (profile.compileType == CompileType::MultipleInvocation) {
   //   } else if (profile.compileType == CompileType::SingleInvocation) {
   //}
@@ -52,6 +51,5 @@ void Driver::BuildJobsForCompileActivity(Compilation &compilation,
                                          const CompileActivity *ce) {}
 
 void Driver::BuildLinkActivity() {
-
   // BuildCompileActivitys();
 }

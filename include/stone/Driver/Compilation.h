@@ -1,16 +1,6 @@
 #ifndef STONE_DRIVER_COMPILATION_H
 #define STONE_DRIVER_COMPILATION_H
 
-#include "stone/Core/LLVM.h"
-#include "stone/Driver/Activity.h"
-#include "stone/Driver/JobQueue.h"
-
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/Optional.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Option/Option.h"
-
 #include <cassert>
 #include <iterator>
 #include <map>
@@ -18,12 +8,21 @@
 #include <utility>
 #include <vector>
 
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/Optional.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Option/Option.h"
+#include "stone/Core/LLVM.h"
+#include "stone/Driver/Activity.h"
+#include "stone/Driver/JobQueue.h"
+
 namespace llvm {
 namespace opt {
 class DerivedArgList;
 class InputArgList;
-} // namespace opt
-} // namespace llvm
+}  // namespace opt
+}  // namespace llvm
 
 namespace stone {
 namespace driver {
@@ -32,7 +31,6 @@ class ToolChain;
 class Driver;
 
 class Compilation final {
-
   /// The System we were created by.
   const Driver &driver;
 
@@ -55,15 +53,16 @@ class Compilation final {
   /// A list of all the procs
   JobList jobs;
 
-public:
+ public:
   Compilation(Driver &driver);
   ~Compilation();
 
-public:
+ public:
   /// Creates a new Activity owned by this Compilation.
   ///
   /// The new Activity is *not* added to the list returned by GetActivitys().
-  template <typename T, typename... Args> T *CreateActivity(Args &&...arg) {
+  template <typename T, typename... Args>
+  T *CreateActivity(Args &&...arg) {
     auto event = new T(std::forward<Args>(arg)...);
     activities.Add(std::unique_ptr<stone::driver::Activity>(event));
     return event;
@@ -113,6 +112,6 @@ public:
       const JobList &jobss,
       llvm::SmallVectorImpl<std::pair<int, const Job *>> &fallBackProcs) const;
 };
-} // namespace driver
-} // namespace stone
+}  // namespace driver
+}  // namespace stone
 #endif

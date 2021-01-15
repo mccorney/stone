@@ -4,6 +4,6 @@
 namespace stone {
 
 class TexDiagnosticListener final {};
-} // namespace stone
+}  // namespace stone
 
 #endif

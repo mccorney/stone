@@ -3,7 +3,7 @@
 
 namespace stone {
 class Object {
-public:
+ public:
 };
-} // namespace stone
+}  // namespace stone
 #endif

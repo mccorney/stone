@@ -32,7 +32,7 @@ if(CLANG_FORMAT)
 		stone-fmt
 		clang-format
 		-i
-		-style=llvm
+		-style=google
 		${stone_lib_files}
 		${stone_include_files}
 		${stone_def_files}

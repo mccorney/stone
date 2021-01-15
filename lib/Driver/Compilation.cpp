@@ -1,7 +1,4 @@
 #include "stone/Driver/Compilation.h"
-#include "stone/Core/Ret.h"
-#include "stone/Driver/Driver.h"
-#include "stone/Driver/ToolChain.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/STLExtras.h"
@@ -27,6 +24,9 @@
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/raw_ostream.h"
+#include "stone/Core/Ret.h"
+#include "stone/Driver/Driver.h"
+#include "stone/Driver/ToolChain.h"
 
 using namespace stone;
 using namespace stone::driver;

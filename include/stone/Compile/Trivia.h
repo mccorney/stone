@@ -1,9 +1,9 @@
 #ifndef STONE_COMPILE_TRIVIA_H
 #define STONE_COMPILE_TRIVIA_H
 
-#include "stone/Core/LLVM.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/SmallVector.h"
+#include "stone/Core/LLVM.h"
 
 namespace stone {
 namespace analysis {
@@ -13,7 +13,7 @@ class TriviaPiece final {
   TriviaKind kind;
   unsigned length;
 
-public:
+ public:
   TriviaPiece(TriviaKind kind, unsigned length) : kind(kind), length(length) {}
 
   TriviaKind GetKind() const { return kind; }
@@ -25,8 +25,7 @@ public:
 
   static size_t GetTotalLength(llvm::ArrayRef<TriviaPiece> pieces) {
     size_t Len = 0;
-    for (auto &p : pieces)
-      Len += p.GetLength();
+    for (auto &p : pieces) Len += p.GetLength();
     return Len;
   }
 
@@ -84,7 +83,7 @@ struct Trivia {
   }
   bool operator!=(const Trivia &other) const { return !(*this == other); }
 };
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 
 #endif

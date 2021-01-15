@@ -1,11 +1,11 @@
 #ifndef STONE_COMPILE_SPECCONTEXT_H
 #define STONE_COMPILE_SPECCONTEXT_H
 
+#include <memory>
+
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Module.h"
 #include "stone/Core/Stats.h"
-
-#include <memory>
 
 namespace stone {
 
@@ -24,5 +24,5 @@ class DeclSpecifier {};
 
 class SpecifierContext final {};
 
-} // namespace stone
+}  // namespace stone
 #endif

@@ -8,17 +8,17 @@
 
 namespace stone {
 class Context {
-protected:
+ protected:
   LangOptions langOpts;
   DiagnosticOptions diagOpts;
   llvm::raw_ostream &os;
   DiagnosticEngine de;
   StatEngine se;
 
-public:
+ public:
   Context();
 
-public:
+ public:
   llvm::raw_ostream &Out() { return os; }
   DiagnosticEngine &GetDiagEngine() { return de; }
   const DiagnosticEngine &GetDiagEngine() const { return de; }
@@ -33,5 +33,5 @@ public:
   const DiagnosticOptions &GetDiagOptions() const { return diagOpts; }
 };
 
-} // namespace stone
+}  // namespace stone
 #endif

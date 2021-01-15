@@ -1,4 +1,5 @@
 #include "stone/Compile/Compiler.h"
+
 #include "stone/Compile/Analysis.h"
 #include "stone/Compile/Frontend.h"
 #include "stone/Core/Ret.h"
@@ -8,9 +9,10 @@ using namespace stone::opts;
 using namespace stone::analysis;
 
 Compiler::Compiler(CompilePipeline *pipeline)
-    : Session(compileOpts), pipeline(pipeline), fm(compileOpts.fsOpts),
+    : Session(compileOpts),
+      pipeline(pipeline),
+      fm(compileOpts.fsOpts),
       sm(GetDiagEngine(), fm) {
-
   analysis.reset(new Analysis(*this, compileOpts, GetSrcMgr()));
 }
 
@@ -19,7 +21,6 @@ void Compiler::ComputeMode(const llvm::opt::DerivedArgList &args) {
 }
 
 bool Compiler::Build(llvm::ArrayRef<const char *> args) {
-
   excludedFlagsBitmask = opts::NoCompileOption;
   auto argList = BuildArgList(args);
 
@@ -62,7 +63,6 @@ int Compiler::Run() {
 void Compiler::Parse() { Parse(false); }
 
 void Compiler::Parse(bool check) {
-
   for (auto input : inputs) {
     // stone::analysis::Parse
     if (check) {

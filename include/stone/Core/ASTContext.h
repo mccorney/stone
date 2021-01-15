@@ -1,16 +1,15 @@
 #ifndef STONE_CORE_ASTCTX_H
 #define STONE_CORE_ASTCTX_H
 
-#include "stone/Core/ASTContextAlloc.h"
-#include "stone/Core/Builtin.h"
-#include "stone/Core/Context.h"
-#include "stone/Core/Identifier.h"
-#include "stone/Core/LangABI.h"
-#include "stone/Core/LangOptions.h"
-#include "stone/Core/SearchPathOptions.h"
-#include "stone/Core/SrcMgr.h"
-#include "stone/Core/Stats.h"
-#include "stone/Core/Type.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -32,16 +31,16 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Compiler.h"
-
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
+#include "stone/Core/ASTContextAlloc.h"
+#include "stone/Core/Builtin.h"
+#include "stone/Core/Context.h"
+#include "stone/Core/Identifier.h"
+#include "stone/Core/LangABI.h"
+#include "stone/Core/LangOptions.h"
+#include "stone/Core/SearchPathOptions.h"
+#include "stone/Core/SrcMgr.h"
+#include "stone/Core/Stats.h"
+#include "stone/Core/Type.h"
 
 namespace stone {
 namespace syntax {
@@ -62,12 +61,11 @@ class ASTContext;
 class ASTContextStats final : public Stats {
   const ASTContext &ac;
 
-public:
+ public:
   ASTContextStats(const ASTContext &ac) : ac(ac) {}
   void Print() const override;
 };
 class ASTContext final {
-
   friend ASTContextStats;
   ASTContextStats stats;
 
@@ -92,7 +90,7 @@ class ASTContext final {
 
   mutable llvm::SmallVector<Type *, 0> types;
 
-public:
+ public:
   ASTContext(const stone::Context &ctx, const SearchPathOptions &pathOpts,
              SrcMgr &sm);
   ~ASTContext();
@@ -100,7 +98,7 @@ public:
   ASTContext(const ASTContext &) = delete;
   ASTContext &operator=(const ASTContext &) = delete;
 
-public:
+ public:
   //
   Identifier &GetIdentifier(llvm::StringRef name);
   //
@@ -116,7 +114,7 @@ public:
 
   ASTContextStats &GetStats() { return stats; }
 
-public:
+ public:
   /// Return the total amount of physical memory allocated for representing
   /// AST nodes and type information.
   size_t GetSizeOfMemUsed() const;
@@ -124,15 +122,16 @@ public:
   void *Allocate(size_t size, unsigned align = 8) const {
     return bumpAlloc.Allocate(size, align);
   }
-  template <typename T> T *Allocate(size_t num = 1) const {
+  template <typename T>
+  T *Allocate(size_t num = 1) const {
     return static_cast<T *>(Allocate(num * sizeof(T), alignof(T)));
   }
   void Deallocate(void *Ptr) const {}
 
-public:
+ public:
 };
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 /// Placement new for using the ASTContext's allocator.
 ///
 /// This placement form of operator new uses the ASTContext's allocator for

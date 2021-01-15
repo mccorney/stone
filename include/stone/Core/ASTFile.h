@@ -4,7 +4,7 @@
 namespace stone {
 namespace syntax {
 class ASTFile final {};
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 
 #endif

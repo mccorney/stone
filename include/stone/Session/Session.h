@@ -1,17 +1,6 @@
 #ifndef STONE_SESSION_SESSION_H
 #define STONE_SESSION_SESSION_H
 
-#include "stone/Core/Context.h"
-#include "stone/Session/FileType.h"
-#include "stone/Session/Mode.h"
-#include "stone/Session/SessionOptions.h"
-
-#include "llvm/Option/Arg.h"
-#include "llvm/Option/ArgList.h"
-#include "llvm/Option/OptSpecifier.h"
-#include "llvm/Option/OptTable.h"
-#include "llvm/Option/Option.h"
-
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/STLExtras.h"
@@ -21,7 +10,11 @@
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSet.h"
 #include "llvm/ADT/StringSwitch.h"
-
+#include "llvm/Option/Arg.h"
+#include "llvm/Option/ArgList.h"
+#include "llvm/Option/OptSpecifier.h"
+#include "llvm/Option/OptTable.h"
+#include "llvm/Option/Option.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/Chrono.h"
 #include "llvm/Support/ErrorHandling.h"
@@ -33,6 +26,10 @@
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Support/VirtualFileSystem.h"
+#include "stone/Core/Context.h"
+#include "stone/Session/FileType.h"
+#include "stone/Session/Mode.h"
+#include "stone/Session/SessionOptions.h"
 
 namespace stone {
 
@@ -49,7 +46,7 @@ class Session : public Context {
   SessionOptions &sessionOpts;
   llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fileSystem;
 
-protected:
+ protected:
   Mode mode;
   /// Bit flags for OptTable
   unsigned includedFlagsBitmask = 0;
@@ -77,7 +74,7 @@ protected:
   /// Object that stores strings read from configuration file.
   llvm::StringSaver strSaver;
 
-public:
+ public:
   void SetFS(llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> fs) {
     fileSystem = fs;
   }
@@ -94,15 +91,15 @@ public:
   /// If unknown, this will be some time in the past.
   llvm::sys::TimePoint<> endTime = llvm::sys::TimePoint<>::min();
 
-public:
+ public:
   Session(SessionOptions &sessionOpts);
   ~Session();
 
-protected:
-  std::unique_ptr<llvm::opt::InputArgList>
-  BuildArgList(llvm::ArrayRef<const char *> args);
+ protected:
+  std::unique_ptr<llvm::opt::InputArgList> BuildArgList(
+      llvm::ArrayRef<const char *> args);
 
-public:
+ public:
   ///
   virtual bool Build(llvm::ArrayRef<const char *> args) = 0;
   ///
@@ -142,18 +139,18 @@ public:
   /// for representing CompileInstances
   size_t GetMemSize() const { return bumpAlloc.getTotalMemory(); }
 
-protected:
+ protected:
   // Compute the mode id -- TODO: virtual
   virtual void ComputeMode(const llvm::opt::DerivedArgList &args);
   /// TranslateInputArgs - Create a new derived argument list from the input
   /// arguments, after applying the standard argument translations.
-  virtual llvm::opt::DerivedArgList *
-  TranslateInputArgs(const llvm::opt::InputArgList &args) const;
+  virtual llvm::opt::DerivedArgList *TranslateInputArgs(
+      const llvm::opt::InputArgList &args) const;
 
   virtual ModeKind GetDefaultModeKind() = 0;
 
   void Purge();
 };
 
-} // namespace stone
+}  // namespace stone
 #endif

@@ -1,8 +1,3 @@
-#include "stone/Compile/Compile.h"
-#include "stone/Core/Ret.h"
-#include "stone/Driver/Run.h"
-#include "stone/Session/ExecutablePath.h"
-
 #include "llvm/ADT/Triple.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/FileSystem.h"
@@ -11,11 +6,14 @@
 #include "llvm/Support/Program.h"
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/TargetSelect.h"
+#include "stone/Compile/Compile.h"
+#include "stone/Core/Ret.h"
+#include "stone/Driver/Run.h"
+#include "stone/Session/ExecutablePath.h"
 
 using namespace stone;
 
 int main(int argc, const char **args) {
-
   llvm::InitLLVM initLLVM(argc, args);
   if (llvm::sys::Process::FixupStandardFileDescriptors()) {
     return ret::err;

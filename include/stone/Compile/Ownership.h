@@ -4,6 +4,6 @@
 namespace stone {
 namespace analysis {
 class Ownership {};
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 #endif

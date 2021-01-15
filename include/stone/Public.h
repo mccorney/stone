@@ -9,20 +9,20 @@ class SourceUnit;
 namespace analysis {
 class Token;
 class Compiler;
-} // namespace analysis
+}  // namespace analysis
 
 class CompilePipeline {
   CompilePipeline() = default;
   virtual ~CompilePipeline() = default;
 
-public:
+ public:
   virtual void OnCompilerConfigured(const analysis::Compiler &compiler);
 
-public:
+ public:
   virtual void OnCompileStarted(const analysis::Compiler &compiler);
   virtual void OnCompileFinished(const analysis::Compiler &compiler);
 
-public:
+ public:
   ///
   virtual void OnParseStarted(const analysis::Compiler &compiler);
   ///
@@ -33,7 +33,7 @@ public:
   virtual void OnToken(const analysis::Token &token);
   virtual void OnSourceFile(const syntax::SourceUnit &unit);
 
-public:
+ public:
   ///
   virtual void OnCheckStarted(const analysis::Compiler &compiler);
   ///
@@ -41,7 +41,7 @@ public:
   ///
   virtual void OnCheckFinished(const analysis::Compiler &compiler);
 
-public:
+ public:
   ///
   virtual void OnGenIRStarted(const analysis::Compiler &compiler);
   ///
@@ -49,7 +49,7 @@ public:
   ///
   virtual void OnGenIRFinished(const analysis::Compiler &compiler);
 
-public:
+ public:
   ///
   virtual void OnGenObjectStarted(const analysis::Compiler &compiler);
   ///
@@ -57,5 +57,5 @@ public:
   ///
   virtual void OnGenObjectFinished(const analysis::Compiler &compiler);
 };
-} // namespace stone
+}  // namespace stone
 #endif

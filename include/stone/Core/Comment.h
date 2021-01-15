@@ -7,10 +7,10 @@ namespace stone {
 namespace syntax {
 
 class Comment {
-public:
+ public:
   Comment();
   ~Comment();
 };
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 #endif

@@ -6,7 +6,6 @@
 #include "stone/Core/FileSystemOptions.h"
 #include "stone/Core/SearchPathOptions.h"
 #include "stone/Core/SrcLoc.h"
-
 #include "stone/Session/SessionOptions.h"
 
 namespace stone {
@@ -19,7 +18,6 @@ class OutputFile;
 
 // TODO: Replace with CompileUnit
 class alignas(8) InputFile final {
-
   SourceUnit *su = nullptr;
   OutputFile *outputFile = nullptr;
   CompileScope *scope = nullptr;
@@ -30,11 +28,11 @@ class alignas(8) InputFile final {
   InputFile(const InputFile &) = delete;
   void operator=(const InputFile &) = delete;
 
-public:
+ public:
   InputFile(Compiler &compiler);
   ~InputFile();
 
-public:
+ public:
   // Make vanilla new/delete illegal for Decls.
   void *operator new(size_t bytes) = delete;
   void operator delete(void *data) = delete;
@@ -43,7 +41,7 @@ public:
   void *operator new(std::size_t bytes, const Compiler &compiler,
                      unsigned alignment = alignof(InputFile));
 
-public:
+ public:
   bool Init();
   static InputFile *Create(Compiler &compiler);
 };
@@ -51,15 +49,15 @@ public:
 class OutputFile final {};
 
 class CompileOptions final : public SessionOptions {
-public:
+ public:
   GenOptions genOpts;
   AnalysisOptions analysisOpts;
   SearchPathOptions spOpts;
   FileSystemOptions fsOpts;
 
-public:
+ public:
   CompileOptions() {}
 };
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 #endif

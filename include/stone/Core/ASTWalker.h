@@ -4,8 +4,8 @@
 namespace stone {
 namespace syntax {
 class ASTWalker {
-public:
+ public:
 };
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 #endif

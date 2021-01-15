@@ -162,7 +162,7 @@ class FunctionDeclBits final {
 
 /// Number of non-inherited bits in FunctionDeclBitfields.
 enum { NumFunctionDeclBits = 27 };
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 
 #endif

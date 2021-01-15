@@ -1,9 +1,9 @@
 #include "stone/Driver/Driver.h"
-#include "stone/Core/Ret.h"
-#include "stone/Driver/ToolChain.h"
 
 #include "llvm/Config/llvm-config.h"
 #include "llvm/Support/FormatVariadic.h"
+#include "stone/Core/Ret.h"
+#include "stone/Driver/ToolChain.h"
 
 using namespace stone;
 using namespace stone::driver;
@@ -11,13 +11,14 @@ using namespace stone::driver;
 using namespace llvm::opt;
 
 Driver::Driver(llvm::StringRef stoneExecutable, std::string driverName)
-    : Session(driverOpts), stoneExecutablePath(stoneExecutablePath),
+    : Session(driverOpts),
+      stoneExecutablePath(stoneExecutablePath),
       driverName(driverName),
       /*sysRoot(DEFAULT_SYSROOT),*/
-      driverTitle("Stone Compiler"), checkInputFilesExist(true) {}
+      driverTitle("Stone Compiler"),
+      checkInputFilesExist(true) {}
 /// Parse the given list of strings into an InputArgList.
 bool Driver::Build(llvm::ArrayRef<const char *> args) {
-
   excludedFlagsBitmask = opts::NoDriverOption;
   originalArgs = BuildArgList(args);
   toolChain = BuildToolChain(*originalArgs);
@@ -26,46 +27,42 @@ bool Driver::Build(llvm::ArrayRef<const char *> args) {
   return true;
 }
 
-std::unique_ptr<ToolChain>
-Driver::BuildToolChain(const llvm::opt::InputArgList &argList) {
-
+std::unique_ptr<ToolChain> Driver::BuildToolChain(
+    const llvm::opt::InputArgList &argList) {
   if (const llvm::opt::Arg *arg = argList.getLastArg(opts::Target)) {
     targetTriple = llvm::Triple::normalize(arg->getValue());
   }
   llvm::Triple target(targetTriple);
 
   switch (target.getOS()) {
-
-  case llvm::Triple::Darwin:
-  case llvm::Triple::MacOSX: {
-    llvm::Optional<llvm::Triple> targetVariant;
-    if (const llvm::opt::Arg *A = argList.getLastArg(opts::TargetVariant)) {
-      targetVariant = llvm::Triple(llvm::Triple::normalize(A->getValue()));
+    case llvm::Triple::Darwin:
+    case llvm::Triple::MacOSX: {
+      llvm::Optional<llvm::Triple> targetVariant;
+      if (const llvm::opt::Arg *A = argList.getLastArg(opts::TargetVariant)) {
+        targetVariant = llvm::Triple(llvm::Triple::normalize(A->getValue()));
+      }
+      return llvm::make_unique<DarwinToolChain>(*this, target, targetVariant);
     }
-    return llvm::make_unique<DarwinToolChain>(*this, target, targetVariant);
-  }
-    /*
-      case llvm::Triple::Linux:
-        return llvm::make_unique<stone::Linux>(*this, target);
-      case llvm::Triple::FreeBSD:
-        return llvm::make_unique<stone::FreeBSD>(*this, target);
-      case llvm::Triple::OpenBSD:
-        return llvm::make_unique<stone::OpenBSD>(*this, target);
-      case llvm::Triple::Win32:
-        return llvm::make_unique<stone::Win>(*this, target);
-    */
+      /*
+        case llvm::Triple::Linux:
+          return llvm::make_unique<stone::Linux>(*this, target);
+        case llvm::Triple::FreeBSD:
+          return llvm::make_unique<stone::FreeBSD>(*this, target);
+        case llvm::Triple::OpenBSD:
+          return llvm::make_unique<stone::OpenBSD>(*this, target);
+        case llvm::Triple::Win32:
+          return llvm::make_unique<stone::Win>(*this, target);
+      */
 
-  default:
-    os << "D(SourceLoc(),"
-       << "msg::error_unknown_target,"
-       << "ArgList.getLastArg(options::OPT_target)->getValue());" << '\n';
-    break;
+    default:
+      os << "D(SourceLoc(),"
+         << "msg::error_unknown_target,"
+         << "ArgList.getLastArg(options::OPT_target)->getValue());" << '\n';
+      break;
   }
 }
-std::unique_ptr<Compilation>
-Driver::BuildCompilation(const ToolChain &tc,
-                         const llvm::opt::InputArgList &argList) {
-
+std::unique_ptr<Compilation> Driver::BuildCompilation(
+    const ToolChain &tc, const llvm::opt::InputArgList &argList) {
   llvm::PrettyStackTraceString CrashInfo("Compilation construction");
 
   // TODO:
@@ -90,8 +87,7 @@ Driver::BuildCompilation(const ToolChain &tc,
 
   BuildInputs(tc, *dArgList, profile.inputFiles);
 
-  if (de.HasError())
-    return nullptr;
+  if (de.HasError()) return nullptr;
 
   // TODO: ComputeCompileMod()
   //
@@ -114,7 +110,6 @@ Driver::BuildCompilation(const ToolChain &tc,
 }
 
 bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {
-
   if (args.hasArg(opts::Help)) {
     PrintHelp(false);
     return false;
@@ -126,17 +121,14 @@ bool Driver::HandleImmediateArgs(const ArgList &args, const ToolChain &tc) {
 /// issue a diagnostic and return false.
 static bool DoesInputExist(Driver &driver, const DerivedArgList &args,
                            DiagnosticEngine &de, llvm::StringRef input) {
-
   // TODO:
   // if (!driver.GetCheckInputFilesExist())
   //  return true;
 
   // stdin always exists.
-  if (input == "-")
-    return true;
+  if (input == "-") return true;
 
-  if (file::Exists(input))
-    return true;
+  if (file::Exists(input)) return true;
 
   driver.Out() << "de.D(SourceLoc(),"
                << "diag::error_no_such_file_or_directory, Input);" << input
@@ -147,11 +139,9 @@ static bool DoesInputExist(Driver &driver, const DerivedArgList &args,
 // TODO: May move to session
 void Driver::BuildInputs(const ToolChain &tc, const DerivedArgList &args,
                          InputFiles &inputs) {
-
   llvm::DenseMap<llvm::StringRef, llvm::StringRef> seenSourceFiles;
 
   for (Arg *arg : args) {
-
     if (arg->getOption().getKind() == Option::InputClass) {
       llvm::StringRef argValue = arg->getValue();
       file::FileType ft = file::FileType::INVALID;

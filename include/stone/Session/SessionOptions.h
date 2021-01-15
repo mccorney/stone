@@ -9,16 +9,16 @@ namespace stone {
 class SessionOptions {
   std::unique_ptr<llvm::opt::OptTable> optTable;
 
-public:
+ public:
   bool showHelp = false;
   bool showLifecycle = false;
 
-public:
+ public:
   SessionOptions() : optTable(stone::CreateOptTable()) {}
 
-public:
+ public:
   llvm::opt::OptTable &GetOpts() const { return *optTable.get(); }
 };
-} // namespace stone
+}  // namespace stone
 
 #endif

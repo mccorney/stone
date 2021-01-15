@@ -3,6 +3,6 @@
 
 namespace stone {
 class GenOptions final {};
-} // namespace stone
+}  // namespace stone
 
 #endif

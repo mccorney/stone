@@ -1,15 +1,14 @@
 #ifndef STONE_DRIVER_JOB_H
 #define STONE_DRIVER_JOB_H
 
-#include "stone/Core/List.h"
-#include "stone/Driver/Activity.h"
-#include "stone/Driver/CrashCondition.h"
-
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Option/Arg.h"
 #include "llvm/Option/ArgList.h"
 #include "llvm/Support/StringSaver.h"
+#include "stone/Core/List.h"
+#include "stone/Driver/Activity.h"
+#include "stone/Driver/CrashCondition.h"
 
 namespace stone {
 namespace driver {
@@ -27,26 +26,26 @@ class Job {
   /// proper response file
   llvm::opt::ArgStringList inputFiles;
 
-public:
+ public:
   Job(CompilationActivity &trigger, Driver &driver)
       : trigger(trigger), driver(driver) {}
   virtual ~Job();
 
-public:
+ public:
   CompilationActivity &GetTrigger() { return trigger; }
 
   virtual void Print(llvm::raw_ostream &os, const char *terminator, bool quote,
                      CrashCondition *crash = nullptr) const;
 
-  virtual int
-  AsyncExecute(llvm::ArrayRef<llvm::Optional<llvm::StringRef>> redirects,
-               std::string *errMsg, bool *failed) const;
+  virtual int AsyncExecute(
+      llvm::ArrayRef<llvm::Optional<llvm::StringRef>> redirects,
+      std::string *errMsg, bool *failed) const;
 
-  virtual int
-  SyncExecute(llvm::ArrayRef<llvm::Optional<llvm::StringRef>> redirects,
-              std::string *errMsg, bool *failed) const;
+  virtual int SyncExecute(
+      llvm::ArrayRef<llvm::Optional<llvm::StringRef>> redirects,
+      std::string *errMsg, bool *failed) const;
 
-public:
+ public:
   // llvm::SmallVector<Job *, 10> deps;
   //
   /// Set an input file list, necessary if you specified an RF_FileList response
@@ -60,10 +59,10 @@ class SyncJob : public Job {};
 class AsyncJob : public Job {};
 
 class JobList final : public List<Job> {
-public:
+ public:
   void Print() const;
 };
 
-} // namespace driver
-} // namespace stone
+}  // namespace driver
+}  // namespace stone
 #endif

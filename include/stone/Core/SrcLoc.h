@@ -1,20 +1,21 @@
 #ifndef STONE_CORE_SOURCELOCATION_H
 #define STONE_CORE_SOURCELOCATION_H
 
-#include "stone/Core/LLVM.h"
-
-#include "llvm/ADT/StringRef.h"
-#include "llvm/Support/PointerLikeTypeTraits.h"
 #include <cassert>
 #include <cstdint>
 #include <string>
 #include <utility>
 
+#include "llvm/ADT/StringRef.h"
+#include "llvm/Support/PointerLikeTypeTraits.h"
+#include "stone/Core/LLVM.h"
+
 namespace llvm {
 
-template <typename T> struct DenseMapInfo;
+template <typename T>
+struct DenseMapInfo;
 
-} // namespace llvm
+}  // namespace llvm
 
 namespace stone {
 
@@ -28,7 +29,7 @@ class SrcID {
   /// this module, and <-1 is something loaded from another module.
   int ID = 0;
 
-public:
+ public:
   bool isValid() const { return ID != 0; }
   bool isInvalid() const { return ID == 0; }
 
@@ -42,7 +43,7 @@ public:
   static SrcID getSentinel() { return get(-1); }
   unsigned getHashValue() const { return static_cast<unsigned>(ID); }
 
-private:
+ private:
   friend class SrcMgr;
   static SrcID get(int V) {
     SrcID F;
@@ -68,14 +69,13 @@ private:
 ///
 /// It is important that this type remains small. It is currently 32 bits wide.
 class SrcLoc {
-
   friend class SrcMgr;
 
   unsigned ID = 0;
 
   enum : unsigned { MacroIDBit = 1U << 31 };
 
-public:
+ public:
   bool isSrcID() const { return (ID & MacroIDBit) == 0; }
   bool isMacroID() const { return (ID & MacroIDBit) != 0; }
 
@@ -87,7 +87,7 @@ public:
   bool isValid() const { return ID != 0; }
   bool isInvalid() const { return ID == 0; }
 
-private:
+ private:
   /// Return the offset into the manager's global input view.
   unsigned getOffset() const { return ID & ~MacroIDBit; }
 
@@ -105,7 +105,7 @@ private:
     return L;
   }
 
-public:
+ public:
   /// Return a source location with the specified offset from this
   /// SrcLoc.
   SrcLoc getLocWithOffset(int Offset) const {
@@ -175,7 +175,7 @@ class SrcRange {
   SrcLoc B;
   SrcLoc E;
 
-public:
+ public:
   SrcRange() = default;
   SrcRange(SrcLoc loc) : B(loc), E(loc) {}
   SrcRange(SrcLoc begin, SrcLoc end) : B(begin), E(end) {}
@@ -209,7 +209,7 @@ class CharSrcRange {
   SrcRange Range;
   bool IsTokenRange = false;
 
-public:
+ public:
   CharSrcRange() = default;
   CharSrcRange(SrcRange R, bool ITR) : Range(R), IsTokenRange(ITR) {}
 
@@ -260,7 +260,7 @@ class PresumedLoc {
   unsigned Line, Col;
   SrcLoc IncludeLoc;
 
-public:
+ public:
   PresumedLoc() = default;
   PresumedLoc(const char *FN, SrcID FID, unsigned Ln, unsigned Co, SrcLoc IL)
       : Filename(FN), ID(FID), Line(Ln), Col(Co), IncludeLoc(IL) {}
@@ -318,7 +318,7 @@ class SrcFile;
 class FullSrcLoc : public SrcLoc {
   const SrcMgr *srcMgr = nullptr;
 
-public:
+ public:
   /// Creates a FullSrcLoc where isValid() returns \c false.
   FullSrcLoc() = default;
 
@@ -409,13 +409,14 @@ public:
   }
 };
 
-} // namespace stone
+}  // namespace stone
 
 namespace llvm {
 
 /// Define DenseMapInfo so that SrcID's can be used as keys in DenseMap and
 /// DenseSets.
-template <> struct DenseMapInfo<stone::SrcID> {
+template <>
+struct DenseMapInfo<stone::SrcID> {
   static stone::SrcID getEmptyKey() { return {}; }
 
   static stone::SrcID getTombstoneKey() { return stone::SrcID::getSentinel(); }
@@ -426,7 +427,8 @@ template <> struct DenseMapInfo<stone::SrcID> {
 };
 
 // Teach SmallPtrSet how to handle SrcLoc.
-template <> struct PointerLikeTypeTraits<stone::SrcLoc> {
+template <>
+struct PointerLikeTypeTraits<stone::SrcLoc> {
   enum { NumLowBitsAvailable = 0 };
 
   static void *getAsVoidPointer(stone::SrcLoc L) { return L.getPtrEncoding(); }
@@ -436,6 +438,6 @@ template <> struct PointerLikeTypeTraits<stone::SrcLoc> {
   }
 };
 
-} // namespace llvm
+}  // namespace llvm
 
-#endif // LLVM_CLANG_BASIC_SOURCELOCATION_H
+#endif  // LLVM_CLANG_BASIC_SOURCELOCATION_H

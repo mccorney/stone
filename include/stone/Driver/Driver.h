@@ -1,17 +1,17 @@
 #ifndef STONE_DRIVER_DRIVER_H
 #define STONE_DRIVER_DRIVER_H
 
+#include <list>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "stone/Core/Mem.h"
 #include "stone/Driver/Activity.h"
 #include "stone/Driver/Compilation.h"
 #include "stone/Driver/DriverOptions.h"
 #include "stone/Driver/ToolChain.h"
 #include "stone/Session/Session.h"
-
-#include <list>
-#include <map>
-#include <string>
-#include <vector>
 
 using namespace llvm::opt;
 namespace llvm {
@@ -25,8 +25,8 @@ class ArgList;
 class OptTable;
 class InputArgList;
 class DerivedArgList;
-} // namespace opt
-} // namespace llvm
+}  // namespace opt
+}  // namespace llvm
 
 namespace stone {
 namespace driver {
@@ -48,7 +48,7 @@ enum class CompileType {
 enum class LTOKind { None, Full, Thin, Unknown };
 
 class BuildProfile final {
-public:
+ public:
   /// All of the input files that have been created
   InputFiles inputFiles;
 
@@ -87,19 +87,19 @@ public:
   /// The output type which should be used for the compiler
   file::FileType compilerOutputFileType = file::FileType::INVALID;
 
-public:
+ public:
   class ModuleInputs final {
-  private:
+   private:
     llvm::SmallVector<const Activity *, 2> inputs;
   };
   class LinkerInputs final {
-  private:
+   private:
     llvm::SmallVector<const Activity *, 2> inputs;
   };
 };
 
 class DriverCache final {
-public:
+ public:
   /// A map for caching Jobs for a given Activity/ToolChain pair
   llvm::DenseMap<std::pair<const Activity *, const ToolChain *>, Job *>
       procChacheMap;
@@ -117,7 +117,7 @@ class Driver final : public Session {
   std::unique_ptr<Compilation> compilation;
   BuildProfile profile;
 
-public:
+ public:
   /// The options for the driver
   DriverOptions driverOpts;
 
@@ -158,7 +158,7 @@ public:
   /// User directory for config files.
   std::string userConfigDir;
 
-private:
+ private:
   /// Name of configuration file if used.
   std::string cfgFile;
 
@@ -169,15 +169,15 @@ private:
   /// Arguments originated from configuration file.
   std::unique_ptr<llvm::opt::InputArgList> cfgOpts;
 
-private:
+ private:
   void BuildActivities();
   void BuildJobs();
   void BuildQueue();
 
   /// This uses a std::unique_ptr instead of returning a toolchain by value
   /// because ToolChain has virtual methods.
-  std::unique_ptr<ToolChain>
-  BuildToolChain(const llvm::opt::InputArgList &argList);
+  std::unique_ptr<ToolChain> BuildToolChain(
+      const llvm::opt::InputArgList &argList);
 
   void BuildInputs(const ToolChain &tc, const DerivedArgList &args,
                    InputFiles &inputs);
@@ -201,13 +201,12 @@ private:
                     const InputFiles &inputs /*TODO: DriverInputs*/,
                     BuildProfile &profile) const;
 
-  std::unique_ptr<Compilation>
-  BuildCompilation(const ToolChain &toolChain,
-                   const llvm::opt::InputArgList &argList);
+  std::unique_ptr<Compilation> BuildCompilation(
+      const ToolChain &toolChain, const llvm::opt::InputArgList &argList);
 
   bool HandleImmediateArgs(const ArgList &args, const ToolChain &tc);
 
-public:
+ public:
   Driver(llvm::StringRef executablePath, std::string driverName);
 
   /// Parse the given list of strings into an InputArgList.
@@ -216,7 +215,7 @@ public:
   void PrintLifecycle() override;
   void PrintHelp(bool showHidden) override;
 
-public:
+ public:
   const std::string &GetConfigFile() const { return cfgFile; }
 
   bool GetCheckInputFilesExist() const { return checkInputFilesExist; }
@@ -227,8 +226,7 @@ public:
 
   /// Get the path to where the clang executable was installed.
   const char *GetInstalledDir() const {
-    if (!installedDir.empty())
-      return installedDir.c_str();
+    if (!installedDir.empty()) return installedDir.c_str();
     return driverDir.c_str();
   }
   void SetInstalledDir(llvm::StringRef v) { installedDir = std::string(v); }
@@ -242,7 +240,7 @@ public:
   const DriverCache &GetCache() const { return cache; }
   DriverCache &GetCache() { return cache; }
 
-protected:
+ protected:
   void ComputeMode(const llvm::opt::DerivedArgList &args) override;
   ModeKind GetDefaultModeKind() override;
 
@@ -250,7 +248,7 @@ protected:
   /// arguments, after applying the standard argument translations.
   // llvm::opt::DerivedArgList *
   // TranslateInputArgs(const llvm::opt::InputArgList &args) override const;
-private:
+ private:
   // Build Activitys
   void BuildCompileActivities(Compilation &compilation,
                               CompilationActivity *le = nullptr);
@@ -264,7 +262,7 @@ private:
   void BuildLinkActivity();
   void BuildStaticLinkActivity();
   void BuildStaticLinkActivity(
-      CompilationActivity &event); // Calls BuildProcForActivity
+      CompilationActivity &event);  // Calls BuildProcForActivity
 
   void BuildDynamicLinkActivity();
   void BuildDynamicLinkActivity(CompilationActivity &event);
@@ -272,6 +270,6 @@ private:
   void BuildBackendActivity();
   void BuildAssemblyActivity();
 };
-} // namespace driver
-} // namespace stone
+}  // namespace driver
+}  // namespace stone
 #endif

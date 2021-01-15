@@ -13,22 +13,22 @@ class MemoryBuffer;
 class Module;
 class TargetOptions;
 class TargetMachine;
-} // namespace llvm
+}  // namespace llvm
 
 namespace stone {
 
 class Transformer final {
-public:
+ public:
   Transformer();
 
-public:
+ public:
   void GenStmt();
 
-public:
+ public:
   void GenDecl();
 
-public:
+ public:
   void GenExpr();
 };
-} // namespace stone
+}  // namespace stone
 #endif

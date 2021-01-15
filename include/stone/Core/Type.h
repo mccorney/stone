@@ -8,6 +8,6 @@ class TypeLoc {};
 
 class Type {};
 
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 #endif

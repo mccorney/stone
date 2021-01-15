@@ -1,18 +1,6 @@
 #ifndef STONE_CORE_DIAGNOSTICS_H
 #define STONE_CORE_DIAGNOSTICS_H
 
-#include "stone/Core/DiagnosticOptions.h"
-#include "stone/Core/SrcLoc.h"
-
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/DenseMap.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Compiler.h"
-#include "llvm/Support/Error.h"
-
 #include <cassert>
 #include <cstdint>
 #include <limits>
@@ -23,6 +11,17 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/Error.h"
+#include "stone/Core/DiagnosticOptions.h"
+#include "stone/Core/SrcLoc.h"
 
 namespace stone {
 
@@ -37,22 +36,22 @@ class DiagnosticListener {};
 class Diagnostics {
   friend DiagnosticEngine;
   // bool isActive;
-protected:
+ protected:
   unsigned int uniqueID = 0;
   unsigned int maxMessages = 0;
   unsigned int startID = 0;
   unsigned int endID = 0;
 
-public:
+ public:
   unsigned int GetUniqueID() const { return uniqueID; }
 
-protected:
+ protected:
   // Only for Diagnostics
   void Init();
   unsigned int GetStartID() const { return startID; }
   unsigned int GetEndID() const { return endID; }
 
-public:
+ public:
 };
 
 enum class DiagnosticLevel {
@@ -90,7 +89,6 @@ class CustomDiagnosticArgument {};
 /// the user. Diagnostics is tied to one translation unit and one
 /// SrcMgr.
 class DiagnosticEngine final {
-
   /// The
   unsigned int diagnosticSeen = 0;
 
@@ -98,7 +96,7 @@ class DiagnosticEngine final {
   // unsigned int maxDiagnosticMessages = 1000;
   llvm::DenseMap<unsigned int, std::unique_ptr<Diagnostics>> entries;
 
-public:
+ public:
   explicit DiagnosticEngine(const DiagnosticOptions &diagOpts,
                             DiagnosticListener *listener = nullptr,
                             bool ownsListener = true);
@@ -107,7 +105,7 @@ public:
   DiagnosticEngine &operator=(const DiagnosticEngine &) = delete;
   ~DiagnosticEngine();
 
-public:
+ public:
   /// Owns the Diagnostics
   // NOTE: when you add, check for existing, calculate id, start, and end and
   // then load message; diagnostic.messageID = diagnostics.size() +1;
@@ -123,7 +121,6 @@ public:
 };
 
 class DiagnosticBuilder final {
-
   friend class DiagnosticEngine;
   // friend class PartialDiagnostic;
 
@@ -144,14 +141,13 @@ class DiagnosticBuilder final {
   DiagnosticBuilder() = default;
 
   explicit DiagnosticBuilder(DiagnosticEngine *de) : de(de), isActive(true) {
-
     assert(de && "DiagnosticBuilder requires a valid DiagnosticsEngine!");
 
     // diagnostics->diagnosticRanges.clear();
     // diagnostics->diagnosticFixIts.clear();
   }
 
-public:
+ public:
   /// Issue the message to the client.
   ///
   /// This actually returns an instance of DiagnosticBuilder which emits the
@@ -168,5 +164,5 @@ public:
                                     const unsigned messageID);
 };
 
-} // namespace stone
+}  // namespace stone
 #endif

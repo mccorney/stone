@@ -1,9 +1,8 @@
 #include "stone/Driver/Run.h"
-#include "stone/Core/LLVM.h"
-#include "stone/Core/Ret.h"
-#include "stone/Driver/Compilation.h"
-#include "stone/Driver/Driver.h"
-#include "stone/Session/ExecutablePath.h"
+
+#include <memory>
+#include <set>
+#include <system_error>
 
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/SmallVector.h"
@@ -14,16 +13,16 @@
 #include "llvm/Support/Host.h"
 #include "llvm/Support/InitLLVM.h"
 #include "llvm/Support/Path.h"
-
 #include "llvm/Support/Program.h"
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/StringSaver.h"
 #include "llvm/Support/TargetSelect.h"
-
-#include <memory>
-#include <set>
-#include <system_error>
+#include "stone/Core/LLVM.h"
+#include "stone/Core/Ret.h"
+#include "stone/Driver/Compilation.h"
+#include "stone/Driver/Driver.h"
+#include "stone/Session/ExecutablePath.h"
 
 using namespace stone;
 using namespace stone::driver;
@@ -59,7 +58,6 @@ static void SetInstallDir(llvm::ArrayRef<const char *> &argv, Driver &driver,
 
 int stone::Run(llvm::ArrayRef<const char *> args, const char *arg0,
                void *mainAddr) {
-
   auto driverPath = stone::GetExecutablePath(arg0);
   auto driverName = llvm::sys::path::stem(arg0);
 

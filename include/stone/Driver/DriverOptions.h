@@ -11,12 +11,12 @@ class InputFile final {};
 class OutputFile final {};
 
 class DriverOptions final : public SessionOptions {
-public:
+ public:
   DriverOptions() {}
 
-public:
+ public:
 };
-} // namespace driver
-} // namespace stone
+}  // namespace driver
+}  // namespace stone
 
 #endif

@@ -1,9 +1,13 @@
 #include "stone/Core/Identifier.h"
+
 #include "stone/Core/Char.h"
 #include "stone/Core/LangOptions.h"
 //#include "stone/Core/OperatorKinds.h"
 //#include "stone/Core/Specifiers.h"
-#include "stone/Core/TokenKind.h"
+#include <cassert>
+#include <cstdio>
+#include <cstring>
+#include <string>
 
 #include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/FoldingSet.h"
@@ -13,10 +17,7 @@
 #include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <string>
+#include "stone/Core/TokenKind.h"
 
 using namespace stone;
 using namespace stone::syntax;
@@ -38,14 +39,13 @@ static KeywordStatus GetKeywordStatus(const LangOptions &langOpts,
 }
 /// Returns true if the identifier is a keyword
 bool Identifier::IsKeyword(const LangOptions &langOpts) const {
-
   switch (kind) {
-#define KEYWORD(NAME, FLAG)                                                    \
-  case tk::kw_##NAME:                                                          \
+#define KEYWORD(NAME, FLAG) \
+  case tk::kw_##NAME:       \
     return GetKeywordStatus(langOpts, FLAG) == KeywordStatus::On;
 #include "stone/Core/TokenKind.def"
-  default:
-    return false;
+    default:
+      return false;
   }
 }
 
@@ -56,7 +56,6 @@ IdentifierTable::IdentifierTable(const LangOptions &langOpts)
 
 static void AddKeyword(llvm::StringRef keyword, tk kind, unsigned flag,
                        const LangOptions &langOpts, IdentifierTable &table) {
-
   auto status = GetKeywordStatus(langOpts, flag);
   if (status == KeywordStatus::Off) {
     return;
@@ -69,7 +68,7 @@ static void AddKeyword(llvm::StringRef keyword, tk kind, unsigned flag,
 
 void IdentifierTable::AddKeywords(const LangOptions &LangOpts) {
   // Add keywords and tokens for the current language.
-#define KEYWORD(NAME, FLAG)                                                    \
+#define KEYWORD(NAME, FLAG) \
   AddKeyword(llvm::StringRef(#NAME), tk::kw_##NAME, FLAG, langOpts, *this);
 #include "stone/Core/TokenKind.def"
 }
@@ -80,7 +79,6 @@ void IdentifierTable::AddKeywords(const LangOptions &LangOpts) {
 /// PrintStats - Print statistics about how well the identifier table is doing
 /// at hashing identifiers.
 void IdentifierTableStats::Print() const {
-
   unsigned numBuckets = table.entries.getNumBuckets();
   unsigned numIdentifiers = table.entries.getNumItems();
   unsigned numEmptyBuckets = numBuckets - numIdentifiers;
@@ -92,11 +90,9 @@ void IdentifierTableStats::Print() const {
            I = table.entries.begin(),
            E = table.entries.end();
        I != E; ++I) {
-
     unsigned idLen = I->getKeyLength();
     averageIdentifierSize += idLen;
-    if (maxIdentifierLength < idLen)
-      maxIdentifierLength = idLen;
+    if (maxIdentifierLength < idLen) maxIdentifierLength = idLen;
   }
 
   os << "\n*** Identifier Table Stats: " << '\n';

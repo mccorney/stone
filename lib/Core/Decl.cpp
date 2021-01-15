@@ -1,17 +1,15 @@
 #include "stone/Core/Decl.h"
+
 #include "stone/Core/ASTContext.h"
 #include "stone/Core/Decl.h"
 //#include "stone/Core/DeclContextInternals.h"
 // TODO: #include "stone/Core/Friend.h"
-#include "stone/Core/Identifier.h"
-#include "stone/Core/LLVM.h"
-#include "stone/Core/LangOptions.h"
-#include "stone/Core/Module.h"
-#include "stone/Core/SrcLoc.h"
-#include "stone/Core/Stmt.h"
-#include "stone/Core/Target.h"
-#include "stone/Core/Template.h" //DeclTemplate
-#include "stone/Core/Type.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <string>
+#include <tuple>
+#include <utility>
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -22,13 +20,15 @@
 #include "llvm/Support/MathExtras.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <string>
-#include <tuple>
-#include <utility>
+#include "stone/Core/Identifier.h"
+#include "stone/Core/LLVM.h"
+#include "stone/Core/LangOptions.h"
+#include "stone/Core/Module.h"
+#include "stone/Core/SrcLoc.h"
+#include "stone/Core/Stmt.h"
+#include "stone/Core/Target.h"
+#include "stone/Core/Template.h"  //DeclTemplate
+#include "stone/Core/Type.h"
 
 using namespace stone;
 using namespace stone::syntax;
@@ -55,7 +55,6 @@ void *Decl::operator new(std::size_t size, const ASTContext &astCtx,
 
 void *Decl::operator new(std::size_t size, const ASTContext &astCtx,
                          DeclContext *parentDeclContext, std::size_t extra) {
-
   /*TODO:
     assert(!parent || &parent->GetParentASTContext() == &astCtx);
     // With local visibility enabled, we track the owning module even for local

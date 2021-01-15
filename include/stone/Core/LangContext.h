@@ -6,6 +6,6 @@ namespace stone {
 class LangContext {
   // Target info
 };
-} // namespace stone
+}  // namespace stone
 
 #endif

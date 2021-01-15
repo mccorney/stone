@@ -1,12 +1,11 @@
 #ifndef STONE_DRIVER_TOOLCHAIN_H
 #define STONE_DRIVER_TOOLCHAIN_H
 
-#include "stone/Core/LLVM.h"
-#include "stone/Core/Mem.h"
-#include "stone/Driver/Job.h"
-#include "stone/Session/FileType.h"
-#include "stone/Session/Mode.h"
-#include "stone/Session/Options.h"
+#include <cassert>
+#include <climits>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/ArrayRef.h"
@@ -17,12 +16,12 @@
 #include "llvm/Option/Option.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Target/TargetOptions.h"
-
-#include <cassert>
-#include <climits>
-#include <memory>
-#include <string>
-#include <utility>
+#include "stone/Core/LLVM.h"
+#include "stone/Core/Mem.h"
+#include "stone/Driver/Job.h"
+#include "stone/Session/FileType.h"
+#include "stone/Session/Mode.h"
+#include "stone/Session/Options.h"
 
 namespace llvm {
 namespace opt {
@@ -30,11 +29,11 @@ class Arg;
 class ArgList;
 class DerivedArgList;
 
-} // namespace opt
+}  // namespace opt
 namespace vfs {
 class FileSystem;
-} // namespace vfs
-} // namespace llvm
+}  // namespace vfs
+}  // namespace llvm
 
 namespace stone {
 namespace driver {
@@ -49,13 +48,13 @@ class Tool {
   /// The tool chain this tool is a part of.
   const ToolChain &toolChain;
 
-public:
+ public:
   /// Whether the tool is still on the system
   bool isOnSystem;
   /// Whether the tools is obsolete
   bool isObsolete;
 
-protected:
+ protected:
   /// The tool is able to emit ir
   bool canEmitIR;
   /// The tool has a builtin assemble
@@ -63,56 +62,56 @@ protected:
   /// The tool as a builtin linker
   bool hasBuiltinLinker;
 
-public:
+ public:
   Tool(llvm::StringRef fullName, llvm::StringRef shortName,
        const ToolChain &toolChain);
 
-public:
+ public:
   virtual ~Tool();
 
-public:
+ public:
   bool IsOnSystem() { return isOnSystem; }
   bool IsObsolete() { return isObsolete; }
   const ToolChain &GetToolChain() const { return toolChain; }
 };
 
 class ClangTool : public Tool {
-public:
+ public:
   ClangTool(llvm::StringRef fullName, llvm::StringRef shortName,
             const ToolChain &toolChain);
   ~ClangTool();
 };
 
 class StoneTool final : public Tool {
-public:
+ public:
   StoneTool(llvm::StringRef fullName, llvm::StringRef shortName,
             const ToolChain &toolChain);
   ~StoneTool();
 };
 
 class GCCTool final : public Tool {
-public:
+ public:
   GCCTool(llvm::StringRef fullName, llvm::StringRef shortName,
           const ToolChain &toolChain);
   ~GCCTool();
 };
 
 class DynamicLinkTool final : public Tool {
-public:
+ public:
   DynamicLinkTool(llvm::StringRef fullName, llvm::StringRef shortName,
                   const ToolChain &toolChain);
   ~DynamicLinkTool();
 };
 
 class StaticLinkTool final : public Tool {
-public:
+ public:
   StaticLinkTool(llvm::StringRef fullName, llvm::StringRef shortName,
                  const ToolChain &toolChain);
   ~StaticLinkTool();
 };
 
 class AssembleTool final : public Tool {
-public:
+ public:
   AssembleTool(llvm::StringRef fullName, llvm::StringRef shortName,
                const ToolChain &toolChain);
   ~AssembleTool();
@@ -125,13 +124,13 @@ class ToolChain {
   /// A special name used to identify the 'stone' executable itself.
   constexpr static const char *const stoneExecutableName = "stone";
 
-public:
+ public:
   using Paths = llvm::SmallVector<std::string, 16>;
 
-protected:
+ protected:
   ToolChain(const Driver &driver, const llvm::Triple &triple);
 
-private:
+ private:
   /// The list of toolchain specific path prefixes to search for libraries.
   Paths libraryPaths;
 
@@ -141,7 +140,7 @@ private:
   /// The list of toolchain specific path prefixes to search for programs.
   Paths programPaths;
 
-protected:
+ protected:
   /// Tools that stone supports and looks for
   std::unique_ptr<ClangTool> clangTool;
   std::unique_ptr<DynamicLinkTool> staticLinkTool;
@@ -150,7 +149,7 @@ protected:
   std::unique_ptr<GCCTool> gccTool;
   std::unique_ptr<StoneTool> StoneTool;
 
-public:
+ public:
   virtual ~ToolChain() = default;
 
   const Driver &GetDriver() const { return driver; }
@@ -182,7 +181,7 @@ public:
   /// a compiler other than Clang.
   virtual Tool *PickTool(const CompilationActivity &event) const;
 
-public:
+ public:
   virtual Tool *BuildClangTool() const = 0;
   virtual Tool *BuildAssembleTool() const = 0;
   virtual Tool *BuildDynamicLinkTool() const = 0;
@@ -195,12 +194,12 @@ public:
 class DarwinToolChain final : public ToolChain {
   const llvm::Optional<llvm::Triple> &targetVariant;
 
-public:
+ public:
   DarwinToolChain(const Driver &driver, const llvm::Triple &triple,
                   const llvm::Optional<llvm::Triple> &targetVariant);
   ~DarwinToolChain() = default;
 
-public:
+ public:
   Tool *BuildClangTool() const override;
   Tool *BuildAssembleTool() const override;
   Tool *BuildDynamicLinkTool() const override;
@@ -271,6 +270,6 @@ public:
   Tool *GetTool(ModeType modeType) override const;
 };
 */
-} // namespace driver
-} // namespace stone
+}  // namespace driver
+}  // namespace stone
 #endif

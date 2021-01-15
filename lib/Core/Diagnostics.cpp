@@ -15,7 +15,6 @@ bool DiagnosticEngine::HasError() { return false; }
 
 void DiagnosticEngine::AddDiagnostics(
     std::unique_ptr<Diagnostics> diagnostics) {
-
   // diagnostics->diagnosticID  = de.size() + 1;
   // entries.insert(diagnostics->diagnosticID, std::move(diagnostics));
 }

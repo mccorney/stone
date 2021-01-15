@@ -10,7 +10,7 @@ class MemoryBuffer;
 class Module;
 class TargetOptions;
 class TargetMachine;
-} // namespace llvm
+}  // namespace llvm
 
 namespace stone {
 class Context;
@@ -20,7 +20,7 @@ class GenOptions;
 namespace syntax {
 class Module;
 class ASTContext;
-} // namespace syntax
+}  // namespace syntax
 
 namespace analysis {
 class Analysis;
@@ -38,6 +38,6 @@ llvm::Module *GenIR(stone::syntax::Module *moduleDecl,
 
 void OptimizeIR(llvm::Module *llvmModule, const GenOptions &genOpts,
                 llvm::TargetMachine *targetMachine);
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 #endif

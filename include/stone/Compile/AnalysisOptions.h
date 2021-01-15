@@ -4,11 +4,11 @@
 namespace stone {
 namespace analysis {
 class AnalysisOptions final {
-public:
+ public:
   bool wholeModuleCheck = false;
 
-public:
+ public:
 };
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 #endif

@@ -6,12 +6,12 @@ namespace syntax {
 
 class DeclNameLoc {};
 class DeclName {
-public:
+ public:
   // TODO:
   bool IsIdentifier() const { return false; }
   // TODO:
   Identifier *GetAsIdentifier() const {}
 };
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 #endif

@@ -29,7 +29,6 @@ enum class TriviaRetentionMode {
 uint32_t ValidateUTF8CharAndAdvance(const char *&startOfByte, const char *end);
 
 class Lexer final {
-
   const SrcID srcID;
   SrcMgr &sm;
   const stone::Context &ctx;
@@ -73,16 +72,16 @@ class Lexer final {
   /// `TriviaRetentionMode::With`.
   Trivia trailingTrivia;
 
-public:
+ public:
   // Making this public for now
   TriviaRetentionMode triviaRetention;
 
-private:
+ private:
   Lexer(const Lexer &) = delete;
   void operator=(const Lexer &) = delete;
   void Init(unsigned startOffset, unsigned endOffset);
 
-private:
+ private:
   void Lex();
   void LexTrivia(Trivia trivia, bool isTrailing);
   void LexIdentifier();
@@ -95,11 +94,11 @@ private:
 
   tk GetKindOfIdentifier(StringRef tokStr);
 
-public:
+ public:
   Lexer(const SrcID srcID, SrcMgr &sm, const Context &ctx,
         CompilePipeline *pipeline = nullptr);
 
-public:
+ public:
   void Lex(Token &result) {
     Trivia leading, trailing;
     Lex(result, leading, trailing);
@@ -118,6 +117,6 @@ public:
 
   SrcID GetSrcID() { return srcID; }
 };
-} // namespace analysis
-} // namespace stone
+}  // namespace analysis
+}  // namespace stone
 #endif

@@ -7,7 +7,7 @@ namespace stone {
 namespace syntax {
 class ASTContext;
 }
-} // namespace stone
+}  // namespace stone
 
 // Defined in CompilationContext.h
 void *operator new(size_t bytes, const stone::syntax::ASTContext &astCtx,

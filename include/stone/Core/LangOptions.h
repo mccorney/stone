@@ -1,6 +1,9 @@
 #ifndef STONE_CORE_LANGOPTIONS_H
 #define STONE_CORE_LANGOPTIONS_H
 
+#include <string>
+#include <vector>
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Hashing.h"
 #include "llvm/ADT/SmallString.h"
@@ -10,13 +13,11 @@
 #include "llvm/Support/Regex.h"
 #include "llvm/Support/VersionTuple.h"
 #include "llvm/Support/raw_ostream.h"
-#include <string>
-#include <vector>
 
 namespace stone {
 
 class LangOptions final {
-public:
+ public:
   /// The target we are building for.
   ///
   /// This represents the minimum deployment target.
@@ -34,6 +35,6 @@ public:
   llvm::Optional<llvm::Triple> targetVariant;
 };
 
-} // namespace stone
+}  // namespace stone
 
 #endif

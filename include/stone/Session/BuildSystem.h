@@ -3,5 +3,5 @@
 
 namespace stone {
 class BuildSystem final {};
-} // namespace stone
+}  // namespace stone
 #endif

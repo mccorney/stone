@@ -1,11 +1,13 @@
 #ifndef STONE_CORE_TEMPLATEDECL_H
 #define STONE_CORE_TEMPLATEDECL_H
 
-#include "stone/Core/Decl.h"
-#include "stone/Core/DeclName.h"
-#include "stone/Core/Identifier.h"
-#include "stone/Core/LLVM.h"
-#include "stone/Core/SrcLoc.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -16,20 +18,17 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/VersionTuple.h"
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <string>
-#include <type_traits>
-#include <utility>
+#include "stone/Core/Decl.h"
+#include "stone/Core/DeclName.h"
+#include "stone/Core/Identifier.h"
+#include "stone/Core/LLVM.h"
+#include "stone/Core/SrcLoc.h"
 
 namespace stone {
 namespace syntax {
 /// Represents a template argument.
 class TemplateArgument final {
-public:
+ public:
   /// The kind of template argument we're storing.
   enum TemplateArgumentKind {
     /// Represents an empty template argument, e.g., one that has not
@@ -68,21 +67,21 @@ public:
 };
 
 class TemplateArgumentLoc final {
-public:
+ public:
 };
 
 class TemplateName {
-public:
+ public:
 };
 
 class TemplateParameterList {
-public:
+ public:
 };
 
 class TemplateDecl : public NamingDecl {
-public:
+ public:
 };
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 
 #endif

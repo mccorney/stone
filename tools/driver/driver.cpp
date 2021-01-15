@@ -3,7 +3,7 @@
 class InputActivityArgs {};
 
 class InputActivityListener {
-public:
+ public:
   virtual void OnInputEntered(InputActivityArgs &args) = 0;
 };
 

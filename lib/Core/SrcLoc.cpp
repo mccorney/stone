@@ -11,17 +11,18 @@
 //===----------------------------------------------------------------------===//
 
 #include "stone/Core/SrcLoc.h"
+
 #include "stone/Core/LLVM.h"
 //#include "stone/Core/PrettyStackTrace.h"
-#include "stone/Core/SrcMgr.h"
+#include <cassert>
+#include <string>
+#include <utility>
 
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/raw_ostream.h"
-#include <cassert>
-#include <string>
-#include <utility>
+#include "stone/Core/SrcMgr.h"
 
 using namespace stone;
 
@@ -88,7 +89,6 @@ LLVM_DUMP_METHOD void SrcRange::dump(const SrcMgr &SM) const {
 static PresumedLoc PrintDifference(raw_ostream &OS, const SrcMgr &SM,
                                    SrcLoc Loc, PresumedLoc Previous) {
   if (Loc.isSrcID()) {
-
     PresumedLoc PLoc = SM.getPresumedLoc(Loc);
 
     if (PLoc.isInvalid()) {
@@ -116,7 +116,6 @@ static PresumedLoc PrintDifference(raw_ostream &OS, const SrcMgr &SM,
 }
 
 void SrcRange::print(raw_ostream &OS, const SrcMgr &SM) const {
-
   OS << '<';
   auto PrintedLoc = PrintDifference(OS, SM, B, {});
   if (B != E) {
@@ -158,8 +157,7 @@ FullSrcLoc FullSrcLoc::getFileLoc() const {
 }
 
 PresumedLoc FullSrcLoc::getPresumedLoc(bool UseLineDirectives) const {
-  if (!isValid())
-    return PresumedLoc();
+  if (!isValid()) return PresumedLoc();
 
   return srcMgr->getPresumedLoc(*this, UseLineDirectives);
 }
@@ -175,8 +173,7 @@ FullSrcLoc FullSrcLoc::getImmediateMacroCallerLoc() const {
 }
 
 std::pair<FullSrcLoc, StringRef> FullSrcLoc::getModuleImportLoc() const {
-  if (!isValid())
-    return std::make_pair(FullSrcLoc(), StringRef());
+  if (!isValid()) return std::make_pair(FullSrcLoc(), StringRef());
 
   std::pair<SrcLoc, StringRef> ImportLoc = srcMgr->getModuleImportLoc(*this);
   return std::make_pair(FullSrcLoc(ImportLoc.first, *srcMgr), ImportLoc.second);

@@ -1,14 +1,13 @@
 #ifndef STONE_CORE_DECL_H
 #define STONE_CORE_DECL_H
 
-#include "stone/Core/ASTNode.h"
-#include "stone/Core/DeclBits.h"
-#include "stone/Core/DeclKind.h"
-#include "stone/Core/DeclName.h"
-#include "stone/Core/Identifier.h"
-#include "stone/Core/LLVM.h"
-#include "stone/Core/Object.h"
-#include "stone/Core/SrcLoc.h"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <iterator>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -19,14 +18,14 @@
 #include "llvm/Support/Compiler.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/VersionTuple.h"
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <string>
-#include <type_traits>
-#include <utility>
+#include "stone/Core/ASTNode.h"
+#include "stone/Core/DeclBits.h"
+#include "stone/Core/DeclKind.h"
+#include "stone/Core/DeclName.h"
+#include "stone/Core/Identifier.h"
+#include "stone/Core/LLVM.h"
+#include "stone/Core/Object.h"
+#include "stone/Core/SrcLoc.h"
 
 namespace stone {
 namespace syntax {
@@ -39,7 +38,7 @@ class ASTContext;
 class DeclStats final : public Stats {
   const Decl &declaration;
 
-public:
+ public:
   DeclStats(const Decl &declaration) : declaration(declaration) {}
   void Print() const override;
 };
@@ -50,7 +49,7 @@ class alignas(8) Decl : public ASTNode /*TODO: Object */ {
   SrcLoc loc;
   DeclContext *dc;
 
-public:
+ public:
   /*
     enum class Kind : unsigned {
   #define DECL(Id, Parent) Id,
@@ -60,7 +59,7 @@ public:
     };
   */
 
-protected:
+ protected:
   /// Allocate memory for a deserialized declaration.
   ///
   /// This routine must be used to allocate memory for any declaration that is
@@ -77,7 +76,7 @@ protected:
   void *operator new(std::size_t size, const ASTContext &astCtx,
                      DeclContext *parentDeclContext, std::size_t extra = 0);
 
-public:
+ public:
   Decl() = delete;
   Decl(const Decl &) = delete;
   Decl(Decl &&) = delete;
@@ -93,20 +92,20 @@ public:
 
   llvm::PointerUnion<DeclContext *, MultipleDeclContext *> declCtx;
 
-public:
+ public:
   decl::Kind GetKind() { return kind; }
 
-protected:
+ protected:
   Decl(decl::Kind kind, DeclContext *dc, SrcLoc loc)
       : kind(kind), dc(dc), loc(loc) {}
 };
 
 class DeclContext {
-public:
+ public:
   // TODO: Think about
   enum class Kind : unsigned { Module };
 
-protected:
+ protected:
   /// This anonymous union stores the bits belonging to DeclContext and classes
   /// deriving from it. The goal is to use otherwise wasted
   /// space in DeclContext to store data belonging to derived classes.
@@ -143,7 +142,7 @@ protected:
     //              "BlockDeclBitfields is larger than 8 bytes!");
   };
 
-protected:
+ protected:
   /// FirstDecl - The first declaration stored within this declaration
   /// context.
   mutable Decl *firstDecl = nullptr;
@@ -167,11 +166,11 @@ class NamingDecl : public Decl {
   /// constructor, etc.)
   DeclName name;
 
-protected:
+ protected:
   NamingDecl(decl::Kind kind, DeclContext *dc, SrcLoc loc, DeclName name)
       : Decl(kind, dc, loc), name(name) {}
 
-public:
+ public:
   /// Get the identifier that names this declaration, if there is one.
   ///
   /// This will return NULL if this declaration has no name (e.g., for
@@ -190,44 +189,44 @@ public:
 };
 
 class TypeDecl : public NamingDecl {
-public:
+ public:
 };
 
 class ValueDecl : public NamingDecl {
-public:
+ public:
 };
 
 class SpaceDecl : public NamingDecl {
-public:
+ public:
   SpaceDecl(DeclContext *dc, SrcLoc loc, DeclName name)
       : NamingDecl(decl::Kind::Space, dc, loc, name) {}
 };
 
 class DeclaratorDecl : public ValueDecl {
-public:
+ public:
 };
 
 class FunctionDecl : public DeclaratorDecl, public DeclContext {
-public:
+ public:
 };
 
 class FunDecl : public FunctionDecl {
-public:
-public:
+ public:
+ public:
   static FunDecl *Create();
 };
 
 class ConstructorInitializer final {
-public:
+ public:
 };
 
 class ConstructorDecl : public FunctionDecl {
-public:
+ public:
 };
 
 class DestructorDecl : public FunctionDecl {
-public:
+ public:
 };
-} // namespace syntax
-} // namespace stone
+}  // namespace syntax
+}  // namespace stone
 #endif
